@@ -1,5 +1,8 @@
 .next
+.open-next
 node_modules
 out
 .env*
+.dev.vars*
+.wrangler
 .DS_Store
