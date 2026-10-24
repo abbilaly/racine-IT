@@ -1,5 +1,5 @@
-export const ASSET = "https://wpglozin.com/electro/wp-content/uploads/sites/24/2025/05";
-export const PAYMENTS = "https://wpglozin.com/electro/wp-content/uploads/sites/24/2025/03/payment.webp";
+export const ASSET = "/images";
+export const PAYMENTS = "/images/payment.webp";
 
 export type Product = {
   slug: string;

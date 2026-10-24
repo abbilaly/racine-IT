@@ -9,8 +9,8 @@ A React / Next.js storefront recreation based on the public Glozin Electro Pulse
 3. Run `npm run dev`.
 4. Open `http://localhost:3000`.
 
-## Preview approach
+## Assets
 
-The React/Next.js code is original. For this temporary visual preview, selected publicly accessible Glozin Electro Pulse demo assets are referenced remotely where available instead of being copied into this repository. Product names, prices, section titles and store-demo content are temporary preview data and are intended to be replaced with the final store branding and catalogue.
+All imagery (product shots, banners, category tiles, brand logos, the theme logo and the payment-method strip) is stored in this repository under `public/images/`, so the site has no dependency on the reference host at runtime. The files come from the reference demo package supplied by the project owner (`electro.zip`); replace them with the final Racine IT branding and photography before launch.
 
 Reference demo: https://wpglozin.com/electro/
