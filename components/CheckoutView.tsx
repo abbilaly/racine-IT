@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
 import { formatPrice, getProduct, imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
-
-const EXPRESS_FEE = 15;
+import {
+  EXPRESS_FEE,
+  type CreateOrderRequest,
+  type DeliveryMethod,
+  type PaymentMethod
+} from "@/lib/orders";
 
 const PAYMENT_METHODS = [
   { key: "card", label: "Credit / debit card" },
@@ -14,11 +19,16 @@ const PAYMENT_METHODS = [
   { key: "cod", label: "Cash on delivery" }
 ] as const;
 
+type Phase = "form" | "saving" | "done";
+
 export default function CheckoutView() {
-  const { cart, hydrated, cartCount, cartTotal } = useShop();
-  const [delivery, setDelivery] = useState<"standard" | "express">("standard");
-  const [payment, setPayment] = useState<(typeof PAYMENT_METHODS)[number]["key"]>("card");
-  const [placed, setPlaced] = useState(false);
+  const router = useRouter();
+  const { cart, hydrated, cartCount, cartTotal, clearCart } = useShop();
+  const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
+  const [payment, setPayment] = useState<PaymentMethod>("card");
+  const [phase, setPhase] = useState<Phase>("form");
+  const [error, setError] = useState<string | null>(null);
+  const [placedRef, setPlacedRef] = useState<string | null>(null);
 
   if (!hydrated) return <p className="muted-note">Loading checkout…</p>;
 
@@ -26,7 +36,7 @@ export default function CheckoutView() {
     .map(line => ({ line, product: getProduct(line.slug) }))
     .filter(entry => Boolean(entry.product));
 
-  if (lines.length === 0 && !placed) {
+  if (lines.length === 0 && phase === "form") {
     return (
       <div className="empty-state">
         <h2>Nothing to check out</h2>
@@ -39,21 +49,18 @@ export default function CheckoutView() {
   const shipping = delivery === "express" ? EXPRESS_FEE : 0;
   const total = cartTotal + shipping;
 
-  if (placed) {
+  if (phase === "done" && placedRef) {
     return (
       <div className="checkout-done">
         <CheckCircle2 size={38} strokeWidth={1.5} />
-        <h2>This was a demo checkout</h2>
+        <h2>Order {placedRef} saved</h2>
         <p>
-          No payment was taken, no order was submitted and none of your details left this browser —
-          Racine IT has no payment or order backend connected yet.
+          Your order is stored in our order system and we have your delivery details. No payment
+          was taken on this page.
         </p>
-        <p className="muted-note">
-          Your cart is untouched, so you can go back and review it. Card details are never requested
-          on this page.
-        </p>
+        <p className="muted-note">Taking you to your order confirmation…</p>
         <div className="checkout-done-actions">
-          <Link href="/cart" className="btn-dark">Back to cart</Link>
+          <Link href={`/order/${placedRef}`} className="btn-dark">View order</Link>
           <Link href="/shop" className="btn-outline">Continue shopping</Link>
         </div>
       </div>
@@ -64,14 +71,54 @@ export default function CheckoutView() {
     <div className="checkout-layout">
       <form
         className="checkout-form"
-        onSubmit={event => {
+        onSubmit={async event => {
           event.preventDefault();
-          if (!event.currentTarget.checkValidity()) {
-            event.currentTarget.reportValidity();
+          const form = event.currentTarget;
+          if (!form.checkValidity()) {
+            form.reportValidity();
             return;
           }
-          setPlaced(true);
-          window.scrollTo({ top: 0, behavior: "smooth" });
+
+          const data = new FormData(form);
+          const payload: CreateOrderRequest = {
+            items: cart.map(line => ({ slug: line.slug, qty: line.qty })),
+            customer: {
+              firstName: String(data.get("firstName") ?? ""),
+              lastName: String(data.get("lastName") ?? ""),
+              email: String(data.get("email") ?? ""),
+              phone: String(data.get("phone") ?? ""),
+              address: String(data.get("address") ?? ""),
+              city: String(data.get("city") ?? ""),
+              postal: String(data.get("postal") ?? ""),
+              country: String(data.get("country") ?? "")
+            },
+            delivery,
+            payment
+          };
+
+          setPhase("saving");
+          setError(null);
+          try {
+            const response = await fetch("/api/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+            const body = (await response.json().catch(() => ({}))) as { ref?: string; error?: string };
+            if (!response.ok || !body.ref) {
+              setError(body.error ?? "We could not save your order. Please try again.");
+              setPhase("form");
+              return;
+            }
+            setPlacedRef(body.ref);
+            setPhase("done");
+            clearCart();
+            router.push(`/order/${body.ref}`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } catch {
+            setError("We could not reach the store. Check your connection and try again.");
+            setPhase("form");
+          }
         }}
       >
         <fieldset>
@@ -185,9 +232,13 @@ export default function CheckoutView() {
           </p>
         </fieldset>
 
-        <button type="submit" className="btn-dark checkout-submit">Place order · {formatPrice(total)}</button>
+        {error && <p className="checkout-error" role="alert">{error}</p>}
+        <button type="submit" className="btn-dark checkout-submit" disabled={phase === "saving"}>
+          {phase === "saving" ? "Placing your order…" : `Place order · ${formatPrice(total)}`}
+        </button>
         <p className="checkout-hint">
-          Submitting shows a confirmation only. Nothing is ordered, charged or sent anywhere.
+          Your order is saved to our order system. No payment is taken on this page — we confirm
+          payment and delivery with you afterwards, and card details are never requested here.
         </p>
       </form>
 

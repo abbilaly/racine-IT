@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CircleUserRound, GitCompareArrows, Heart, ShoppingBag } from "lucide-react";
+import OrderLookup from "@/components/OrderLookup";
 
 const ENTRIES = [
   {
@@ -67,12 +68,14 @@ export default function AccountPage() {
       </div>
 
       <section className="account-orders">
-        <h2>Order history</h2>
+        <h2>Your orders</h2>
         <p>
-          No orders yet. Orders will appear here once checkout is connected to a payment and
-          fulfilment backend — until then the checkout form is a demo and places no real order.
+          Orders are stored on the server, not just in this browser. Enter the reference from your
+          confirmation page — for example <b>RIT-AB12CD34</b> — to reopen one. There is no sign-in
+          yet, so that reference is what opens the order.
         </p>
-        <Link href="/checkout" className="btn-dark">Go to checkout</Link>
+        <OrderLookup />
+        <Link href="/checkout" className="btn-outline">Go to checkout</Link>
       </section>
 
       <section className="account-support">
