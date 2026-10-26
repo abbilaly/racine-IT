@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Headphones, RotateCcw, Truck } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import MiniProduct from "@/components/MiniProduct";
-import { ASSET, products } from "@/lib/products";
+import { ASSET } from "@/lib/products";
+import { useShop } from "@/lib/shop-store";
 
 const DEMO = "/shop";
 
@@ -42,6 +43,14 @@ const categories: [string, string, string][] = [
 ];
 
 export default function Home() {
+  const { products } = useShop();
+  // The catalogue can change at runtime, so pick by index defensively.
+  const pick = (indexes: number[]) =>
+    indexes
+      .map(i => products[i])
+      .filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const popularPicks = pick([5, 6, 0, 3]);
+  const highlightPicks = pick([11, 9, 6]);
   const [slide, setSlide] = useState(1);
   const [copied, setCopied] = useState(false);
 
@@ -156,10 +165,9 @@ export default function Home() {
         <div className="title-line"><h2>Popular Picks</h2><Link href="/shop">View All <ChevronRight size={15} /></Link></div>
         <div className="popular-grid">
           <div className="popular-products">
-            <MiniProduct product={products[5]} />
-            <MiniProduct product={products[6]} />
-            <MiniProduct product={products[0]} />
-            <MiniProduct product={products[3]} />
+            {popularPicks.map(p => (
+              <MiniProduct product={p} key={p.slug} />
+            ))}
           </div>
           <Link className="wide-promo desert" href="/shop?category=tablets">
             <img src={`${ASSET}/h-electro-pulse-banner-4.webp`} alt="" loading="lazy" />
@@ -214,9 +222,9 @@ export default function Home() {
           </div>
         </div>
         <div className="highlight-products">
-          <MiniProduct product={products[11]} />
-          <MiniProduct product={products[9]} />
-          <MiniProduct product={products[6]} />
+          {highlightPicks.map(p => (
+            <MiniProduct product={p} key={p.slug} />
+          ))}
         </div>
       </section>
 

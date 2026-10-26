@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getProduct } from "@/lib/products";
+import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import {
   DELIVERY_METHODS,
   EXPRESS_FEE,
@@ -207,11 +208,69 @@ type ItemRow = {
 };
 
 /**
- * Validates the request, re-prices every line from the server-side catalogue
- * (client prices are never trusted) and writes the order in one transaction.
+ * Supabase path: re-validate in Postgres through the security-definer
+ * create_order() function, which re-prices every line, locks the inventory
+ * rows it touches and writes order + items + stock in one transaction.
+ */
+async function createOrderSupabase(request: CreateOrderRequest): Promise<CreateOrderResponse> {
+  const supabase = getServiceClient();
+  if (!supabase) {
+    throw new OrderError("The order database is not configured for this environment.", 503);
+  }
+
+  const items = request.items.map(item => ({ slug: item.slug, qty: item.qty }));
+  const { data, error } = await supabase.rpc("create_order", {
+    p_items: items,
+    p_customer: request.customer,
+    p_delivery: request.delivery,
+    p_payment: request.payment,
+    p_note: request.note ?? null
+  });
+
+  if (error || !data) {
+    if (error?.code === "RC001") {
+      const conflict = /left of|no longer available|currently unavailable|temporarily unavailable/i.test(
+        error.message
+      );
+      throw new OrderError(error.message, conflict ? 409 : 400);
+    }
+    console.error("Supabase create_order failed", error);
+    throw new OrderError("We could not save your order. Please try again.", 503);
+  }
+
+  const result = data as {
+    ref: string;
+    id: string;
+    item_count: number;
+    subtotal: number;
+    shipping: number;
+    total: number;
+    created_at: string;
+  };
+
+  return {
+    ref: result.ref,
+    id: result.id,
+    itemCount: result.item_count,
+    subtotal: result.subtotal,
+    shipping: result.shipping,
+    total: result.total,
+    createdAt: result.created_at
+  };
+}
+
+/**
+ * Validates the request, then writes it through Supabase (or the legacy D1
+ * store when Supabase is not configured). Client prices are never trusted:
+ * both paths price every line from the server-side catalogue.
  */
 export async function createOrder(raw: unknown): Promise<CreateOrderResponse> {
   const request = parseOrderRequest(raw);
+  if (isSupabaseConfigured()) return createOrderSupabase(request);
+  return createOrderWithD1(request);
+}
+
+async function createOrderWithD1(request: CreateOrderRequest): Promise<CreateOrderResponse> {
   const db = getDb();
   await ensureSchema(db);
 
@@ -283,10 +342,72 @@ export async function createOrder(raw: unknown): Promise<CreateOrderResponse> {
   return { ref, id, itemCount, subtotal, shipping, total, createdAt };
 }
 
+async function getOrderFromSupabase(ref: string): Promise<StoredOrder | null> {
+  const supabase = getServiceClient();
+  if (!supabase) {
+    throw new OrderError("The order database is not configured for this environment.", 503);
+  }
+
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("ref", ref)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Supabase order lookup failed", error);
+    throw new OrderError("We could not load that order right now.", 503);
+  }
+  if (!data) return null;
+
+  const rows = (data.order_items ?? []) as {
+    slug: string;
+    title: string;
+    unit_price: number;
+    qty: number;
+    line_total: number;
+  }[];
+
+  return {
+    id: data.id,
+    ref: data.ref,
+    status: data.status,
+    itemCount: data.item_count,
+    subtotal: data.subtotal,
+    shipping: data.shipping,
+    total: data.total,
+    createdAt: data.created_at,
+    delivery: data.delivery,
+    payment: data.payment,
+    note: data.note ?? null,
+    customer: {
+      firstName: data.first_name,
+      lastName: data.last_name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      city: data.city,
+      postal: data.postal,
+      country: data.country
+    },
+    items: rows.map(row => ({
+      slug: row.slug,
+      title: row.title,
+      unitPrice: row.unit_price,
+      qty: row.qty,
+      lineTotal: row.line_total
+    }))
+  };
+}
+
 export async function getOrder(rawRef: string): Promise<StoredOrder | null> {
   const ref = normaliseRef(rawRef);
   if (!/^RIT-[A-Z0-9]{8}$/.test(ref)) return null;
+  if (isSupabaseConfigured()) return getOrderFromSupabase(ref);
+  return getOrderFromD1(ref);
+}
 
+async function getOrderFromD1(ref: string): Promise<StoredOrder | null> {
   const db = getDb();
   await ensureSchema(db);
 

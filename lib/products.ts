@@ -18,15 +18,49 @@ export type Product = {
   specs: [string, string][];
 };
 
+export type CategoryOption = { key: string; label: string };
+
+/** Shipping and checkout settings, sourced from public.store_settings when Supabase is connected. */
+export type StoreSettings = {
+  storeName: string;
+  currency: string;
+  /** Express delivery fee in dollars. */
+  expressShipping: number;
+  /** Standard delivery fee in dollars. */
+  standardShipping: number;
+  checkoutEnabled: boolean;
+};
+
+export const DEFAULT_SETTINGS: StoreSettings = {
+  storeName: "Racine IT",
+  currency: "USD",
+  expressShipping: 15,
+  standardShipping: 0,
+  checkoutEnabled: true
+};
+
+/** Everything the storefront renders from: products, categories and store settings. */
+export type Catalog = {
+  products: Product[];
+  categories: CategoryOption[];
+  settings: StoreSettings;
+};
+
 export const CATEGORIES = [
   { key: "phones", label: "Phones/Mobile" },
   { key: "laptops", label: "Macbook/PCs" },
   { key: "tablets", label: "Tablets/Ipad Pro" },
   { key: "audio", label: "Audio/Headphones" },
-  { key: "wearables", label: "Watches/Wearables" },
+  { key: "wearables", label: "Watches/Wearables" }
 ] as const;
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];
+
+/** The same list in the shape the catalogue layer uses. */
+export const SEED_CATEGORIES: CategoryOption[] = CATEGORIES.map(c => ({
+  key: c.key,
+  label: c.label
+}));
 
 export const products: Product[] = [
   {
@@ -341,6 +375,18 @@ export const productMap: Record<string, Product> = Object.fromEntries(
   products.map(p => [p.slug, p])
 );
 
+/**
+ * The offline catalogue baked into the app. It is used until Supabase is
+ * configured (and as the seed for supabase/seed.sql).
+ */
+export function seedCatalog(): Catalog {
+  return {
+    products: products.map(p => ({ ...p })),
+    categories: SEED_CATEGORIES.map(c => ({ ...c })),
+    settings: { ...DEFAULT_SETTINGS }
+  };
+}
+
 export function getProduct(slug: string): Product | undefined {
   return productMap[slug];
 }
@@ -349,20 +395,27 @@ export function categoryLabel(key: string): string {
   return CATEGORIES.find(c => c.key === key)?.label ?? "All Products";
 }
 
+/** Category lookup against an explicit catalogue (used by server-rendered pages). */
+export function labelFor(categories: readonly CategoryOption[], key: string): string {
+  return categories.find(c => c.key === key)?.label ?? "All Products";
+}
+
 export function formatPrice(value: number): string {
   return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function imageUrl(file: string): string {
+  if (!file) return "";
+  if (/^(https?:)?\/\//.test(file) || file.startsWith("/")) return file;
   return `${ASSET}/${file}`;
 }
 
 /** Text search across title, category and short description. */
-export function searchProducts(query: string): Product[] {
+export function searchProducts(list: readonly Product[], query: string): Product[] {
   const q = query.trim().toLowerCase();
-  if (!q) return products;
+  if (!q) return [...list];
   const terms = q.split(/\s+/);
-  return products.filter(p => {
+  return list.filter(p => {
     const haystack = `${p.title} ${p.category} ${p.short} ${categoryLabel(p.category)}`.toLowerCase();
     return terms.every(t => haystack.includes(t));
   });

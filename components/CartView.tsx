@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
-import { formatPrice, getProduct, imageUrl } from "@/lib/products";
+import { formatPrice, imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function CartView() {
-  const { cart, hydrated, setQty, removeFromCart, cartCount, cartTotal } = useShop();
+  const { cart, hydrated, setQty, removeFromCart, cartCount, cartTotal, getProduct } = useShop();
 
   if (!hydrated) return <p className="muted-note">Loading your cart…</p>;
 

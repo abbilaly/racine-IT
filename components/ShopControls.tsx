@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CATEGORIES, SORT_OPTIONS, type SortKey } from "@/lib/products";
+import { SORT_OPTIONS, type SortKey } from "@/lib/products";
+import { useShop } from "@/lib/shop-store";
 
 type Props = {
   q: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function ShopControls({ q, category, sort, total }: Props) {
   const router = useRouter();
+  const { categories } = useShop();
 
   const go = (next: Partial<{ q: string; category: string; sort: SortKey }>) => {
     const params = new URLSearchParams();
@@ -29,7 +31,7 @@ export default function ShopControls({ q, category, sort, total }: Props) {
         <button className={category === "" ? "is-on" : ""} onClick={() => go({ category: "" })}>
           All Products
         </button>
-        {CATEGORIES.map(c => (
+        {categories.map(c => (
           <button
             key={c.key}
             className={category === c.key ? "is-on" : ""}

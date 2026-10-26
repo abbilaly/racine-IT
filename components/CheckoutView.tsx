@@ -4,14 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
-import { formatPrice, getProduct, imageUrl } from "@/lib/products";
+import { formatPrice, imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
-import {
-  EXPRESS_FEE,
-  type CreateOrderRequest,
-  type DeliveryMethod,
-  type PaymentMethod
-} from "@/lib/orders";
+import type { CreateOrderRequest, DeliveryMethod, PaymentMethod } from "@/lib/orders";
 
 const PAYMENT_METHODS = [
   { key: "card", label: "Credit / debit card" },
@@ -23,7 +18,7 @@ type Phase = "form" | "saving" | "done";
 
 export default function CheckoutView() {
   const router = useRouter();
-  const { cart, hydrated, cartCount, cartTotal, clearCart } = useShop();
+  const { cart, hydrated, cartCount, cartTotal, clearCart, getProduct, settings } = useShop();
   const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
   const [payment, setPayment] = useState<PaymentMethod>("card");
   const [phase, setPhase] = useState<Phase>("form");
@@ -46,7 +41,7 @@ export default function CheckoutView() {
     );
   }
 
-  const shipping = delivery === "express" ? EXPRESS_FEE : 0;
+  const shipping = delivery === "express" ? settings.expressShipping : 0;
   const total = cartTotal + shipping;
 
   if (phase === "done" && placedRef) {
@@ -206,8 +201,7 @@ export default function CheckoutView() {
             <span>
               <strong>Express delivery</strong>
               <small>1–2 business days, tracked</small>
-            </span>
-            <b>{formatPrice(EXPRESS_FEE)}</b>
+            </span>                    <b>{formatPrice(settings.expressShipping)}</b>
           </label>
         </fieldset>
 

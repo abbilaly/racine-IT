@@ -1,13 +1,8 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ShopControls from "@/components/ShopControls";
-import {
-  SORT_OPTIONS,
-  categoryLabel,
-  searchProducts,
-  sortProducts,
-  type SortKey
-} from "@/lib/products";
+import { SORT_OPTIONS, labelFor, searchProducts, sortProducts, type SortKey } from "@/lib/products";
+import { loadCatalog } from "@/lib/server/catalog";
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -27,7 +22,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const sortRaw = first(sp.sort) as SortKey;
   const sort = SORT_OPTIONS.some(o => o.key === sortRaw) ? sortRaw : "featured";
 
-  let list = searchProducts(q);
+  const catalog = await loadCatalog();
+  const categoryLabel = (key: string) => labelFor(catalog.categories, key);
+
+  let list = searchProducts(catalog.products, q);
   if (category) list = list.filter(p => p.category === category);
   list = sortProducts(list, sort);
 

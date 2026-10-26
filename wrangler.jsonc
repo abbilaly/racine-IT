@@ -8,6 +8,13 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // No d1_databases here on purpose: the deployed racine-it Worker has never
+  // had a D1 binding, and with SUPABASE_* secrets set the app reads/writes
+  // orders through Supabase (create_order / getOrder), so D1 is only a
+  // fallback. The placeholder database_id that used to live here would make
+  // `wrangler deploy` fail. Add a real database_id only if you actually bind
+  // an existing D1 database to this Worker.
+  // "d1_databases": [{ "binding": "DB", "database_name": "...", "database_id": "<real-uuid>" }]
   "observability": {
     "enabled": true
   }

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import { categoryLabel, formatPrice, getProduct, imageUrl } from "@/lib/products";
+import { formatPrice, imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function CompareTable() {
-  const { compare, hydrated, toggleCompare, clearCompare, addToCart } = useShop();
+  const { compare, hydrated, toggleCompare, clearCompare, addToCart, getProduct, categoryLabel } =
+    useShop();
 
   if (!hydrated) return <p className="muted-note">Loading comparison…</p>;
 

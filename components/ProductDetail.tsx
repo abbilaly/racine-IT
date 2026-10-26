@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { GitCompareArrows, Heart, Minus, Plus, ShoppingCart, Truck } from "lucide-react";
-import { categoryLabel, formatPrice, imageUrl, type Product } from "@/lib/products";
+import { formatPrice, imageUrl, type Product } from "@/lib/products";
 import { MAX_COMPARE, useShop } from "@/lib/shop-store";
 
 export default function ProductDetail({ product }: { product: Product }) {
@@ -12,7 +12,8 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const [showBar, setShowBar] = useState(false);
   const buyRef = useRef<HTMLDivElement>(null);
-  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, compare } = useShop();
+  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, compare, categoryLabel } =
+    useShop();
 
   useEffect(() => {
     setMain(product.image);

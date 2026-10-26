@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { getProduct } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function WishlistGrid() {
-  const { wishlist, hydrated } = useShop();
+  const { wishlist, hydrated, getProduct } = useShop();
 
   if (!hydrated) {
     return <p className="muted-note">Loading your saved items…</p>;

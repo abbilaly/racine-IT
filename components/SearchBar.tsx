@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
-import { categoryLabel, formatPrice, imageUrl, searchProducts } from "@/lib/products";
+import { formatPrice, imageUrl } from "@/lib/products";
+import { useShop } from "@/lib/shop-store";
 
 const MAX_SUGGESTIONS = 6;
 
 export default function SearchBar() {
   const router = useRouter();
+  const { searchProducts, categoryLabel } = useShop();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -18,11 +20,11 @@ export default function SearchBar() {
 
   const results = useMemo(
     () => (query.trim() ? searchProducts(query).slice(0, MAX_SUGGESTIONS) : []),
-    [query]
+    [query, searchProducts]
   );
   const totalCount = useMemo(
     () => (query.trim() ? searchProducts(query).length : 0),
-    [query]
+    [query, searchProducts]
   );
   // rows: suggestion links first, then the "view all" row
   const rowCount = results.length + (query.trim() ? 1 : 0);

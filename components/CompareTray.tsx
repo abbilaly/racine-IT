@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import { getProduct, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
 import { MAX_COMPARE, useShop } from "@/lib/shop-store";
 
 export default function CompareTray() {
-  const { compare, hydrated, toggleCompare, clearCompare } = useShop();
+  const { compare, hydrated, toggleCompare, clearCompare, getProduct } = useShop();
   if (!hydrated || compare.length === 0) return null;
 
   const items = compare.map(getProduct).filter(Boolean);

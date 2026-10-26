@@ -12,7 +12,7 @@ import {
   type ReactNode
 } from "react";
 import { ChevronRight, X } from "lucide-react";
-import { CATEGORIES } from "@/lib/products";
+import { useShop } from "@/lib/shop-store";
 
 type MenuContextValue = { open: boolean; setOpen: (value: boolean) => void; toggle: () => void };
 
@@ -43,6 +43,7 @@ const QUICK_LINKS: { label: string; href: string }[] = [
 
 export function MobileMenu() {
   const { open, setOpen } = useMobileMenu();
+  const { categories } = useShop();
   const pathname = usePathname();
   const closeBtn = useRef<HTMLButtonElement>(null);
 
@@ -93,7 +94,7 @@ export function MobileMenu() {
 
           <p className="menu-group-label">Product Categories</p>
           <ul className="menu-cats">
-            {CATEGORIES.map(cat => (
+            {categories.map(cat => (
               <li key={cat.key}>
                 <Link href={`/shop?category=${cat.key}`} tabIndex={open ? 0 : -1}>
                   {cat.label}

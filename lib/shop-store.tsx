@@ -9,7 +9,14 @@ import {
   useState,
   type ReactNode
 } from "react";
-import { getProduct } from "./products";
+import {
+  DEFAULT_SETTINGS,
+  seedCatalog,
+  type Catalog,
+  type CategoryOption,
+  type Product,
+  type StoreSettings
+} from "./products";
 
 export const MAX_COMPARE = 4;
 const STORAGE_KEY = "racine-shop-v1";
@@ -23,6 +30,13 @@ type ShopState = {
   compare: string[];
   cartCount: number;
   cartTotal: number;
+  /** Products from the database (or the seed catalogue when Supabase is off). */
+  products: Product[];
+  categories: CategoryOption[];
+  settings: StoreSettings;
+  getProduct: (slug: string) => Product | undefined;
+  categoryLabel: (key: string) => string;
+  searchProducts: (query: string) => Product[];
   addToCart: (slug: string, qty?: number) => void;
   setQty: (slug: string, qty: number) => void;
   removeFromCart: (slug: string) => void;
@@ -56,7 +70,13 @@ function readStored(): Persisted {
   }
 }
 
-export function ShopProvider({ children }: { children: ReactNode }) {
+export function ShopProvider({
+  catalog,
+  children
+}: {
+  catalog?: Catalog;
+  children: ReactNode;
+}) {
   const [state, setState] = useState<Persisted>(EMPTY);
   const [hydrated, setHydrated] = useState(false);
 
@@ -111,9 +131,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const toggleCompare = useCallback((slug: string) => {
     setState(prev => {
-      if (prev.compare.includes(slug)) {
-        return { ...prev, compare: prev.compare.filter(s => s !== slug) };
-      }
+      if (prev.compare.includes(slug)) return { ...prev, compare: prev.compare.filter(s => s !== slug) };
       if (prev.compare.length >= MAX_COMPARE) return prev;
       return { ...prev, compare: [...prev.compare, slug] };
     });
@@ -121,17 +139,44 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const clearCompare = useCallback(() => setState(prev => ({ ...prev, compare: [] })), []);
 
+  const activeCatalog = useMemo(() => catalog ?? seedCatalog(), [catalog]);
+
+  const catalogueLookups = useMemo(() => {
+    const bySlug = new Map(activeCatalog.products.map(p => [p.slug, p]));
+    const labelByKey = new Map(activeCatalog.categories.map(c => [c.key, c.label]));
+    return {
+      bySlug,
+      labelByKey,
+      search: (query: string) => {
+        const q = query.trim().toLowerCase();
+        if (!q) return activeCatalog.products;
+        const terms = q.split(/\s+/);
+        return activeCatalog.products.filter(p => {
+          const haystack = `${p.title} ${p.category} ${p.short} ${labelByKey.get(p.category) ?? ""}`.toLowerCase();
+          return terms.every(t => haystack.includes(t));
+        });
+      }
+    };
+  }, [activeCatalog]);
+
   const value = useMemo<ShopState>(() => {
+    const getProduct = (slug: string) => catalogueLookups.bySlug.get(slug);
     const cartCount = state.cart.reduce((n, l) => n + l.qty, 0);
     const cartTotal = state.cart.reduce((sum, l) => {
-      const p = getProduct(l.slug);
-      return p ? sum + p.price * l.qty : sum;
+      const product = getProduct(l.slug);
+      return product ? sum + product.price * l.qty : sum;
     }, 0);
     return {
       hydrated,
       ...state,
       cartCount,
       cartTotal,
+      products: activeCatalog.products,
+      categories: activeCatalog.categories,
+      settings: activeCatalog.settings ?? DEFAULT_SETTINGS,
+      getProduct,
+      categoryLabel: key => catalogueLookups.labelByKey.get(key) ?? "All Products",
+      searchProducts: catalogueLookups.search,
       addToCart,
       setQty,
       removeFromCart,
@@ -145,6 +190,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }, [
     state,
     hydrated,
+    activeCatalog,
+    catalogueLookups,
     addToCart,
     setQty,
     removeFromCart,

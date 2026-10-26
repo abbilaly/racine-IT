@@ -3,17 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductDetail from "@/components/ProductDetail";
 import ProductCard from "@/components/ProductCard";
-import { categoryLabel, getProduct, products } from "@/lib/products";
+import { labelFor } from "@/lib/products";
+import { loadCatalog } from "@/lib/server/catalog";
 
 type Params = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return products.map(p => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const catalog = await loadCatalog();
+  return catalog.products.map(p => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const catalog = await loadCatalog();
+  const product = catalog.products.find(p => p.slug === slug);
   if (!product) return { title: "Product not found — Racine IT" };
   return {
     title: `${product.title} — Racine IT`,
@@ -23,14 +26,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Params) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const catalog = await loadCatalog();
+  const product = catalog.products.find(p => p.slug === slug);
   if (!product) notFound();
 
-  const sameCategory = products.filter(
+  const categoryLabel = (key: string) => labelFor(catalog.categories, key);
+  const sameCategory = catalog.products.filter(
     p => p.category === product.category && p.slug !== product.slug
   );
-  const related = [...sameCategory, ...products.filter(p => p.category !== product.category)]
-    .slice(0, 5);
+  const related = [
+    ...sameCategory,
+    ...catalog.products.filter(p => p.category !== product.category)
+  ].slice(0, 5);
 
   return (
     <main className="site-shell page">
