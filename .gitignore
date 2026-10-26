@@ -15,3 +15,7 @@ out
 tsconfig.tsbuildinfo
 artifacts/
 freebuff-sites-build/
+
+.verify/
+*.pid
+*.zip
