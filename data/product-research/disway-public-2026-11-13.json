@@ -1,0 +1,319 @@
+{
+  "dataset": "AB Tech supplier product research — public listings",
+  "version": 1,
+  "researchDate": "2026-11-13",
+  "supplier": {
+    "name": "Disway",
+    "country": "Morocco",
+    "website": "https://www.disway.com",
+    "entityNote": "Disway is an IT/electronics distributor based in Casablanca. AB Tech has no documented reseller or partnership agreement with Disway; nothing in this dataset implies one.",
+    "access": {
+      "publicCatalogue": true,
+      "publicPrices": false,
+      "priceAccessNote": "Public category pages list product names, model references and specifications, but no prices. The site states that all prices are excl. tax and directs resellers to request an account before the catalogue and pricing are available.",
+      "scraping": "Only public, unauthenticated pages were read. No reseller account was used and no access control was bypassed."
+    }
+  },
+  "fieldRules": {
+    "price": "Never estimated. 'requires_confirmation' means no public price exists and AB Tech must obtain a quote before listing a retail price.",
+    "availability": "Listed as 'unverified' unless the supplier publishes stock state on a public page. Public pages expose no stock quantity.",
+    "specs": "Only specifications printed on the public listing. Fields the listing does not state are null, not inferred.",
+    "images": "No image URLs are recorded: the supplier's product photography is not licensed for reuse here. AB Tech must supply its own or licensed images."
+  },
+  "products": [
+    {
+      "id": "disway-samsung-galaxy-a07",
+      "name": "SAMSUNG SMARTPHONE Galaxy A07",
+      "brand": "Samsung",
+      "model": "SM-A075FZGDMWD",
+      "category": "smartphones",
+      "subcategory": "Android smartphone",
+      "specs": {
+        "display": "6.7\"",
+        "chipset": "MediaTek",
+        "ram": "4 GB",
+        "storage": "64 GB",
+        "network": "4G dual SIM",
+        "frontCamera": "8 MP",
+        "rearCamera": "50 MP",
+        "os": "Android",
+        "colour": "Green",
+        "warranty": "12 months (as stated on listing)"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-asus-va249hg",
+      "name": "ASUS Monitor VA249HG 24-inch",
+      "brand": "ASUS",
+      "model": "90LM02W0-B01171",
+      "category": "monitors",
+      "subcategory": "24-inch monitor",
+      "specs": {
+        "screenSize": "24 inch",
+        "warranty": "12 months (as stated on listing)"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-hp-150a-toner",
+      "name": "HP 150A Black Original LaserJet Toner Cartridge",
+      "brand": "HP",
+      "model": "W1500A",
+      "category": "printers",
+      "subcategory": "Printer consumable",
+      "specs": {
+        "colour": "Black",
+        "technology": "LaserJet"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-samsung-25w-charger",
+      "name": "SAMSUNG 25W wall charger C-to-C",
+      "brand": "Samsung",
+      "model": "EP-T2510XBEGWW",
+      "category": "peripherals",
+      "subcategory": "Phone charger",
+      "specs": {
+        "power": "25 W",
+        "connector": "USB-C to USB-C"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-huawei-qsfp-40g",
+      "name": "HUAWEI QSFP+ 40G High Speed Direct",
+      "brand": "Huawei",
+      "model": "4X41Q27244",
+      "category": "networking",
+      "subcategory": "Network transceiver",
+      "specs": {
+        "formFactor": "QSFP+",
+        "speed": "40G"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-hp-usbc-multiport-hub",
+      "name": "HP Universal USB-C Multiport Hub",
+      "brand": "HP",
+      "model": "50H55UT",
+      "category": "peripherals",
+      "subcategory": "USB-C hub",
+      "specs": {
+        "interface": "USB-C",
+        "warranty": "12 months (as stated on listing)"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/",
+        "type": "public product promotion"
+      }
+    },
+    {
+      "id": "disway-samsung-tab-s11-ultra-keyboard",
+      "name": "SAMSUNG Tab S11 Ultra Book Cover Keyboard [Slim] QWERTY",
+      "brand": "Samsung",
+      "model": "EF-DX930UBEGWW",
+      "category": "tablets",
+      "subcategory": "Tablet accessory",
+      "specs": {
+        "layout": "QWERTY",
+        "compatibility": "Galaxy Tab S11 Ultra",
+        "type": "Book cover keyboard (slim)"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/tablette-telephonie",
+        "type": "public category listing"
+      }
+    },
+    {
+      "id": "disway-samsung-tab-s9-privacy-screen",
+      "name": "Samsung Privacy Screen for Galaxy Tab S9",
+      "brand": "Samsung",
+      "model": "EF-NX712PBEGWW",
+      "category": "tablets",
+      "subcategory": "Tablet accessory",
+      "specs": {
+        "compatibility": "Galaxy Tab S9",
+        "type": "Privacy screen"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/tablette-telephonie",
+        "type": "public category listing"
+      }
+    },
+    {
+      "id": "disway-mobilis-screen-protector-5-3-5-5",
+      "name": "MOBILIS Screen Protector Tempered Glass Clear 9H Universal Smartphone 5.3-5.5\"",
+      "brand": "Mobilis",
+      "model": "016649",
+      "category": "peripherals",
+      "subcategory": "Screen protector",
+      "specs": {
+        "hardness": "9H",
+        "finish": "Clear",
+        "fit": "Universal 5.3-5.5 inch"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/tablette-telephonie",
+        "type": "public category listing"
+      }
+    },
+    {
+      "id": "disway-mobilis-car-phone-kit-mini",
+      "name": "Mobilis U.FIX Universal Car Phone Kit mini",
+      "brand": "Mobilis",
+      "model": "016648-adjacent listing; exact reference must be confirmed",
+      "category": "peripherals",
+      "subcategory": "Car mount",
+      "specs": {
+        "type": "Universal car phone kit"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/tablette-telephonie",
+        "type": "public category listing"
+      }
+    },
+    {
+      "id": "disway-logitech-tap-ip",
+      "name": "LOGITECH Tap IP — Graphite",
+      "brand": "Logitech",
+      "model": "939-001950",
+      "category": "multimedia",
+      "subcategory": "Conference room controller",
+      "specs": {
+        "colour": "Graphite",
+        "type": "Conference room touch controller"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.com/tablette-telephonie",
+        "type": "public category listing"
+      }
+    },
+    {
+      "id": "disway-asus-zenbook-a14",
+      "name": "ASUS Zenbook A14 Snapdragon X X126100 14\" OLED WUXGA",
+      "brand": "ASUS",
+      "model": "Zenbook A14 (X126100)",
+      "category": "computers",
+      "subcategory": "Laptop",
+      "specs": {
+        "processor": "Snapdragon X X126100",
+        "display": "14 inch OLED WUXGA"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.tn/",
+        "type": "public product promotion",
+        "note": "Listed by Disway Tunisie, a separate Disway entity from Disway Maroc. Confirm which entity AB Tech would buy from before listing."
+      }
+    },
+    {
+      "id": "disway-hp-15-fc0181nk",
+      "name": "HP 15-fc0181nk Ryzen 5-7520U 15.6 FHD 8GB 512GB FreeDOS",
+      "brand": "HP",
+      "model": "15-fc0181nk",
+      "category": "computers",
+      "subcategory": "Laptop",
+      "specs": {
+        "processor": "AMD Ryzen 5 7520U",
+        "display": "15.6 inch FHD",
+        "ram": "8 GB",
+        "storage": "512 GB",
+        "os": "FreeDOS",
+        "colour": "Natural Silver",
+        "warranty": "1 year (as stated on listing)"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.tn/",
+        "type": "public product promotion",
+        "note": "Listed by Disway Tunisie, a separate Disway entity from Disway Maroc."
+      }
+    },
+    {
+      "id": "disway-lenovo-e310-earbuds",
+      "name": "Lenovo E310 True Wireless Stereo Earbuds (White)",
+      "brand": "Lenovo",
+      "model": "GXD1Q65145",
+      "category": "multimedia",
+      "subcategory": "Earbuds",
+      "specs": {
+        "type": "True wireless stereo earbuds",
+        "colour": "White"
+      },
+      "price": { "status": "requires_confirmation", "currency": null, "amount": null },
+      "availability": "unverified",
+      "image": null,
+      "source": {
+        "page": "https://www.disway.tn/",
+        "type": "public product promotion",
+        "note": "Listed by Disway Tunisie, a separate Disway entity from Disway Maroc."
+      }
+    }
+  ],
+  "notVerifiedInThisPass": {
+    "suppliers": ["JouTech", "TechPro", "NT Revolution"],
+    "reason": "No publicly accessible product catalogue with citable listings was retrieved for these suppliers in this research pass, so no rows were created for them. Producing rows from memory or inference would fabricate specification and pricing data.",
+    "nextStep": "Confirm which of these are actual AB Tech supply channels and obtain either a public catalogue URL or a price list the business is permitted to use."
+  },
+  "catalogueReadiness": {
+    "records": 14,
+    "recordsWithPublicPrice": 0,
+    "recordsWithImages": 0,
+    "blockingDecision": "Every price is 'requires_confirmation' because the distributor publishes none publicly. AB Tech must decide whether to show these products with a 'price on request' state or hold them until trade pricing is obtained."
+  }
+}

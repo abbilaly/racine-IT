@@ -7,7 +7,7 @@ import {
   type Product,
   type StoreSettings
 } from "@/lib/products";
-import { getServiceClient } from "@/lib/supabase/server";
+import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 /**
  * Catalogue access for server-rendered pages.
@@ -63,6 +63,13 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
   if (!supabase) return null;
 
   const [categoriesRes, productsRes, imagesRes, inventoryRes, settingsRes] = await Promise.all([
+    // TODO(0007): category visibility is filtered in PostgreSQL once
+    // `categories.is_active` exists (migration 0007_categories_taxonomy.sql).
+    // The column is NOT in the current production schema, and PostgREST rejects
+    // the whole query with 42703 when an unknown column is filtered on, so the
+    // filter cannot be sent yet. Every category is therefore visible for the
+    // MVP; restore `.eq("is_active", true)` here only after 0007 is applied and
+    // verified. `products.is_active` (0001) is unaffected and still filtered.
     supabase.from("categories").select("slug,label,position").order("position"),
     supabase
       .from("products")
@@ -134,13 +141,50 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
   return { products, categories, settings: toSettings(settingsRes.data) };
 }
 
-/** Catalogue for the current request (deduplicated by React `cache`). */
+/**
+ * Catalogue for the current request (deduplicated by React `cache`).
+ *
+ * Failure policy:
+ *  - Supabase not configured (local preview / demo): the seeded catalogue in
+ *    `lib/products.ts` is the intended source of truth. Nothing is wrong.
+ *  - Supabase configured, query fails (missing column, network, RLS, outage):
+ *    the request FAILS instead of quietly serving seed products. Selling from
+ *    stale prices and stock is worse than showing an honest "temporarily
+ *    unavailable" page, and a silent fallback also hides outages from
+ *    operators — which is exactly how a broken catalogue shipped unnoticed.
+ *    The thrown error is generic; details stay in the server log and in the
+ *    error digest.
+ */
 export const loadCatalog = cache(async function loadCatalog(): Promise<Catalog> {
+  if (!isSupabaseConfigured()) {
+    return seedCatalog();
+  }
+
   try {
     const catalogue = await fetchCatalogFromSupabase();
     if (catalogue) return catalogue;
   } catch (error) {
-    console.error("Supabase catalogue unavailable — serving the seeded catalogue instead.", error);
+    console.error(
+      "Catalogue database unavailable — refusing to serve seed data.",
+      error instanceof Error ? error.message : error
+    );
+    throw new Error("catalogue-unavailable");
   }
-  return seedCatalog();
+
+  // Supabase is configured but returned no catalogue: treat as a failure too.
+  console.error("Catalogue database returned no data — refusing to serve seed data.");
+  throw new Error("catalogue-unavailable");
 });
+
+/**
+ * Guard for catalogue-backed pages that do not need the data themselves (their
+ * views read the catalogue from the client store). Awaiting this makes the page
+ * fail visibly when the database is unavailable instead of quietly rendering the
+ * seed catalogue as if it were current stock and pricing.
+ *
+ * React `cache` memoises the rejection for the rest of the request, so this is
+ * cheap even when the root layout has already tried (and handled) the same read.
+ */
+export async function requireCatalog(): Promise<Catalog> {
+  return loadCatalog();
+}

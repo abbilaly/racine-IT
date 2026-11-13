@@ -2,40 +2,47 @@
 
 import { useRouter } from "next/navigation";
 import { SORT_OPTIONS, type SortKey } from "@/lib/products";
+import { shopHref, type ShopState } from "@/lib/shop-params";
 import { useShop } from "@/lib/shop-store";
 
 type Props = {
-  q: string;
-  category: string;
-  sort: SortKey;
+  state: ShopState;
   total: number;
 };
 
-export default function ShopControls({ q, category, sort, total }: Props) {
+/**
+ * Shop toolbar: category pills and sorting.
+ *
+ * Every navigation is built from the full shop state, so changing the category
+ * or the sort order keeps the active brand/price/technical filters instead of
+ * silently dropping them. Changing either resets pagination to page 1.
+ */
+export default function ShopControls({ state, total }: Props) {
   const router = useRouter();
   const { categories } = useShop();
 
-  const go = (next: Partial<{ q: string; category: string; sort: SortKey }>) => {
-    const params = new URLSearchParams();
-    const merged = { q, category, sort, ...next };
-    if (merged.q) params.set("q", merged.q);
-    if (merged.category) params.set("category", merged.category);
-    if (merged.sort && merged.sort !== "featured") params.set("sort", merged.sort);
-    const qs = params.toString();
-    router.replace(`/shop${qs ? `?${qs}` : ""}`, { scroll: false });
+  const navigate = (next: Partial<ShopState>) => {
+    router.replace(shopHref({ ...state, ...next, page: 1 }), { scroll: false });
   };
 
   return (
     <div className="shop-toolbar">
       <div className="shop-cats" role="group" aria-label="Filter by category">
-        <button className={category === "" ? "is-on" : ""} onClick={() => go({ category: "" })}>
+        <button
+          type="button"
+          className={state.category === "" ? "is-on" : ""}
+          aria-pressed={state.category === ""}
+          onClick={() => navigate({ category: "" })}
+        >
           All Products
         </button>
         {categories.map(c => (
           <button
             key={c.key}
-            className={category === c.key ? "is-on" : ""}
-            onClick={() => go({ category: c.key })}
+            type="button"
+            className={state.category === c.key ? "is-on" : ""}
+            aria-pressed={state.category === c.key}
+            onClick={() => navigate({ category: c.key })}
           >
             {c.label}
           </button>
@@ -47,8 +54,8 @@ export default function ShopControls({ q, category, sort, total }: Props) {
         <label>
           Sort by
           <select
-            value={sort}
-            onChange={e => go({ sort: e.target.value as SortKey })}
+            value={state.sort}
+            onChange={e => navigate({ sort: e.target.value as SortKey })}
             aria-label="Sort products"
           >
             {SORT_OPTIONS.map(o => (

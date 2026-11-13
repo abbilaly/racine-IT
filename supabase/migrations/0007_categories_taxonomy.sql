@@ -30,12 +30,13 @@
 -- Both paths converge on the SAME 16 rows (same ids, slugs, labels, positions,
 -- active flags): 14 active + 2 inactive. Only created_at differs.
 --
--- MODE RECORD: the resolved mode, baselines and timestamp are written to
---   public._migration_0007_state
--- which the rollback script READS and verifies. It is RLS-enabled with no
--- policies and revoked from PUBLIC/anon/authenticated, so it is invisible to
--- the API while remaining queryable by an operator. The rollback never guesses
--- the mode; if the marker is missing it aborts.
+-- MODE RECORD: the resolved mode, baselines, timestamp and exact
+--   pre-migration category snapshot are written to
+--   public._migration_0007_state, which the rollback script READS and verifies
+--   instead of its own compiled-in literals. It is RLS-enabled with no
+--   policies and revoked from PUBLIC/anon/authenticated/service_role, so it is
+--   invisible to the API while remaining queryable by an operator. The
+--   rollback never guesses the mode; if the marker is missing it aborts.
 --
 -- ROLLBACK: supabase/rollback/0007_categories_taxonomy_rollback.sql
 --   Run MANUALLY with psql. That directory is NOT scanned for migrations, so
@@ -65,20 +66,46 @@ BEGIN
   END IF;
 END $$;
 
--- 0b. Durable mode record (written below, read by the rollback).
+-- 0b. Durable mode + pre-migration snapshot record. Written exactly once, by
+--     this migration, before anything is modified; read by the rollback, which
+--     restores the rows recorded here instead of comparing against literals.
 CREATE TABLE public._migration_0007_state (
   id                     boolean     PRIMARY KEY DEFAULT true CHECK (id),
   mode                   text        NOT NULL CHECK (mode IN ('production', 'fresh')),
   applied_at             timestamptz NOT NULL DEFAULT now(),
-  categories_before      integer     NOT NULL,
-  products_before        integer     NOT NULL,
-  active_products_before integer     NOT NULL
+  categories_before      integer     NOT NULL CHECK (categories_before >= 0),
+  products_before        integer     NOT NULL CHECK (products_before >= 0),
+  active_products_before integer     NOT NULL CHECK (active_products_before >= 0),
+  -- [{id, slug, label, position, created_at}] exactly as they were before this
+  -- migration modified anything, ordered by id. created_at is canonical UTC text,
+  -- so comparison does not depend on the session TimeZone.
+  snapshot               jsonb       NOT NULL,
+  snapshot_md5           text        NOT NULL CHECK (snapshot_md5 ~ '^[0-9a-f]{32}$'),
+  CONSTRAINT _migration_0007_state_snapshot_shape CHECK (
+    jsonb_typeof(snapshot) = 'array' AND (
+      (
+        mode = 'fresh'
+        AND categories_before = 0
+        AND products_before = 0
+        AND active_products_before = 0
+        AND snapshot = '[]'::jsonb
+      )
+      OR
+      (
+        mode = 'production'
+        AND categories_before = 5
+        AND jsonb_array_length(snapshot) = 5
+      )
+    )
+  ),
+  CONSTRAINT _migration_0007_state_snapshot_digest CHECK (snapshot_md5 = md5(snapshot::text))
 );
 
 COMMENT ON TABLE public._migration_0007_state IS
-  'Which installation mode migration 0007 ran in. Read and verified by 0007_categories_taxonomy_rollback.sql. Dropped by that rollback.';
+  'Mode and exact pre-migration category rows recorded by migration 0007. Write-once; read and verified by 0007_categories_taxonomy_rollback.sql, which drops it.';
 
--- Lock it down: no API access. Service role bypasses RLS; nobody else sees it.
+-- Lock it down: no API access. Service role bypasses RLS; nobody else sees it,
+-- so revoke it explicitly as well.
 ALTER TABLE public._migration_0007_state ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public._migration_0007_state FROM PUBLIC;
 DO $$
@@ -89,31 +116,75 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
     EXECUTE 'REVOKE ALL ON TABLE public._migration_0007_state FROM authenticated';
   END IF;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+    EXECUTE 'REVOKE ALL ON TABLE public._migration_0007_state FROM service_role';
+  END IF;
 END $$;
 
--- 0c. Resolve and record the mode.
+-- The record is write-once. An UPDATE, DELETE or TRUNCATE is either a bug or a
+-- tamper attempt: the rollback only reads this table and then drops it.
+CREATE OR REPLACE FUNCTION public._migration_0007_state_write_once()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RAISE EXCEPTION 'public._migration_0007_state is write-once (attempted %)', TG_OP;
+END;
+$$;
+REVOKE ALL ON FUNCTION public._migration_0007_state_write_once() FROM PUBLIC;
+
+DROP TRIGGER IF EXISTS _migration_0007_state_write_once ON public._migration_0007_state;
+CREATE TRIGGER _migration_0007_state_write_once
+  BEFORE UPDATE OR DELETE ON public._migration_0007_state
+  FOR EACH ROW EXECUTE FUNCTION public._migration_0007_state_write_once();
+
+DROP TRIGGER IF EXISTS _migration_0007_state_no_truncate ON public._migration_0007_state;
+CREATE TRIGGER _migration_0007_state_no_truncate
+  BEFORE TRUNCATE ON public._migration_0007_state
+  FOR EACH STATEMENT EXECUTE FUNCTION public._migration_0007_state_write_once();
+
+-- 0c. Resolve the mode, and capture the exact pre-migration category rows.
 DO $$
 DECLARE
   v_categories integer;
   v_products   integer;
   v_active     integer;
   v_src_ok     boolean;
+  v_snapshot   jsonb;
 BEGIN
   SELECT count(*) INTO v_categories FROM public.categories;
   SELECT count(*) INTO v_products   FROM public.products;
   SELECT count(*) INTO v_active     FROM public.products WHERE is_active = true;
 
+  -- Captured here, before section 2/3 mutate anything, so this is the genuine
+  -- pre-migration state of whichever database this ran against. created_at is
+  -- stored as canonical UTC text; comparing a timestamptz as jsonb would render
+  -- according to the session TimeZone.
+  SELECT coalesce(jsonb_agg(jsonb_build_object(
+           'id',         c.id,
+           'slug',       c.slug,
+           'label',      c.label,
+           'position',   c.position,
+           'created_at', to_char(c.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
+         ) ORDER BY c.id), '[]'::jsonb)
+    INTO v_snapshot
+    FROM public.categories c;
+
   -- Fresh database: nothing exists yet (migrations run before seed.sql).
   IF v_categories = 0 AND v_products = 0 THEN
-    INSERT INTO public._migration_0007_state (mode, categories_before, products_before, active_products_before)
-      VALUES ('fresh', 0, 0, 0);
+    INSERT INTO public._migration_0007_state
+      (mode, categories_before, products_before, active_products_before, snapshot, snapshot_md5)
+      VALUES ('fresh', 0, 0, 0, v_snapshot, md5(v_snapshot::text));
     RETURN;
   END IF;
 
-  -- Production snapshot: exactly the 5 verified rows and nothing else.
+  -- Production snapshot: exactly the 5 verified rows and nothing else. This gate
+  -- deliberately ignores created_at, so a staging clone with different
+  -- created_at values still qualifies.
   IF v_categories = 5 THEN
     SELECT bool_and(
-      (id, slug, label, coalesce(position, 0)) IN (
+      (id, slug, label, position) IN (
         ('d68104ff-a80e-4281-a8a1-8189cd423c2c', 'phones',    'Phones/Mobile',     0),
         ('84d6206c-c5f0-48ce-8bd6-f653e4a78ba7', 'laptops',   'Macbook/PCs',       1),
         ('fd414ab7-0ef6-443f-a7f0-fb1a7234deed', 'tablets',   'Tablets/Ipad Pro',  2),
@@ -127,8 +198,9 @@ BEGIN
       RAISE EXCEPTION 'migration 0007 precondition FAILED: the 5 existing categories do not match the verified snapshot (id/slug/label/position)';
     END IF;
 
-    INSERT INTO public._migration_0007_state (mode, categories_before, products_before, active_products_before)
-      VALUES ('production', v_categories, v_products, v_active);
+    INSERT INTO public._migration_0007_state
+      (mode, categories_before, products_before, active_products_before, snapshot, snapshot_md5)
+      VALUES ('production', v_categories, v_products, v_active, v_snapshot, md5(v_snapshot::text));
     RETURN;
   END IF;
 

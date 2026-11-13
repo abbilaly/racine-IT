@@ -73,3 +73,16 @@ export async function getAdminApiSession(): Promise<AdminSession | null> {
 export function adminClient(session: AdminSession): SupabaseClient {
   return createUserClient(session.accessToken);
 }
+
+/**
+ * Compatibility aliases used by the Email Center admin APIs. They resolve to
+ * the same RLS-scoped client as `adminClient`, so authorization behaviour is
+ * unchanged.
+ */
+export function getAdminClient(session: AdminSession): SupabaseClient {
+  return adminClient(session);
+}
+
+export function createAdminClient(session: AdminSession): SupabaseClient {
+  return adminClient(session);
+}

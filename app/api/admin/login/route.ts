@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, ADMIN_COOKIE_MAX_AGE } from "@/lib/server/admin-auth";
 import { getAuthClient, getServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { RATE_LIMITS, checkRateLimit, rateLimitResponse } from "@/lib/server/rate-limit";
 
 type Body = { email?: unknown; password?: unknown };
 
 export async function POST(request: Request) {
+  const limit = checkRateLimit(request, RATE_LIMITS.adminSignIn);
+  if (!limit.ok) return rateLimitResponse(limit);
+
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
       { error: "Supabase is not configured for this environment yet." },

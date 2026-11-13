@@ -1,12 +1,16 @@
 import Link from "next/link";
 import CompareTable from "@/components/CompareTable";
+import { requireCatalog } from "@/lib/server/catalog";
 
 export const metadata = {
-  title: "Compare — Racine IT",
+  title: "Compare — AB Tech",
   description: "Compare up to four products side by side."
 };
 
-export default function ComparePage() {
+export default async function ComparePage() {
+  // Catalogue-backed page: fail visibly rather than comparing seed specs.
+  await requireCatalog();
+
   return (
     <main className="site-shell page">
       <nav className="breadcrumbs" aria-label="Breadcrumb">

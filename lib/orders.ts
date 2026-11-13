@@ -43,6 +43,7 @@ export type StoredOrderItem = {
   unitPrice: number;
   qty: number;
   lineTotal: number;
+  variantName?: string | null;
 };
 
 export type StoredOrder = CreateOrderResponse & {

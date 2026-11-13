@@ -1,139 +1,153 @@
-import Link from "next/link";
+import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
+import { getOrderDetail, listAdminNotes } from "@/lib/server/admin-data";
 import { notFound } from "next/navigation";
-import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
-import { formatCents } from "@/lib/orders";
-import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import Link from "next/link";
+import { ArrowLeft, Package, User, Mail, Phone, MapPin, Calendar, FileText, AlertCircle, CheckCircle, Clock, XCircle, RefreshCw, Eye } from "lucide-react";
+import { AdminEmptyState, AdminBadgeStatus } from "@/lib/server/admin-ui";
+import { OrderStatusForm } from "./OrderStatusForm";
+import { OrderNotes } from "./OrderNotes";
+import { OrderItems } from "./OrderItems";
+import { deliveryLabel, paymentLabel } from "@/lib/server/orders";
+import { formatCents } from "@/lib/server/admin-data";
 
 export const dynamic = "force-dynamic";
 
-type ItemRow = {
-  slug: string;
-  title: string;
-  variant_name: string | null;
-  unit_price: number;
-  qty: number;
-  line_total: number;
-  snapshot: Record<string, unknown> | null;
-};
-
-type OrderDetail = {
-  id: string;
-  ref: string;
-  status: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  postal: string;
-  country: string;
-  delivery: string;
-  payment: string;
-  note: string | null;
-  item_count: number;
-  subtotal: number;
-  shipping: number;
-  total: number;
-  created_at: string;
-  order_items: ItemRow[];
-};
-
-export default async function AdminOrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const { data, error } = await db
-    .from("orders")
-    .select("*, order_items(*)")
-    .eq("id", id)
-    .maybeSingle();
+  const order = await getOrderDetail(db, params.id);
+  if (!order) notFound();
 
-  if (error) {
-    return (
-      <div className="admin-page">
-        <div className="empty-state">
-          <h2>The order could not be loaded</h2>
-          <p>{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-  if (!data) notFound();
-
-  const order = data as unknown as OrderDetail;
-  const items = [...order.order_items].sort((a, b) => a.title.localeCompare(b.title));
+  const notes = await listAdminNotes(db, "orders", params.id, { page: 1, limit: 50 });
 
   return (
     <div className="admin-page">
-      <div className="page-heading">
-        <div>
-          <h1>Order {order.ref}</h1>
-          <p>
-            Placed {new Date(order.created_at).toLocaleString("en-US", {
-              dateStyle: "medium",
-              timeStyle: "short"
-            })}
-          </p>
+      <div className="admin-page-header">
+        <Link href="/admin/orders" className="admin-back-link">
+          <ArrowLeft size={16} />
+          Back to orders
+        </Link>
+        <div className="admin-page-title">
+          <h1>Order detail</h1>
+          <p className="admin-page-subtitle">{order.ref}</p>
         </div>
-        <div className="admin-order-status">
-          <OrderStatusSelect id={order.id} value={order.status} />
+        <div className="admin-page-actions">
+          <Link href={`/admin/orders/${params.id}/email-preview`} className="btn-outline">
+            <Eye size={16} />
+            Email preview
+          </Link>
+          <Link href={`/admin/orders/${params.id}/status`} className="btn-outline">
+            <RefreshCw size={16} />
+            Update status
+          </Link>
+          <OrderStatusForm orderId={params.id} currentStatus={order.status} />
         </div>
       </div>
 
-      <div className="admin-order-grid">
-        <section className="admin-panel">
-          <div className="admin-panel-head"><h2>Items</h2></div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Unit</th>
-                <th scope="col">Qty</th>
-                <th scope="col">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={`${item.slug}-${item.title}`}>
-                  <td>
-                    <strong>{item.title}</strong>
-                    <small className="admin-sub">
-                      /product/{item.slug}
-                      {item.variant_name ? ` · ${item.variant_name}` : ""}
-                    </small>
-                    <small className="admin-sub">
-                      snapshot saved: {String((item.snapshot as { title?: string })?.title ?? "yes")}
-                    </small>
-                  </td>
-                  <td>{formatCents(item.unit_price)}</td>
-                  <td>{item.qty}</td>
-                  <td>{formatCents(item.line_total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <dl className="admin-totals">
-            <div><dt>Subtotal</dt><dd>{formatCents(order.subtotal)}</dd></div>
-            <div><dt>Shipping · {order.delivery === "express" ? "Express" : "Standard"}</dt><dd>{order.shipping === 0 ? "FREE" : formatCents(order.shipping)}</dd></div>
-            <div><dt>Payment</dt><dd>{order.payment.toUpperCase()}</dd></div>
-            <div className="admin-total"><dt>Total</dt><dd>{formatCents(order.total)}</dd></div>
+      <div className="admin-grid">
+        <section className="admin-card admin-card--wide">
+          <div className="admin-card-header">
+            <h2>Order summary</h2>
+            <div className="admin-order-meta">
+              <span className="admin-order-meta-item">
+                <Calendar size={14} />
+                {new Date(order.created_at).toLocaleString()}
+              </span>
+              <span className="admin-order-meta-item">
+                <Package size={14} />
+                {order.item_count} {order.item_count === 1 ? "item" : "items"}
+              </span>
+            </div>
+          </div>
+
+          <dl className="admin-definition-list admin-definition-list--inline">
+            <div className="admin-definition-row">
+              <dt>Status</dt>
+              <dd><AdminBadgeStatus status={order.status} /></dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Payment</dt>
+              <dd>{paymentLabel(order.payment)}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Delivery</dt>
+              <dd>{deliveryLabel(order.delivery)}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Subtotal</dt>
+              <dd>{order.subtotal ? formatCents(order.subtotal) : "—"}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Shipping</dt>
+              <dd>{order.shipping ? formatCents(order.shipping) : "—"}</dd>
+            </div>
+            <div className="admin-definition-row admin-definition-row--total">
+              <dt>Total</dt>
+              <dd><strong>{formatCents(order.total)}</strong></dd>
+            </div>
           </dl>
         </section>
 
-        <section className="admin-panel">
-          <div className="admin-panel-head"><h2>Customer</h2></div>
-          <address className="admin-address">
-            <strong>{order.first_name} {order.last_name}</strong><br />
-            {order.address}<br />
-            {order.city}, {order.postal}<br />
-            {order.country}<br /><br />
-            {order.email}<br />
-            {order.phone}
-          </address>
-          {order.note && <p className="order-note">“{order.note}”</p>}
-          <Link href="/admin/orders" className="admin-back">← All orders</Link>
+        <section className="admin-card admin-card--wide">
+          <div className="admin-card-header">
+            <h2>Items</h2>
+          </div>
+          <OrderItems items={order.order_items} />
+        </section>
+
+        <section className="admin-card">
+          <div className="admin-card-header">
+            <h2>Customer</h2>
+          </div>
+          <dl className="admin-definition-list">
+            <div className="admin-definition-row">
+              <dt><User size={14} /> Name</dt>
+              <dd>{order.first_name} {order.last_name}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt><Mail size={14} /> Email</dt>
+              <dd><a href={`mailto:${order.email}`} className="admin-link">{order.email}</a></dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt><Phone size={14} /> Phone</dt>
+              <dd>{order.phone || "—"}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt><MapPin size={14} /> Address</dt>
+              <dd>
+                {order.address}<br></br>
+                {order.city}, {order.postal}<br></br>
+                {order.country}
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="admin-card">
+          <div className="admin-card-header">
+            <h2>Notes</h2>
+            <OrderNotes orderId={params.id} />
+          </div>
+          {notes.rows.length > 0 ? (
+            <div className="admin-notes-list">
+              {notes.rows.map((note) => (
+                <div key={note.id} className="admin-note">
+                  <div className="admin-note-header">
+                    <span className="admin-note-author">{note.author_email || "System"}</span>
+                    <span className="admin-note-date">{new Date(note.created_at).toLocaleString()}</span>
+                  </div>
+                  <p className="admin-note-body">{note.note}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <AdminEmptyState
+              icon={<FileText size={24} />}
+              title="No notes yet"
+              description="Add internal notes about this order."
+            />
+          )}
         </section>
       </div>
     </div>

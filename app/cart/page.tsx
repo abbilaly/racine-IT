@@ -1,12 +1,17 @@
 import Link from "next/link";
 import CartView from "@/components/CartView";
+import { requireCatalog } from "@/lib/server/catalog";
 
 export const metadata = {
-  title: "Cart — Racine IT",
+  title: "Cart — AB Tech",
   description: "Review the items in your cart before checkout."
 };
 
-export default function CartPage() {
+export default async function CartPage() {
+  // Catalogue-backed page: without this the shell's seed fallback would show
+  // stale prices as if they were current.
+  await requireCatalog();
+
   return (
     <main className="site-shell page">
       <nav className="breadcrumbs" aria-label="Breadcrumb">

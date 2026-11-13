@@ -1,91 +1,142 @@
+import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
+import { getProductDetail, listStockAdjustments, formatCents } from "@/lib/server/admin-data";
 import { notFound } from "next/navigation";
-import ProductForm, { type AdminProduct } from "@/components/admin/ProductForm";
-import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import Image from "next/image";
+import { AdminSpinner, AdminEmptyState, AdminBadgeStatus, AdminTable, AdminPagination, AdminSearchInput } from "@/lib/server/admin-ui";
+import Link from "next/link";
+import { ArrowLeft, Package, ArrowUpDown, Edit2, Trash2, Plus, History } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-type Row = {
-  id: string;
-  slug: string;
-  title: string;
-  short_description: string;
-  description: string[] | null;
-  specs: { name: string; value: string }[] | null;
-  price_cents: number;
-  compare_at_price_cents: number | null;
-  badge: string | null;
-  is_active: boolean;
-  category: unknown;
-  product_images: { path: string; kind: string }[];
-  inventory: { on_hand: number; variant_id: string | null }[];
-};
-
-export default async function EditProductPage({
-  params
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default async function AdminProductDetailPage({ params }: { params: { id: string } }) {
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const [productRes, categoriesRes] = await Promise.all([
-    db
-      .from("products")
-      .select(
-        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,is_active,category:categories(slug),product_images(path,kind),inventory(on_hand,variant_id)"
-      )
-      .eq("id", id)
-      .maybeSingle(),
-    db.from("categories").select("slug,label").order("position")
-  ]);
+  const product = await getProductDetail(db, params.id);
+  if (!product) notFound();
 
-  if (productRes.error) {
-    return (
-      <div className="admin-page">
-        <div className="empty-state">
-          <h2>The product could not be loaded</h2>
-          <p>{productRes.error.message}</p>
-        </div>
-      </div>
-    );
-  }
-  if (!productRes.data) notFound();
-
-  const row = productRes.data as unknown as Row;
-  const relation = Array.isArray(row.category) ? row.category[0] : row.category;
-  const primary = row.product_images.find(image => image.kind === "primary")?.path ?? null;
-  const stock = row.inventory
-    .filter(line => line.variant_id === null)
-    .reduce((sum, line) => sum + line.on_hand, 0);
-
-  const initial: AdminProduct = {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    categorySlug: (relation as { slug?: string } | null)?.slug ?? "",
-    price: row.price_cents / 100,
-    compareAtPrice: row.compare_at_price_cents == null ? null : row.compare_at_price_cents / 100,
-    badge: row.badge,
-    short: row.short_description,
-    description: row.description ?? [],
-    specs: (row.specs ?? []).map(spec => [spec.name, spec.value] as [string, string]),
-    stock,
-    isActive: row.is_active,
-    imagePath: primary
-  };
-
-  const categories = (categoriesRes.data ?? []).map(c => ({ key: c.slug, label: c.label }));
+  const stockHistory = await listStockAdjustments(db, params.id, { page: 1, limit: 20 });
 
   return (
     <div className="admin-page">
-      <div className="page-heading">
-        <div>
+      <div className="admin-page-header">
+        <Link href="/admin/products" className="admin-back-link">
+          <ArrowLeft size={16} />
+          Back to products
+        </Link>
+        <div className="admin-page-title">
           <h1>Edit product</h1>
-          <p>{row.title}</p>
+          <p className="admin-page-subtitle">{product.title}</p>
+        </div>
+        <div className="admin-page-actions">
+          <Link href={`/admin/products/${params.id}/edit`} className="btn-dark">
+            <Edit2 size={16} />
+            Edit product
+          </Link>
+          <Link href={`/admin/products/${params.id}/images`} className="btn-outline">
+            <Package size={16} />
+            Manage images
+          </Link>
         </div>
       </div>
-      <ProductForm categories={categories} initial={initial} />
+
+      <div className="admin-grid">
+        <section className="admin-card">
+          <div className="admin-card-header">
+            <h2>Current stock</h2>
+            <Link href={`/admin/products/${params.id}/stock`} className="admin-card-link">
+              View full history
+            </Link>
+          </div>
+          <div className="admin-stock-summary">
+            <div className="admin-stock-value">
+              <Package size={24} />
+              <span>{product.stock.toLocaleString()}</span>
+              <span className="admin-stock-label">units on hand</span>
+            </div>
+            {product.stock === 0 && (
+              <div className="admin-stock-alert">
+                <span className="admin-badge admin-badge--danger">Out of stock</span>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="admin-card">
+          <div className="admin-card-header">
+            <h2>Pricing</h2>
+          </div>
+          <dl className="admin-definition-list">
+            <div className="admin-definition-row">
+              <dt>Selling price</dt>
+              <dd>${formatCents(product.price_cents)}</dd>
+            </div>
+            {product.compare_at_price_cents != null && (
+              <div className="admin-definition-row">
+                <dt>Compare-at price</dt>
+                <dd>${formatCents(product.compare_at_price_cents)}</dd>
+              </div>
+            )}
+            {product.badge && (
+              <div className="admin-definition-row">
+                <dt>Badge</dt>
+                <dd><AdminBadgeStatus status={product.badge} /></dd>
+              </div>
+            )}
+          </dl>
+        </section>
+
+        <section className="admin-card admin-card--wide">
+          <div className="admin-card-header">
+            <h2>Stock movement history</h2>
+            <Link href={`/admin/products/${params.id}/stock`} className="admin-card-link">
+              View all
+            </Link>
+          </div>
+          {stockHistory.rows.length === 0 ? (
+            <AdminEmptyState title="No stock adjustments yet" description="Adjustments you make through the product page will appear here." />
+          ) : (
+            <AdminTable
+              columns={[
+                { key: "created_at", label: "Date" },
+                { key: "change", label: "Change", render: (row) => <span className={`admin-stock-change ${row.change > 0 ? "positive" : "negative"}`}>{row.change > 0 ? "+" : ""}{row.change}</span> },
+                { key: "reason", label: "Reason" },
+                { key: "note", label: "Note" },
+              ]}
+              rows={stockHistory.rows.slice(0, 20)}
+              emptyMessage="No stock adjustments yet"
+            />
+          )}
+        </section>
+
+        <section className="admin-card admin-card--wide">
+          <div className="admin-card-header">
+            <h2>Details</h2>
+          </div>
+          <dl className="admin-definition-list admin-definition-list--stacked">
+            <div className="admin-definition-row">
+              <dt>Slug</dt>
+              <dd><code>{product.slug}</code></dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Category</dt>
+              <dd>{product.category ? (
+                <Link href={`/admin/products?category=${product.category.slug}`}>{product.category.label}</Link>
+              ) : (
+                <span className="admin-muted">Uncategorized</span>
+              )}</dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Status</dt>
+              <dd><AdminBadgeStatus status={product.is_active ? "active" : "hidden"} /></dd>
+            </div>
+            <div className="admin-definition-row">
+              <dt>Created</dt>
+              <dd>{new Date(product.created_at).toLocaleString()}</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,12 @@ type Params = { params: Promise<{ ref: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { ref } = await params;
-  return { title: `Order ${normaliseRef(ref)} — Racine IT` };
+  // Order pages contain a customer's name, address, phone and email. Keep them
+  // out of search indexes and off referrer headers.
+  return {
+    title: `Order ${normaliseRef(ref)} — AB Tech`,
+    robots: { index: false, follow: false }
+  };
 }
 
 export default async function OrderPage({ params }: Params) {

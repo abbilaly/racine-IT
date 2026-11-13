@@ -93,7 +93,7 @@ export default function CartView() {
           <strong>{formatPrice(cartTotal)}</strong>
         </div>
         <Link href="/checkout" className="btn-dark cart-checkout">Proceed to Checkout</Link>
-        <p className="cart-note"><Truck size={14} /> Free worldwide shipping and 15-day returns.</p>
+        <p className="cart-note"><Truck size={14} /> Delivery options and costs are confirmed at checkout.</p>
       </aside>
     </div>
   );

@@ -25,9 +25,9 @@
 --                           marker. It does NOT leave five categories behind.
 --
 -- Because the migration never deletes and never recreates a category row,
--- created_at is inherently preserved in production mode (rows were updated in
--- place), and no UUID changes in either direction, so no foreign key or
--- external reference can break.
+-- no UUID changes in either direction, so no foreign key or external reference
+-- can break. Production restoration and verification use the exact
+-- pre-migration snapshot recorded by migration 0007, including created_at.
 --
 -- Everything runs inside ONE DO block so that a single BEGIN/COMMIT gives full
 -- atomicity across both branches, and so the branch is chosen at runtime from
@@ -37,10 +37,14 @@ BEGIN;
 
 DO $$
 DECLARE
-  v_mode  text;
-  v_n     integer;
-  v_ok    boolean;
-  v_bad   text;
+  v_mode        text;
+  v_n           integer;
+  v_ok          boolean;
+  v_bad         text;
+  v_snapshot    jsonb;
+  v_digest      text;
+  v_actual      jsonb;
+  v_rows_before integer;
 BEGIN
   -- ---------------------------------------------------------------------
   -- P. Locate and verify the mode record. No guessing, no defaults.
@@ -69,6 +73,51 @@ BEGIN
     RAISE EXCEPTION 'rollback 0007 precondition FAILED: categories.is_active does not exist, so migration 0007 is not applied (recorded mode %)', v_mode;
   END IF;
 
+  -- Verify the recorded pre-migration snapshot before using it for restoration.
+  SELECT snapshot, snapshot_md5 INTO v_snapshot, v_digest
+    FROM public._migration_0007_state;
+
+  IF md5(v_snapshot::text) <> v_digest THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: the recorded snapshot no longer matches its digest — the mode record was altered after migration 0007 wrote it. Refusing to restore from it.';
+  END IF;
+
+  IF jsonb_typeof(v_snapshot) <> 'array' THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: recorded snapshot is not a JSON array (found %)', jsonb_typeof(v_snapshot);
+  END IF;
+
+  IF v_mode = 'production' AND jsonb_array_length(v_snapshot) <> 5 THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: production mode requires a five-row snapshot, found % row(s)', jsonb_array_length(v_snapshot);
+  END IF;
+
+  IF v_mode = 'fresh' AND v_snapshot <> '[]'::jsonb THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: fresh mode recorded a non-empty snapshot — the record is internally inconsistent.';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+      FROM jsonb_array_elements(v_snapshot) AS s(item)
+     WHERE jsonb_typeof(s.item) <> 'object'
+        OR NOT (s.item ?& array['id','slug','label','position','created_at'])
+        OR (s.item->>'id')         IS NULL
+        OR (s.item->>'id')         !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        OR (s.item->>'position')   IS NULL
+        OR (s.item->>'position')   !~ '^-?[0-9]{1,9}$'
+        OR (s.item->>'created_at') IS NULL
+        OR (s.item->>'created_at') !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z$'
+        OR (s.item->>'slug')       IS NULL
+        OR btrim(s.item->>'slug')  = ''
+        OR (s.item->>'label')      IS NULL
+        OR btrim(s.item->>'label') = ''
+  ) THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: the recorded snapshot has a malformed row; expected id, slug, label, non-NULL position and canonical UTC created_at for every entry.';
+  END IF;
+
+  IF (SELECT count(DISTINCT s.item->>'id')
+        FROM jsonb_array_elements(v_snapshot) AS s(item))
+     <> jsonb_array_length(v_snapshot) THEN
+    RAISE EXCEPTION 'rollback 0007 precondition FAILED: the recorded snapshot contains duplicate ids.';
+  END IF;
+
   -- =====================================================================
   -- BRANCH 1: PRODUCTION
   -- =====================================================================
@@ -85,45 +134,20 @@ BEGIN
       RAISE EXCEPTION 'rollback 0007 precondition FAILED: expected 2 inactive categories before reversing, found %', v_n;
     END IF;
 
-    -- R1. Reactivate the two preserved rows and restore their ORIGINAL
-    --     positions. The ids were never deleted, so this is a flag flip plus a
-    --     position move back from the parked 15/16 to 2/3.
-    UPDATE public.categories c
-       SET is_active = true,
-           position  = v.position
-      FROM (VALUES
-        ('fd414ab7-0ef6-443f-a7f0-fb1a7234deed'::uuid, 2),   -- tablets: 15 -> 2
-        ('5857c9ab-c554-4c15-bb3d-b88b4ebc2b8d'::uuid, 3)    -- audio:   16 -> 3
-      ) AS v(id, position)
-     WHERE c.id = v.id;
+    -- R1. Restore every recorded row from the snapshot: slug, label, position
+    --     and active flag. No literal id, label or position appears here, so
+    --     this restores whatever 0007 actually found, including created_at
+    --     values that differ from production.
+    UPDATE public.categories AS c
+       SET slug      = s.item->>'slug',
+           label     = s.item->>'label',
+           position  = (s.item->>'position')::integer,
+           is_active = true
+      FROM jsonb_array_elements(v_snapshot) AS s(item)
+     WHERE c.id = (s.item->>'id')::uuid;
     GET DIAGNOSTICS v_n = ROW_COUNT;
-    IF v_n <> 2 THEN
-      RAISE EXCEPTION 'rollback 0007 step R1 FAILED: reactivated/parked % rows, expected 2 (tablets, audio)', v_n;
-    END IF;
-
-    -- R2. Relabel the 3 reused rows back. Ids and created_at are untouched.
-    UPDATE public.categories
-       SET slug = 'phones', label = 'Phones/Mobile', position = 0
-     WHERE id = 'd68104ff-a80e-4281-a8a1-8189cd423c2c';
-    GET DIAGNOSTICS v_n = ROW_COUNT;
-    IF v_n <> 1 THEN
-      RAISE EXCEPTION 'rollback 0007 step R2-1 FAILED: reverted % smartphones rows, expected 1', v_n;
-    END IF;
-
-    UPDATE public.categories
-       SET slug = 'laptops', label = 'Macbook/PCs', position = 1
-     WHERE id = '84d6206c-c5f0-48ce-8bd6-f653e4a78ba7';
-    GET DIAGNOSTICS v_n = ROW_COUNT;
-    IF v_n <> 1 THEN
-      RAISE EXCEPTION 'rollback 0007 step R2-2 FAILED: reverted % computers rows, expected 1', v_n;
-    END IF;
-
-    UPDATE public.categories
-       SET label = 'Watches/Wearables', position = 4
-     WHERE id = 'c69827ba-1c33-4dd6-993e-ecc34cca9702';
-    GET DIAGNOSTICS v_n = ROW_COUNT;
-    IF v_n <> 1 THEN
-      RAISE EXCEPTION 'rollback 0007 step R2-3 FAILED: reverted % wearables rows, expected 1', v_n;
+    IF v_n <> jsonb_array_length(v_snapshot) THEN
+      RAISE EXCEPTION 'rollback 0007 step R1 FAILED: restored % row(s) from the snapshot, expected %. The record does not describe this database.', v_n, jsonb_array_length(v_snapshot);
     END IF;
 
     -- R3. Move products back. Scoped by the NEW category_id plus the exact
@@ -173,54 +197,41 @@ BEGIN
       RAISE EXCEPTION 'rollback 0007 guard FAILED: product(s) still on a new category — reassign them first: %', v_bad;
     END IF;
 
-    -- R5. Delete the 11 categories the migration created.
-    DELETE FROM public.categories WHERE id IN (
-      '0c0d1c35-2e2e-46d6-85a1-c15bf69c2f32',
-      '3a7b6117-2a1d-4dc8-98e1-7fcc2fe4d829',
-      '1d5c2bf8-4948-48d0-9e64-d32d87ed72a1',
-      '1afa9181-d014-40a1-84b0-77b3b9d49c91',
-      'dcc07a8b-ce35-4af8-86a1-eba2d5db7526',
-      '115696d3-4e3b-4632-b6fb-d4f25352b798',
-      '22e6f582-bd46-46c8-9542-19a87e74d2cc',
-      '7e8b2e2a-517f-4fd8-8dfb-5e7fd335f3c1',
-      '60f1fd6e-2227-498b-ae51-6f375e6e30b5',
-      '43fdb502-c820-4e95-b610-8117bc582bb0',
-      '1835d8f4-6514-4a1a-9011-b4a3789f7c98'
-    );
+    -- R5. Delete every category row the snapshot does not contain — the 11 rows
+    --     0007 created, whatever their ids.
+    SELECT count(*) INTO v_rows_before FROM public.categories;
+    DELETE FROM public.categories AS c
+     WHERE NOT EXISTS (
+       SELECT 1
+         FROM jsonb_array_elements(v_snapshot) AS s(item)
+        WHERE (s.item->>'id')::uuid = c.id
+     );
     GET DIAGNOSTICS v_n = ROW_COUNT;
-    IF v_n <> 11 THEN
-      RAISE EXCEPTION 'rollback 0007 step R5 FAILED: deleted % new categories, expected 11', v_n;
+    IF v_n <> v_rows_before - jsonb_array_length(v_snapshot) THEN
+      RAISE EXCEPTION 'rollback 0007 step R5 FAILED: deleted % row(s), expected %', v_n, v_rows_before - jsonb_array_length(v_snapshot);
     END IF;
 
     -- R6. Drop is_active (restores the original 5-column shape).
     ALTER TABLE public.categories DROP COLUMN is_active;
 
     -- R7. Verify exact restoration of the production snapshot. The position
-    --     values below (tablets 2, audio 3) prove R1 undid the 15/16 parking.
-    SELECT count(*) INTO v_n FROM public.categories;
-    IF v_n <> 5 THEN
-      RAISE EXCEPTION 'rollback 0007 verification FAILED: expected 5 categories, found %', v_n;
-    END IF;
+    --     values prove R1 undid the 15/16 parking. Nothing is compared against
+    --     a literal: id, slug, label, position and created_at must match the
+    --     snapshot recorded by migration 0007.
+    SELECT coalesce(jsonb_agg(jsonb_build_object(
+             'id',         c.id,
+             'slug',       c.slug,
+             'label',      c.label,
+             'position',   c.position,
+             'created_at', to_char(c.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
+           ) ORDER BY c.id), '[]'::jsonb)
+      INTO v_actual
+      FROM public.categories c;
 
-    SELECT bool_and(
-      (id, slug, label, position) IN (
-        ('d68104ff-a80e-4281-a8a1-8189cd423c2c', 'phones',    'Phones/Mobile',     0),
-        ('84d6206c-c5f0-48ce-8bd6-f653e4a78ba7', 'laptops',   'Macbook/PCs',       1),
-        ('fd414ab7-0ef6-443f-a7f0-fb1a7234deed', 'tablets',   'Tablets/Ipad Pro',  2),
-        ('5857c9ab-c554-4c15-bb3d-b88b4ebc2b8d', 'audio',     'Audio/Headphones',  3),
-        ('c69827ba-1c33-4dd6-993e-ecc34cca9702', 'wearables', 'Watches/Wearables', 4)
-      )
-    ) INTO v_ok
-    FROM public.categories;
-    IF NOT v_ok THEN
-      RAISE EXCEPTION 'rollback 0007 verification FAILED: rows do not match the verified pre-migration snapshot (id/slug/label/position)';
-    END IF;
-
-    -- created_at must still be the original instant: no row was ever deleted.
-    SELECT bool_and(created_at = '2026-10-26T00:25:05.42357+00:00'::timestamptz) INTO v_ok
-    FROM public.categories;
-    IF NOT v_ok THEN
-      RAISE EXCEPTION 'rollback 0007 verification FAILED: created_at was not preserved for the original 5 rows';
+    IF v_actual IS DISTINCT FROM v_snapshot THEN
+      RAISE EXCEPTION 'rollback 0007 verification FAILED: restored rows do not match the snapshot migration 0007 captured.%',
+        E'\n  expected: ' || v_snapshot::text ||
+        E'\n  actual:   ' || v_actual::text;
     END IF;
 
     -- Products must be back on the 5 original categories.
@@ -232,13 +243,11 @@ BEGIN
     END IF;
 
     SELECT count(*) INTO v_n
-    FROM public.products p
-    WHERE p.category_id NOT IN (
-      'd68104ff-a80e-4281-a8a1-8189cd423c2c',
-      '84d6206c-c5f0-48ce-8bd6-f653e4a78ba7',
-      'fd414ab7-0ef6-443f-a7f0-fb1a7234deed',
-      '5857c9ab-c554-4c15-bb3d-b88b4ebc2b8d',
-      'c69827ba-1c33-4dd6-993e-ecc34cca9702'
+    FROM public.products AS p
+    WHERE NOT EXISTS (
+      SELECT 1
+        FROM jsonb_array_elements(v_snapshot) AS s(item)
+       WHERE (s.item->>'id')::uuid = p.category_id
     );
     IF v_n <> 0 THEN
       RAISE EXCEPTION 'rollback 0007 verification FAILED: % product(s) on an unexpected category after rollback', v_n;
@@ -282,7 +291,21 @@ BEGIN
     -- R9. Drop is_active.
     ALTER TABLE public.categories DROP COLUMN is_active;
 
-    -- R10. Verify the blank pre-migration state.
+    -- R10. Verify the blank pre-migration state against the recorded snapshot.
+    SELECT coalesce(jsonb_agg(jsonb_build_object(
+             'id', c.id,
+             'slug', c.slug,
+             'label', c.label,
+             'position', c.position,
+             'created_at', to_char(c.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
+           ) ORDER BY c.id), '[]'::jsonb)
+      INTO v_actual
+      FROM public.categories c;
+
+    IF v_actual IS DISTINCT FROM v_snapshot THEN
+      RAISE EXCEPTION 'rollback 0007 verification FAILED: fresh rollback left rows behind — expected the recorded empty snapshot, found %', v_actual::text;
+    END IF;
+
     SELECT count(*) INTO v_n FROM public.categories;
     IF v_n <> 0 THEN
       RAISE EXCEPTION 'rollback 0007 verification FAILED: expected 0 categories after a fresh-mode rollback, found %', v_n;
@@ -304,6 +327,7 @@ BEGIN
   -- ---------------------------------------------------------------------
 
   DROP TABLE public._migration_0007_state;
+  DROP FUNCTION IF EXISTS public._migration_0007_state_write_once();
 END $$;
 
 COMMIT;

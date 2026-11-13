@@ -29,8 +29,19 @@ type D1Like = {
   batch(statements: D1Statement[]): Promise<unknown[]>;
 };
 
+/**
+ * Whether the customer can safely retry.
+ *
+ * - `not_created`: the order was rejected before it could be written, so a retry
+ *   cannot duplicate anything.
+ * - `unknown`: the write may or may not have reached Postgres (timeout, aborted
+ *   request, transport failure). Retrying can create a second order, so the
+ *   storefront must tell the customer to check for a confirmation first.
+ */
+export type OrderOutcome = "not_created" | "unknown";
+
 export class OrderError extends Error {
-  constructor(message: string, readonly status: number) {
+  constructor(message: string, readonly status: number, readonly outcome: OrderOutcome = "not_created") {
     super(message);
     this.name = "OrderError";
   }
@@ -208,24 +219,61 @@ type ItemRow = {
 };
 
 /**
+ * Whether a placed order may be attributed to a customer account.
+ *
+ * Order ownership is written by the optional `p_user_id` parameter of
+ * `create_order()`, which only exists after migration 0006. The function
+ * deployed today takes five parameters (p_items, p_customer, p_delivery,
+ * p_payment, p_note), and PostgREST rejects the entire call when it is sent an
+ * unknown argument — so sending `p_user_id` breaks *every* checkout, guest ones
+ * included.
+ *
+ * MVP: ownership stays OFF and every order is a guest order
+ * (`orders.user_id = NULL`). Do not claim that customer order ownership works
+ * until 0006 is applied, the extended function is verified, and this flag is
+ * turned on. No fake user id is ever sent.
+ */
+export const ORDER_OWNERSHIP_ENABLED: boolean = false;
+
+/**
+ * RPC parameters for `create_order()`.
+ *
+ * The guest path sends exactly the five parameters the deployed function
+ * declares. `p_user_id` is added only when order ownership is enabled and a
+ * verified customer id exists, so the authenticated shape is ready for 0006
+ * without ever sending an unknown argument today.
+ */
+export function buildCreateOrderRpcParams(request: CreateOrderRequest, customerUserId?: string) {
+  return {
+    p_items: request.items.map(item => ({ slug: item.slug, qty: item.qty })),
+    p_customer: request.customer,
+    p_delivery: request.delivery,
+    p_payment: request.payment,
+    p_note: request.note ?? null,
+    ...(ORDER_OWNERSHIP_ENABLED && customerUserId ? { p_user_id: customerUserId } : {})
+  };
+}
+
+/**
  * Supabase path: re-validate in Postgres through the security-definer
  * create_order() function, which re-prices every line, locks the inventory
  * rows it touches and writes order + items + stock in one transaction.
+ *
+ * The payload is built so that the guest path sends exactly the five parameters
+ * the deployed function declares. `p_user_id` is only added when ownership is
+ * enabled (see ORDER_OWNERSHIP_ENABLED), which keeps the authenticated call
+ * shape ready for 0006 without breaking today's checkout.
  */
-async function createOrderSupabase(request: CreateOrderRequest): Promise<CreateOrderResponse> {
+async function createOrderSupabase(request: CreateOrderRequest, customerUserId?: string): Promise<CreateOrderResponse> {
   const supabase = getServiceClient();
   if (!supabase) {
     throw new OrderError("The order database is not configured for this environment.", 503);
   }
 
-  const items = request.items.map(item => ({ slug: item.slug, qty: item.qty }));
-  const { data, error } = await supabase.rpc("create_order", {
-    p_items: items,
-    p_customer: request.customer,
-    p_delivery: request.delivery,
-    p_payment: request.payment,
-    p_note: request.note ?? null
-  });
+  const { data, error } = await supabase.rpc(
+    "create_order",
+    buildCreateOrderRpcParams(request, customerUserId)
+  );
 
   if (error || !data) {
     if (error?.code === "RC001") {
@@ -234,8 +282,47 @@ async function createOrderSupabase(request: CreateOrderRequest): Promise<CreateO
       );
       throw new OrderError(error.message, conflict ? 409 : 400);
     }
-    console.error("Supabase create_order failed", error);
-    throw new OrderError("We could not save your order. Please try again.", 503);
+    // Safe server-side diagnostic logging for order creation failures.
+    // Never log raw credentials, tokens, full customer data, or stack traces.
+    let errorCode = "unknown";
+    let errorCategory = "unknown";
+    if (error instanceof Object && "code" in error) {
+      errorCode = String((error as { code: unknown }).code ?? "unknown");
+    }
+    if (error instanceof Object && "message" in error) {
+      const message = String((error as { message: unknown }).message ?? "");
+      if (/RC001/i.test(errorCode) || /left.of|no.longer.available|currently.unavailable|temporarily.unavailable/i.test(message)) {
+        errorCategory = "business_rule_violation";
+      } else if (/duplicate|already.exists/i.test(message)) {
+        errorCategory = "duplicate";
+      } else if (/rate.limit|too.many|flood/i.test(message)) {
+        errorCategory = "rate_limited";
+      } else if (/unauthorized|invalid|credential|permission|forbidden/i.test(message)) {
+        errorCategory = "permission_or_auth";
+      } else if (/network|fetch|timeout|econnrefused|econnreset/i.test(message)) {
+        errorCategory = "network";
+      } else if (/not.found|does.not.exist/i.test(message)) {
+        errorCategory = "not_found";
+      } else {
+        errorCategory = "other";
+      }
+    }
+    console.error(
+      `[createOrderSupabase] failure: errorCode=${errorCode} errorCategory=${errorCategory} ` +
+      `customerEmail=${request.customer.email.length > 0 ? request.customer.email.slice(0, 4) + "***@***" : "(no email)"} ` +
+      `productSlugs=${request.items.map(i => i.slug).join(",")}`
+    );
+    // A transport failure means the RPC may still have committed: the order can
+    // exist even though this response is an error. Retrying must not be
+    // presented as safe, or the customer can create a second order.
+    const ambiguous = !error || errorCategory === "network" || errorCategory === "other" || errorCategory === "unknown";
+    throw new OrderError(
+      ambiguous
+        ? "We could not confirm whether your order was saved. Check your email for a confirmation before ordering again."
+        : "We could not save your order. Please try again.",
+      503,
+      ambiguous ? "unknown" : "not_created"
+    );
   }
 
   const result = data as {
@@ -255,9 +342,40 @@ async function createOrderSupabase(request: CreateOrderRequest): Promise<CreateO
     subtotal: result.subtotal,
     shipping: result.shipping,
     total: result.total,
-    createdAt: result.created_at
+    createdAt: result.created_at,
   };
 }
+
+const STATUS_LABELS: Record<string, string> = {
+  received: "Received",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
+const DELIVERY_LABELS: Record<string, string> = {
+  standard: "Standard delivery",
+  express: "Express delivery",
+};
+const PAYMENT_LABELS: Record<string, string> = {
+  card: "Card payment",
+  paypal: "PayPal",
+  cod: "Cash on delivery",
+};
+
+export function statusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status;
+}
+
+export function deliveryLabel(delivery: string): string {
+  return DELIVERY_LABELS[delivery] ?? delivery;
+}
+
+export function paymentLabel(payment: string): string {
+  return PAYMENT_LABELS[payment] ?? payment;
+}
+
+export { createOrderSupabase };
 
 /**
  * Validates the request, then writes it through Supabase (or the legacy D1

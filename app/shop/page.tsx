@@ -1,70 +1,127 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ShopControls from "@/components/ShopControls";
-import { SORT_OPTIONS, labelFor, searchProducts, sortProducts, type SortKey } from "@/lib/products";
+import ShopFacets from "@/components/ShopFacets";
+import ShopPagination from "@/components/ShopPagination";
+import {
+  SORT_OPTIONS,
+  buildFacetGroups,
+  filterCatalogue,
+  labelFor,
+  paginate,
+  parseSpecParam,
+  sortProducts,
+  type SortKey
+} from "@/lib/products";
+import { readShopState, shopHref } from "@/lib/shop-params";
 import { loadCatalog } from "@/lib/server/catalog";
+import "./shop.css";
 
 type RawParams = Record<string, string | string[] | undefined>;
 
-function first(value: string | string[] | undefined): string {
-  return (Array.isArray(value) ? value[0] : value) ?? "";
-}
-
 export const metadata = {
-  title: "Shop — Racine IT",
-  description: "Browse phones, laptops, tablets, audio and wearables with filters, sorting and live search."
+  title: "Shop — AB Tech",
+  description:
+    "Browse phones, laptops, tablets, audio and wearables with filters, sorting and live search."
 };
+
+function toNumber(value: string): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+}
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<RawParams> }) {
   const sp = await searchParams;
-  const q = first(sp.q).trim();
-  const category = first(sp.category);
-  const sortRaw = first(sp.sort) as SortKey;
-  const sort = SORT_OPTIONS.some(o => o.key === sortRaw) ? sortRaw : "featured";
+  const state = readShopState(sp);
+  const sort: SortKey = SORT_OPTIONS.some(o => o.key === state.sort)
+    ? (state.sort as SortKey)
+    : "featured";
 
   const catalog = await loadCatalog();
   const categoryLabel = (key: string) => labelFor(catalog.categories, key);
 
-  let list = searchProducts(catalog.products, q);
-  if (category) list = list.filter(p => p.category === category);
-  list = sortProducts(list, sort);
+  // Facets are built from the category scope, so a filter never disappears
+  // because another filter is currently applied.
+  const scoped = state.category
+    ? catalog.products.filter(p => p.category === state.category)
+    : catalog.products;
+  const facets = buildFacetGroups(scoped);
 
-  const heading = q
-    ? `Results for “${q}”`
-    : category
-      ? categoryLabel(category)
+  const specs = state.spec
+    .map(parseSpecParam)
+    .filter((value): value is { key: string; value: string } => value !== null);
+
+  const filtered = filterCatalogue(scoped, {
+    q: state.q,
+    brands: state.brand,
+    colours: state.colour,
+    minPrice: toNumber(state.min),
+    maxPrice: toNumber(state.max),
+    inStockOnly: state.stock === "in",
+    minRating: toNumber(state.rating),
+    specs
+  });
+
+  const paged = paginate(sortProducts(filtered, sort), state.page);
+
+  const heading = state.q
+    ? `Results for “${state.q}”`
+    : state.category
+      ? categoryLabel(state.category)
       : "All Products";
+
+  const hasFilters =
+    state.brand.length > 0 ||
+    state.colour.length > 0 ||
+    state.spec.length > 0 ||
+    Boolean(state.min || state.max || state.stock || state.rating || state.q || state.category);
 
   return (
     <main className="site-shell page">
       <nav className="breadcrumbs" aria-label="Breadcrumb">
         <Link href="/">Home</Link> <span>/</span> <span aria-current="page">Shop</span>
-        {category && <> <span>/</span> <span>{categoryLabel(category)}</span></>}
+        {state.category && <> <span>/</span> <span>{categoryLabel(state.category)}</span></>}
       </nav>
 
       <div className="page-heading">
         <h1>{heading}</h1>
         <p>
-          {list.length} product{list.length === 1 ? "" : "s"}
-          {q && <> matching “{q}”</>}
+          {paged.total} product{paged.total === 1 ? "" : "s"}
+          {state.q && <> matching “{state.q}”</>}
+          {paged.pages > 1 && <> · page {paged.page} of {paged.pages}</>}
         </p>
       </div>
 
-      <ShopControls q={q} category={category} sort={sort} total={list.length} />
+      <ShopControls state={{ ...state, sort }} total={paged.total} />
 
-      {list.length === 0 ? (
-        <div className="empty-state">
-          <h2>No products found</h2>
-          <p>Nothing matches these filters yet. Try a different search term or browse the full catalogue.</p>
-          <Link href="/shop" className="btn-dark">Clear filters</Link>
+      <div className="shop-layout">
+        <ShopFacets state={state} facets={facets} />
+
+        <div className="shop-results">
+          {paged.items.length === 0 ? (
+            <div className="empty-state">
+              <h2>No products found</h2>
+              <p>Nothing matches these filters yet. Try removing a filter or browsing the full catalogue.</p>
+              <div className="empty-actions">
+                {hasFilters && <Link href="/shop" className="btn-dark">Clear all filters</Link>}
+                <Link href={shopHref({ ...state, category: "", q: "", page: 1 })} className="btn-ghost">
+                  Browse all products
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="deal-grid shop-grid">
+                {paged.items.map(p => (
+                  <ProductCard key={p.slug} product={p} />
+                ))}
+              </div>
+              <ShopPagination state={state} page={paged.page} pages={paged.pages} />
+            </>
+          )}
         </div>
-      ) : (
-        <div className="deal-grid shop-grid">
-          {list.map(p => (
-            <ProductCard key={p.slug} product={p} />
-          ))}
-        </div>
-      )}
+      </div>
     </main>
   );
 }

@@ -51,7 +51,7 @@ export default function CheckoutView() {
         <h2>Order {placedRef} saved</h2>
         <p>
           Your order is stored in our order system and we have your delivery details. No payment
-          was taken on this page.
+          has been taken yet — we will contact you to confirm payment and delivery.
         </p>
         <p className="muted-note">Taking you to your order confirmation…</p>
         <div className="checkout-done-actions">
@@ -99,9 +99,19 @@ export default function CheckoutView() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)
             });
-            const body = (await response.json().catch(() => ({}))) as { ref?: string; error?: string };
+            const body = (await response.json().catch(() => ({}))) as {
+              ref?: string;
+              error?: string;
+              outcome?: "not_created" | "unknown";
+            };
             if (!response.ok || !body.ref) {
-              setError(body.error ?? "We could not save your order. Please try again.");
+              // "unknown" means the order may already exist: never invite a retry
+              // that would create a duplicate, and keep the cart intact.
+              setError(
+                body.outcome === "unknown"
+                  ? "We could not confirm whether your order was received. Check your email (and your account, if you signed in) for a confirmation before ordering again — retrying now could create a second order."
+                  : body.error ?? "We could not save your order. Please try again."
+              );
               setPhase("form");
               return;
             }
@@ -111,7 +121,10 @@ export default function CheckoutView() {
             router.push(`/order/${body.ref}`);
             window.scrollTo({ top: 0, behavior: "smooth" });
           } catch {
-            setError("We could not reach the store. Check your connection and try again.");
+            // The request may have reached the store before the connection failed.
+            setError(
+              "We could not reach the store, so we cannot confirm whether your order was received. Check your connection and your email for a confirmation before placing the order again."
+            );
             setPhase("form");
           }
         }}
@@ -221,8 +234,8 @@ export default function CheckoutView() {
             ))}
           </div>
           <p className="checkout-disclosure">
-            <Lock size={13} /> Demo storefront — no payment provider is connected, so no card details
-            are collected and nothing is charged.
+            <Lock size={13} /> Orders are recorded in test mode: no payment provider is connected,
+            so no card details are collected and nothing is charged.
           </p>
         </fieldset>
 
@@ -231,8 +244,8 @@ export default function CheckoutView() {
           {phase === "saving" ? "Placing your order…" : `Place order · ${formatPrice(total)}`}
         </button>
         <p className="checkout-hint">
-          Your order is saved to our order system. No payment is taken on this page — we confirm
-          payment and delivery with you afterwards, and card details are never requested here.
+          Your order is saved to our order system. No payment is taken on this page — we contact
+          you to confirm payment and delivery, and card details are never requested here.
         </p>
       </form>
 

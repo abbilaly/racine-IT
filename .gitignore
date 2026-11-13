@@ -19,3 +19,6 @@ freebuff-sites-build/
 .verify/
 *.pid
 *.zip
+# backup artifacts: never commit dumps, manifests or connection strings
+/backups/
+scripts/backup/backup.env

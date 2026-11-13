@@ -5,6 +5,10 @@ export type Product = {
   slug: string;
   title: string;
   category: string;
+  /** Brand name, when the catalogue knows it (products.brand_id → brands.name). */
+  brand?: string;
+  /** Available colourways, when the catalogue knows them. */
+  colours?: string[];
   image: string;
   hover: string;
   price: number;
@@ -32,7 +36,7 @@ export type StoreSettings = {
 };
 
 export const DEFAULT_SETTINGS: StoreSettings = {
-  storeName: "Racine IT",
+  storeName: "AB Tech",
   currency: "USD",
   expressShipping: 15,
   standardShipping: 0,
@@ -46,12 +50,25 @@ export type Catalog = {
   settings: StoreSettings;
 };
 
+/** The approved 14 main categories, in the exact order and with the exact
+ *  labels stored in public.categories (positions 1..14). This list feeds the
+ *  offline demo catalogue and supabase/seed.sql, so it must stay in step with
+ *  the database taxonomy applied by migration 0007. */
 export const CATEGORIES = [
-  { key: "phones", label: "Phones/Mobile" },
-  { key: "laptops", label: "Macbook/PCs" },
-  { key: "tablets", label: "Tablets/Ipad Pro" },
-  { key: "audio", label: "Audio/Headphones" },
-  { key: "wearables", label: "Watches/Wearables" }
+  { key: "computers", label: "Computers & Laptops" },
+  { key: "desktops", label: "Desktop Computers" },
+  { key: "servers", label: "Servers" },
+  { key: "networking", label: "Networking & Telecom" },
+  { key: "components", label: "PC Components" },
+  { key: "smartphones", label: "Smartphones & Tablets" },
+  { key: "wearables", label: "Wearables & Smartwatches" },
+  { key: "gaming", label: "Gaming" },
+  { key: "printers", label: "Printers & Scanners" },
+  { key: "monitors", label: "Monitors & Displays" },
+  { key: "multimedia", label: "Multimedia & Audio" },
+  { key: "peripherals", label: "Peripherals & Accessories" },
+  { key: "software", label: "Software & Licenses" },
+  { key: "power", label: "UPS & Power" }
 ] as const;
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];
@@ -62,11 +79,41 @@ export const SEED_CATEGORIES: CategoryOption[] = CATEGORIES.map(c => ({
   label: c.label
 }));
 
+/** Real AB Tech subcategory hierarchy for the Gloxin-style category panel.
+ *  Only categories with children get a submenu on hover/click; leaf categories
+ *  navigate straight to the filtered shop route.
+ */
+export const CATEGORY_SUBKEYS: Record<string, string[]> = {
+  computers: ["desktops", "laptops", "monitors", "components", "servers", "peripherals"],
+  desktops: ["all-in-one", "tower", "workstation"],
+  servers: ["rack-servers", "tower-servers", "server-racks", "storage-nas"],
+  networking: ["routers", "switches", "modems", "wi-fi-extenders", "network-cables"],
+  components: ["cpus", "gpus", "memory", "storage", "motherboards", "power-supplies"],
+  smartphones: [
+    "iphone",
+    "android",
+    "feature-phones",
+    "phone-accessories",
+    "ipad-pro",
+    "ipad-air",
+    "android-tablets",
+    "tablet-accessories",
+  ],
+  wearables: ["smartwatches", "fitness-bands", "watch-bands", "watch-accessories"],
+  gaming: ["consoles", "games", "gaming-pcs", "peripherals"],
+  printers: ["inkjet", "laser", "multifunction", "printer-supplies"],
+  monitors: ["computer-monitors", "curved-monitors", "professional-monitors", "monitor-arms"],
+  multimedia: ["headphones", "speakers", "home-audio", "audio-accessories"],
+  peripherals: ["keyboards", "mice", "webcams", "hubs-docks", "cables", "mounts"],
+  software: ["operating-systems", "productivity", "security", "creative", "b2b-licenses"],
+  power: ["ups", "surge-protectors", "inverters", "battery-backups"],
+};
+
 export const products: Product[] = [
   {
     slug: "apple-iphone-13-mini-128gb-pink",
     title: "Apple iPhone 13 Mini 128GB Pink – Unlocked (Renewed)",
-    category: "phones",
+    category: "smartphones",
     image: "products_digital_1_1-min.webp",
     hover: "products_digital_1_2-min-400x400.webp",
     price: 175,
@@ -118,7 +165,7 @@ export const products: Product[] = [
   {
     slug: "apple-ipad-pro-m1-12-inch-2022",
     title: "Apple iPad Pro M1 12-inch 2022 Wi-Fi 128GB – Blue",
-    category: "tablets",
+    category: "smartphones",
     image: "products_digital_3_1-min.webp",
     hover: "products_digital_3_2-min-400x400.webp",
     price: 175,
@@ -170,7 +217,7 @@ export const products: Product[] = [
   {
     slug: "apple-ipad-pro-m1-11-inch-2021",
     title: "Apple iPad Pro M1 11-inch 2021 Wi-Fi 128GB – Black",
-    category: "tablets",
+    category: "smartphones",
     image: "products_digital_5_1-min.webp",
     hover: "products_digital_5_2-min-400x400.webp",
     price: 150,
@@ -196,7 +243,7 @@ export const products: Product[] = [
   {
     slug: "proove-wireless-headset-gaming-bliss",
     title: "2024 Proove Wireless Headset Gaming Bliss – White",
-    category: "audio",
+    category: "multimedia",
     image: "products_digital_6_1-min.webp",
     hover: "products_digital_6_2-min-400x400.webp",
     price: 150,
@@ -222,7 +269,7 @@ export const products: Product[] = [
   {
     slug: "macbook-pro-16-m3-gray-2025",
     title: "Hot Sales For Original MacBooks Pro 16 M3 Gray 2025",
-    category: "laptops",
+    category: "computers",
     image: "products_digital_7_1-min.webp",
     hover: "products_digital_7_2-min-400x400.webp",
     price: 175,
@@ -248,7 +295,7 @@ export const products: Product[] = [
   {
     slug: "apple-iphone-13-mini-128gb-blue",
     title: "Apple iPhone 13 Mini 128GB Blue – Unlocked (Renewed)",
-    category: "phones",
+    category: "smartphones",
     image: "products_digital_8_1-min.webp",
     hover: "products_digital_8_2-min-400x400.webp",
     price: 175,
@@ -272,7 +319,7 @@ export const products: Product[] = [
   {
     slug: "apple-airpods-3-2022",
     title: "Apple AirPods 3 2022 Bluetooth Headset – Unlocked",
-    category: "audio",
+    category: "multimedia",
     image: "products_digital_9_1-min.webp",
     hover: "products_digital_9_2-min-400x400.webp",
     price: 150,
@@ -296,7 +343,7 @@ export const products: Product[] = [
   {
     slug: "macbook-pro-16-m2-gray",
     title: "Hot Sales For Original MacBooks Pro 16 M2 – Gray Color",
-    category: "laptops",
+    category: "computers",
     image: "products_digital_10_1-min.webp",
     hover: "products_digital_10_2-min-400x400.webp",
     price: 2399,
@@ -322,7 +369,7 @@ export const products: Product[] = [
   {
     slug: "apple-iphone-13-mini-128gb-white",
     title: "Apple iPhone 13 Mini 128GB White – Unlocked (Renewed)",
-    category: "phones",
+    category: "smartphones",
     image: "products_digital_11_1-min.webp",
     hover: "products_digital_11_2-min-400x400.webp",
     price: 150,
@@ -346,7 +393,7 @@ export const products: Product[] = [
   {
     slug: "portable-wireless-speakers-2025",
     title: "Portable Wireless Speakers Music Speakers New 2025",
-    category: "audio",
+    category: "multimedia",
     image: "products_digital_12_1-min_440c4ce0-1c9b-491b-ad23-41bd1de013fe.webp",
     hover: "products_digital_12_2-min_f6726fbb-a322-4e34-8bd1-65436e926f59-400x400.webp",
     price: 135,
@@ -395,9 +442,48 @@ export function categoryLabel(key: string): string {
   return CATEGORIES.find(c => c.key === key)?.label ?? "All Products";
 }
 
+export function categorySubkeys(key: string): readonly string[] {
+  return CATEGORY_SUBKEYS[key] ?? [];
+}
+
+export function hasSubcategories(key: string): boolean {
+  return (CATEGORY_SUBKEYS[key]?.length ?? 0) > 0;
+}
+
+/** Best shop route for a category or subcategory key. Subcategories that map
+ *  directly onto a real product category keep their filtered route; everything
+ *  else falls back to the parent catalogue filtered route or /shop.
+ */
+const ALL_CATEGORY_KEYS: readonly CategoryKey[] = CATEGORIES.map(c => c.key);
+
+export function categoryShopHref(key: string): string {
+  if (key === "") return "/shop";
+  const parentKey = parentKeyFor(key);
+  if (parentKey && ALL_CATEGORY_KEYS.includes(parentKey as CategoryKey)) {
+    return `/shop?category=${parentKey}`;
+  }
+  if (ALL_CATEGORY_KEYS.includes(key as CategoryKey)) {
+    return `/shop?category=${key}`;
+  }
+  return "/shop";
+}
+
+function parentKeyFor(subkey: string): string | null {
+  for (const [parent, children] of Object.entries(CATEGORY_SUBKEYS)) {
+    if (children.includes(subkey)) return parent;
+  }
+  return null;
+}
+
 /** Category lookup against an explicit catalogue (used by server-rendered pages). */
 export function labelFor(categories: readonly CategoryOption[], key: string): string {
-  return categories.find(c => c.key === key)?.label ?? "All Products";
+  const known = categories.find(c => c.key === key)?.label;
+  if (known) return known;
+  // A category present in the URL but not in the loaded taxonomy (a stale link, or
+  // a link written against a different taxonomy) still gets a readable heading
+  // instead of being mislabelled "All Products".
+  const humanised = key.replace(/[-_]+/g, " ").trim();
+  return humanised ? humanised.charAt(0).toUpperCase() + humanised.slice(1) : "All Products";
 }
 
 export function formatPrice(value: number): string {
@@ -449,4 +535,176 @@ export function sortProducts(list: Product[], sort: SortKey): Product[] {
     default:
       return copy;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* filtering, faceting and pagination                                  */
+/* ------------------------------------------------------------------ */
+
+/** One selectable value inside a facet, with how many products carry it. */
+export type FacetValue = { value: string; count: number };
+
+export type FacetGroup = { key: string; label: string; values: FacetValue[] };
+
+export type CatalogueFilters = {
+  q?: string;
+  category?: string;
+  brands?: string[];
+  colours?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  inStockOnly?: boolean;
+  minRating?: number;
+  /** Technical filters, matched against the product's `specs` pairs. */
+  specs?: { key: string; value: string }[];
+};
+
+const SPEC_SEPARATOR = "::";
+
+/** Encode one technical filter as `Key::Value` for the `spec` URL parameter. */
+export function encodeSpecParam(key: string, value: string): string {
+  return `${key}${SPEC_SEPARATOR}${value}`;
+}
+
+/** Parse a `spec` URL parameter; returns null when malformed. */
+export function parseSpecParam(raw: string): { key: string; value: string } | null {
+  const index = raw.indexOf(SPEC_SEPARATOR);
+  if (index <= 0) return null;
+  const key = raw.slice(0, index).trim();
+  const value = raw.slice(index + SPEC_SEPARATOR.length).trim();
+  if (!key || !value) return null;
+  return { key, value };
+}
+
+function specMatches(product: Product, key: string, value: string): boolean {
+  const wantedKey = key.toLowerCase();
+  const wantedValue = value.toLowerCase();
+  return product.specs.some(
+    ([specKey, specValue]) =>
+      specKey.toLowerCase() === wantedKey && specValue.toLowerCase() === wantedValue
+  );
+}
+
+/**
+ * Applies every shop filter to a catalogue already held in memory, so filtering
+ * costs no extra database round trips (the CPU budget matters here — see the
+ * production stability reports).
+ */
+export function filterCatalogue(
+  list: readonly Product[],
+  filters: CatalogueFilters
+): Product[] {
+  let result = filters.q ? searchProducts(list, filters.q) : [...list];
+
+  if (filters.category) result = result.filter(p => p.category === filters.category);
+
+  if (filters.brands && filters.brands.length > 0) {
+    const wanted = new Set(filters.brands.map(b => b.toLowerCase()));
+    result = result.filter(p => Boolean(p.brand) && wanted.has(p.brand!.toLowerCase()));
+  }
+
+  if (filters.colours && filters.colours.length > 0) {
+    const wanted = new Set(filters.colours.map(c => c.toLowerCase()));
+    result = result.filter(p => (p.colours ?? []).some(c => wanted.has(c.toLowerCase())));
+  }
+
+  if (typeof filters.minPrice === "number") {
+    const min = filters.minPrice;
+    result = result.filter(p => p.price >= min);
+  }
+  if (typeof filters.maxPrice === "number") {
+    const max = filters.maxPrice;
+    result = result.filter(p => p.price <= max);
+  }
+  if (filters.inStockOnly) result = result.filter(p => p.stock > 0);
+
+  if (typeof filters.minRating === "number") {
+    const min = filters.minRating;
+    result = result.filter(p => p.rating >= min);
+  }
+
+  for (const spec of filters.specs ?? []) {
+    result = result.filter(p => specMatches(p, spec.key, spec.value));
+  }
+
+  return result;
+}
+
+/**
+ * Builds the facet groups for the current scope (usually one category).
+ * Facets are derived from the products themselves, so a filter is only offered
+ * when the catalogue can actually answer it.
+ */
+export function buildFacetGroups(scope: readonly Product[]): {
+  brands: FacetGroup | null;
+  colours: FacetGroup | null;
+  specs: FacetGroup[];
+} {
+  const brandCounts = new Map<string, number>();
+  const colourCounts = new Map<string, number>();
+  const specCounts = new Map<string, Map<string, number>>();
+
+  for (const product of scope) {
+    if (product.brand) {
+      brandCounts.set(product.brand, (brandCounts.get(product.brand) ?? 0) + 1);
+    }
+    for (const colour of product.colours ?? []) {
+      colourCounts.set(colour, (colourCounts.get(colour) ?? 0) + 1);
+    }
+    for (const [key, value] of product.specs) {
+      const values = specCounts.get(key) ?? new Map<string, number>();
+      values.set(value, (values.get(value) ?? 0) + 1);
+      specCounts.set(key, values);
+    }
+  }
+
+  const toFacet = (
+    key: string,
+    label: string,
+    counts: Map<string, number>,
+    limit: number
+  ): FacetGroup | null => {
+    if (counts.size < 2) return null;
+    const values = [...counts.entries()]
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value))
+      .slice(0, limit);
+    return { key, label, values };
+  };
+
+  const specs: FacetGroup[] = [];
+  for (const [key, counts] of specCounts) {
+    // A technical filter is only useful when it splits the scope into groups.
+    if (counts.size < 2) continue;
+    if (![...counts.values()].some(n => n >= 2)) continue;
+    const facet = toFacet(key, key, counts, 6);
+    if (facet) specs.push(facet);
+  }
+  specs.sort((a, b) => a.key.localeCompare(b.key));
+
+  return {
+    brands: toFacet("brand", "Brand", brandCounts, 10),
+    colours: toFacet("colour", "Colour", colourCounts, 10),
+    specs: specs.slice(0, 6)
+  };
+}
+
+/** Default products per shop page. */
+export const SHOP_PAGE_SIZE = 24;
+
+export type Paged<T> = {
+  items: T[];
+  page: number;
+  pages: number;
+  total: number;
+  perPage: number;
+};
+
+/** Slices a list into a page, clamping the requested page into range. */
+export function paginate<T>(items: readonly T[], page: number, perPage = SHOP_PAGE_SIZE): Paged<T> {
+  const total = items.length;
+  const pages = Math.max(1, Math.ceil(total / perPage));
+  const safePage = Math.min(Math.max(1, Math.trunc(page) || 1), pages);
+  const start = (safePage - 1) * perPage;
+  return { items: items.slice(start, start + perPage), page: safePage, pages, total, perPage };
 }

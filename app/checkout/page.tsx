@@ -1,12 +1,16 @@
 import Link from "next/link";
 import CheckoutView from "@/components/CheckoutView";
+import { requireCatalog } from "@/lib/server/catalog";
 
 export const metadata = {
-  title: "Checkout — Racine IT",
+  title: "Checkout — AB Tech",
   description: "Delivery details, delivery method and order summary."
 };
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  // Catalogue-backed page: fail visibly rather than showing seed prices.
+  await requireCatalog();
+
   return (
     <main className="site-shell page">
       <nav className="breadcrumbs" aria-label="Breadcrumb">
