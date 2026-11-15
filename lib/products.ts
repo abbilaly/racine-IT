@@ -9,6 +9,8 @@ export type Product = {
   brand?: string;
   /** Available colourways, when the catalogue knows them. */
   colours?: string[];
+  /** Country of origin, when the catalogue records it (products.origin). */
+  origin?: string;
   image: string;
   hover: string;
   price: number;
@@ -538,6 +540,109 @@ export function sortProducts(list: Product[], sort: SortKey): Product[] {
 }
 
 /* ------------------------------------------------------------------ */
+/* catalogue-derived attributes                                        */
+/* ------------------------------------------------------------------ */
+
+/** Connectivity options the shop can offer. A product only carries one of
+ *  these when its own specs say so, so the filter never invents hardware. */
+export const CONNECTIVITY_VALUES = ["Wi-Fi", "Bluetooth", "USB", "HDMI", "LAN"] as const;
+
+const CONNECTIVITY_SPEC_KEYS = /^(connectivity|connection|connections|ports?|interfaces?|features)$/i;
+const COLOUR_SPEC_KEYS = /^(colou?rs?|finish|colourway)$/i;
+const WARRANTY_SPEC_KEYS = /^warranty$/i;
+const ORIGIN_SPEC_KEYS = /^(origin|country of origin|made in|manufactured in)$/i;
+
+/** Swatch colours for the colour names the catalogue actually uses. Unknown
+ *  names get a neutral swatch and keep their real label. */
+const COLOUR_SWATCHES: Record<string, string> = {
+  black: "#111111",
+  white: "#ffffff",
+  "space gray": "#6f6f73",
+  "space grey": "#6f6f73",
+  gray: "#8a8a8e",
+  grey: "#8a8a8e",
+  silver: "#c9c9ce",
+  blue: "#2f5d9e",
+  "dark blue": "#1b2a4a",
+  navy: "#1b2a4a",
+  pink: "#e9a4b8",
+  red: "#c8322f",
+  green: "#3f7d54",
+  gold: "#d8b273",
+  purple: "#6b4f9b",
+  yellow: "#f2d04b",
+  starlight: "#f0e7dc",
+  graphite: "#4a4a4a",
+  midnight: "#1f2733"
+};
+
+/** CSS colour for a catalogue colour name. */
+export function colourHex(name: string): string {
+  const key = name.trim().toLowerCase();
+  const direct = COLOUR_SWATCHES[key];
+  if (direct) return direct;
+  for (const word of key.split(/[\s/+-]+/)) {
+    const match = COLOUR_SWATCHES[word];
+    if (match) return match;
+  }
+  return "#d4d4d8";
+}
+
+/** Colourways recorded for a product: variant options plus any "Colour"
+ *  spec. Nothing is inferred from the title or the marketing copy. */
+export function coloursOf(product: Product): string[] {
+  const colours = new Map<string, string>();
+  const add = (raw: string) => {
+    const value = raw.trim();
+    if (value && !colours.has(value.toLowerCase())) colours.set(value.toLowerCase(), value);
+  };
+  for (const colour of product.colours ?? []) add(colour);
+  for (const [key, value] of product.specs) {
+    if (!COLOUR_SPEC_KEYS.test(key.trim())) continue;
+    for (const part of value.split(/[,/]|\band\b/)) add(part);
+  }
+  return [...colours.values()];
+}
+
+/** Warranty term recorded in the product specs, when present. */
+export function warrantyOf(product: Product): string | null {
+  const spec = product.specs.find(([key]) => WARRANTY_SPEC_KEYS.test(key.trim()));
+  const value = spec?.[1]?.trim();
+  return value ? value : null;
+}
+
+/** Country of origin: the explicit column first, then an origin spec. */
+export function originOf(product: Product): string | null {
+  const explicit = product.origin?.trim();
+  if (explicit) return explicit;
+  const spec = product.specs.find(([key]) => ORIGIN_SPEC_KEYS.test(key.trim()));
+  const value = spec?.[1]?.trim();
+  return value ? value : null;
+}
+
+/** Connectivity standards the product's own specs mention. */
+export function connectivityOf(product: Product): string[] {
+  const text = product.specs
+    .filter(([key]) => CONNECTIVITY_SPEC_KEYS.test(key.trim()))
+    .map(([, value]) => value)
+    .join(" ")
+    .toLowerCase();
+  if (!text) return [];
+  const found: string[] = [];
+  if (/wi-?fi|802\.11|wireless lan/.test(text)) found.push("Wi-Fi");
+  if (/bluetooth/.test(text)) found.push("Bluetooth");
+  if (/\busb\b/.test(text)) found.push("USB");
+  if (/\bhdmi\b/.test(text)) found.push("HDMI");
+  if (/\blan\b|ethernet|rj-?45/.test(text)) found.push("LAN");
+  return found;
+}
+
+/** True when the catalogue lists a higher compare-at price. */
+export function isOnSale(product: Product): boolean {
+  return typeof product.oldPrice === "number" && product.oldPrice > product.price;
+}
+
+/* ------------------------------------------------------------------ */
 /* filtering, faceting and pagination                                  */
 /* ------------------------------------------------------------------ */
 
@@ -551,9 +656,14 @@ export type CatalogueFilters = {
   category?: string;
   brands?: string[];
   colours?: string[];
+  /** Connectivity standards (Wi-Fi, Bluetooth, USB, HDMI, LAN). */
+  connectivities?: string[];
+  warranties?: string[];
+  origins?: string[];
   minPrice?: number;
   maxPrice?: number;
   inStockOnly?: boolean;
+  onSaleOnly?: boolean;
   minRating?: number;
   /** Technical filters, matched against the product's `specs` pairs. */
   specs?: { key: string; value: string }[];
@@ -605,7 +715,28 @@ export function filterCatalogue(
 
   if (filters.colours && filters.colours.length > 0) {
     const wanted = new Set(filters.colours.map(c => c.toLowerCase()));
-    result = result.filter(p => (p.colours ?? []).some(c => wanted.has(c.toLowerCase())));
+    result = result.filter(p => coloursOf(p).some(c => wanted.has(c.toLowerCase())));
+  }
+
+  if (filters.connectivities && filters.connectivities.length > 0) {
+    const wanted = new Set(filters.connectivities.map(v => v.toLowerCase()));
+    result = result.filter(p => connectivityOf(p).some(v => wanted.has(v.toLowerCase())));
+  }
+
+  if (filters.warranties && filters.warranties.length > 0) {
+    const wanted = new Set(filters.warranties.map(v => v.toLowerCase()));
+    result = result.filter(p => {
+      const value = warrantyOf(p);
+      return value !== null && wanted.has(value.toLowerCase());
+    });
+  }
+
+  if (filters.origins && filters.origins.length > 0) {
+    const wanted = new Set(filters.origins.map(v => v.toLowerCase()));
+    result = result.filter(p => {
+      const value = originOf(p);
+      return value !== null && wanted.has(value.toLowerCase());
+    });
   }
 
   if (typeof filters.minPrice === "number") {
@@ -617,6 +748,7 @@ export function filterCatalogue(
     result = result.filter(p => p.price <= max);
   }
   if (filters.inStockOnly) result = result.filter(p => p.stock > 0);
+  if (filters.onSaleOnly) result = result.filter(isOnSale);
 
   if (typeof filters.minRating === "number") {
     const min = filters.minRating;
@@ -630,32 +762,50 @@ export function filterCatalogue(
   return result;
 }
 
+/** The facet groups the shop sidebar renders, all derived from the catalogue. */
+export type ShopFacets = {
+  brands: FacetGroup | null;
+  colours: FacetGroup | null;
+  connectivity: FacetGroup | null;
+  warranty: FacetGroup | null;
+  origin: FacetGroup | null;
+  availability: { onSale: number; inStock: number };
+  /** Price bounds of the current scope, in whole dollars. */
+  price: { min: number; max: number };
+};
+
 /**
  * Builds the facet groups for the current scope (usually one category).
  * Facets are derived from the products themselves, so a filter is only offered
- * when the catalogue can actually answer it.
+ * when the catalogue can actually answer it. Brand and origin stay empty until
+ * the database records them; the UI says so instead of inventing values.
  */
-export function buildFacetGroups(scope: readonly Product[]): {
-  brands: FacetGroup | null;
-  colours: FacetGroup | null;
-  specs: FacetGroup[];
-} {
-  const brandCounts = new Map<string, number>();
+export function buildFacetGroups(scope: readonly Product[]): ShopFacets {
+  const brands = new Map<string, number>();
   const colourCounts = new Map<string, number>();
-  const specCounts = new Map<string, Map<string, number>>();
+  const connectivityCounts = new Map<string, number>();
+  const warrantyCounts = new Map<string, number>();
+  const originCounts = new Map<string, number>();
+  let onSale = 0;
+  let inStock = 0;
+  let lowPrice = Number.POSITIVE_INFINITY;
+  let highPrice = 0;
+
+  const bump = (counts: Map<string, number>, value: string) =>
+    counts.set(value, (counts.get(value) ?? 0) + 1);
 
   for (const product of scope) {
-    if (product.brand) {
-      brandCounts.set(product.brand, (brandCounts.get(product.brand) ?? 0) + 1);
-    }
-    for (const colour of product.colours ?? []) {
-      colourCounts.set(colour, (colourCounts.get(colour) ?? 0) + 1);
-    }
-    for (const [key, value] of product.specs) {
-      const values = specCounts.get(key) ?? new Map<string, number>();
-      values.set(value, (values.get(value) ?? 0) + 1);
-      specCounts.set(key, values);
-    }
+    if (product.brand) bump(brands, product.brand);
+    for (const colour of coloursOf(product)) bump(colourCounts, colour);
+    for (const value of connectivityOf(product)) bump(connectivityCounts, value);
+    const warrantyValue = warrantyOf(product);
+    if (warrantyValue) bump(warrantyCounts, warrantyValue);
+    const originValue = originOf(product);
+    if (originValue) bump(originCounts, originValue);
+    if (isOnSale(product)) onSale += 1;
+    if (product.stock > 0) inStock += 1;
+    lowPrice = Math.min(lowPrice, product.price);
+    highPrice = Math.max(highPrice, product.price);
   }
 
   const toFacet = (
@@ -664,7 +814,7 @@ export function buildFacetGroups(scope: readonly Product[]): {
     counts: Map<string, number>,
     limit: number
   ): FacetGroup | null => {
-    if (counts.size < 2) return null;
+    if (counts.size === 0) return null;
     const values = [...counts.entries()]
       .map(([value, count]) => ({ value, count }))
       .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value))
@@ -672,20 +822,18 @@ export function buildFacetGroups(scope: readonly Product[]): {
     return { key, label, values };
   };
 
-  const specs: FacetGroup[] = [];
-  for (const [key, counts] of specCounts) {
-    // A technical filter is only useful when it splits the scope into groups.
-    if (counts.size < 2) continue;
-    if (![...counts.values()].some(n => n >= 2)) continue;
-    const facet = toFacet(key, key, counts, 6);
-    if (facet) specs.push(facet);
-  }
-  specs.sort((a, b) => a.key.localeCompare(b.key));
+  const min = scope.length > 0 ? Math.floor(lowPrice) : 0;
+  const max = scope.length > 0 ? Math.ceil(highPrice) : 0;
 
   return {
-    brands: toFacet("brand", "Brand", brandCounts, 10),
-    colours: toFacet("colour", "Colour", colourCounts, 10),
-    specs: specs.slice(0, 6)
+    brands: toFacet("brand", "Brand", brands, 12),
+    colours: toFacet("colour", "Colour", colourCounts, 12),
+    connectivity: toFacet("connectivity", "Connectivity", connectivityCounts, CONNECTIVITY_VALUES.length),
+    warranty: toFacet("warranty", "Warranty", warrantyCounts, 8),
+    origin: toFacet("origin", "Origin", originCounts, 12),
+    availability: { onSale, inStock },
+    // A flat catalogue price still needs a movable track, so keep a 1-unit span.
+    price: { min, max: max > min ? max : min + 1 }
   };
 }
 
