@@ -2,16 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import {
-  Headphones,
-  Laptop,
-  LayoutGrid,
-  Menu,
-  Smartphone,
-  Tablet,
-  Watch,
-  type LucideIcon
-} from "lucide-react";
+import { Menu } from "lucide-react";
+import { categoryIcon } from "@/lib/category-icons";
 import { useShop } from "@/lib/shop-store";
 import { formatPrice, imageUrl } from "@/lib/products";
 
@@ -26,24 +18,7 @@ import { formatPrice, imageUrl } from "@/lib/products";
  * existing mobile menu keeps handling category navigation.
  */
 
-type IconKey = "laptop" | "smartphone" | "tablet" | "headphones" | "watch" | "grid";
-
-/** Display labels/icons for the catalogue categories, keyed by category slug. */
-const CATEGORY_META: Record<string, { label: string; icon: IconKey }> = {
-  computers: { label: "Computers & Laptops", icon: "laptop" },
-  smartphones: { label: "Smartphones & Tablets", icon: "smartphone" },
-  multimedia: { label: "Multimedia & Audio", icon: "headphones" },
-  wearables: { label: "Wearables & Smartwatches", icon: "watch" }
-};
-
-const ICONS: Record<IconKey, LucideIcon> = {
-  laptop: Laptop,
-  smartphone: Smartphone,
-  tablet: Tablet,
-  headphones: Headphones,
-  watch: Watch,
-  grid: LayoutGrid
-};
+/** Icons come from the shared slug map, so the rail covers every category. */
 
 /** Matches the reference: six links per column at most. */
 const MAX_LINKS = 6;
@@ -57,12 +32,10 @@ export default function CategoryPanel() {
   const items = useMemo(
     () =>
       categories.map(cat => {
-        const meta = CATEGORY_META[cat.key];
         const list = products.filter(p => p.category === cat.key);
         return {
           key: cat.key,
-          label: meta?.label ?? cat.label,
-          icon: meta?.icon ?? "grid",
+          label: cat.label,
           href: `/shop?category=${cat.key}`,
           links: list.slice(0, MAX_LINKS),
           promo: list[0]
@@ -119,7 +92,7 @@ export default function CategoryPanel() {
         <nav className="gz-cats__nav" id="product-categories-nav" aria-label="Product categories">
           <ul className="gz-cats__list">
             {items.map(item => {
-              const Icon = ICONS[item.icon];
+              const Icon = categoryIcon(item.key);
               const others = items.filter(other => other.key !== item.key);
               return (
                 <li className="gz-cats__item" key={item.key}>

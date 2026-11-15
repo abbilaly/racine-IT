@@ -1,5 +1,7 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
+import CategoryBanner from "@/components/CategoryBanner";
+import CategoryPanel from "@/components/CategoryPanel";
 import ShopControls from "@/components/ShopControls";
 import ShopFacets from "@/components/ShopFacets";
 import ShopPagination from "@/components/ShopPagination";
@@ -13,9 +15,12 @@ import {
   sortProducts,
   type SortKey
 } from "@/lib/products";
+import { categoryDescription } from "@/lib/category-copy";
 import { readShopState, shopHref } from "@/lib/shop-params";
 import { loadCatalog } from "@/lib/server/catalog";
+import { loadCategoryContent } from "@/lib/server/category-content";
 import "./shop.css";
+import "./category.css";
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -39,6 +44,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     : "featured";
 
   const catalog = await loadCatalog();
+  const content = await loadCategoryContent();
   const categoryLabel = (key: string) => labelFor(catalog.categories, key);
 
   // Facets are built from the category scope, so a filter never disappears
@@ -104,21 +110,87 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
         state.category
     );
 
+  // Optional hierarchy/presentation data. Empty on the current production
+  // schema (before migration 0008), so everything below degrades to flat
+  // categories with built-in icons and copy.
+  const activeContent = state.category ? content.get(state.category) : undefined;
+  const parentSlug = activeContent?.parentSlug ?? null;
+  const parentLabel = parentSlug ? categoryLabel(parentSlug) : null;
+
+  const showCategoryHero = Boolean(state.category) && !state.q;
+
+  const categoryChildren = state.category
+    ? categories.filter(category => content.get(category.key)?.parentSlug === state.category)
+    : [];
+
+  const subcategoryLinks = categoryChildren.map(child => ({
+    label: child.label,
+    href: shopHref({ ...state, category: child.key, page: 1 }),
+    count: child.count
+  }));
+
+  // Brand shortcuts filter inside the category scope (never the whole shop).
+  const brandLinks = (facets.brands?.values ?? []).map(brand => {
+    const active = state.brand.includes(brand.value);
+    const nextBrands = active
+      ? state.brand.filter(value => value !== brand.value)
+      : [...state.brand, brand.value];
+    return {
+      label: brand.value,
+      count: brand.count,
+      active,
+      href: shopHref({ ...state, brand: nextBrands, page: 1 })
+    };
+  });
+  const allBrandsHref = shopHref({ ...state, brand: [], page: 1 });
+
+  const heroImage =
+    activeContent?.bannerPath ?? scoped.find(product => product.image)?.image ?? null;
+
   return (
     <main className="site-shell page">
+      <CategoryPanel />
+
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link href="/">Home</Link> <span>/</span> <span aria-current="page">Shop</span>
-        {state.category && <> <span>/</span> <span>{categoryLabel(state.category)}</span></>}
+        <Link href="/">Home</Link> <span>/</span> <Link href="/shop">Shop</Link>
+        {parentSlug && (
+          <>
+            {" "}
+            <span>/</span>{" "}
+            <Link href={shopHref({ ...state, category: parentSlug, page: 1 })}>
+              {parentLabel}
+            </Link>
+          </>
+        )}
+        {state.category && (
+          <>
+            {" "}
+            <span>/</span> <span aria-current="page">{categoryLabel(state.category)}</span>
+          </>
+        )}
       </nav>
 
-      <div className="page-heading">
-        <h1>{heading}</h1>
-        <p>
-          {paged.total} product{paged.total === 1 ? "" : "s"}
-          {state.q && <> matching “{state.q}”</>}
-          {paged.pages > 1 && <> · page {paged.page} of {paged.pages}</>}
-        </p>
-      </div>
+      {showCategoryHero && state.category ? (
+        <CategoryBanner
+          slug={state.category}
+          label={categoryLabel(state.category)}
+          description={activeContent?.description ?? categoryDescription(state.category)}
+          image={heroImage}
+          total={paged.total}
+          subcategories={subcategoryLinks}
+          brands={brandLinks}
+          allBrandsHref={allBrandsHref}
+        />
+      ) : (
+        <div className="page-heading">
+          <h1>{heading}</h1>
+          <p>
+            {paged.total} product{paged.total === 1 ? "" : "s"}
+            {state.q && <> matching “{state.q}”</>}
+            {paged.pages > 1 && <> · page {paged.page} of {paged.pages}</>}
+          </p>
+        </div>
+      )}
 
       <ShopControls state={{ ...state, sort }} total={paged.total} />
 
