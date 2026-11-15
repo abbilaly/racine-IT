@@ -60,19 +60,44 @@ function toSettings(row: SettingsRow | null): StoreSettings {
   };
 }
 
+/** `categories.is_active` arrives with migration 0007. */
+function isMissingIsActive(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return (
+    error.code === "42703" ||
+    error.code === "PGRST204" ||
+    /is_active/i.test(error.message ?? "") && /does not exist|schema cache/i.test(error.message ?? "")
+  );
+}
+
+/**
+ * Storefront categories.
+ *
+ * After migration 0007 the retired `tablets` and `audio` rows stay in the table
+ * with `is_active = false`; they must not appear next to their replacements.
+ * Before 0007 the column does not exist and filtering on it makes PostgREST
+ * reject the query (42703), so fall back to the unfiltered list — on that schema
+ * every category is visible, which is exactly the legacy truth.
+ */
+async function loadStorefrontCategories(
+  supabase: NonNullable<ReturnType<typeof getServiceClient>>
+) {
+  const filtered = await supabase
+    .from("categories")
+    .select("slug,label,position")
+    .eq("is_active", true)
+    .order("position");
+  if (!filtered.error || !isMissingIsActive(filtered.error)) return filtered;
+
+  return supabase.from("categories").select("slug,label,position").order("position");
+}
+
 async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
   const supabase = getServiceClient();
   if (!supabase) return null;
 
   const [categoriesRes, productsRes, imagesRes, inventoryRes, variantsRes, settingsRes] = await Promise.all([
-    // TODO(0007): category visibility is filtered in PostgreSQL once
-    // `categories.is_active` exists (migration 0007_categories_taxonomy.sql).
-    // The column is NOT in the current production schema, and PostgREST rejects
-    // the whole query with 42703 when an unknown column is filtered on, so the
-    // filter cannot be sent yet. Every category is therefore visible for the
-    // MVP; restore `.eq("is_active", true)` here only after 0007 is applied and
-    // verified. `products.is_active` (0001) is unaffected and still filtered.
-    supabase.from("categories").select("slug,label,position").order("position"),
+    loadStorefrontCategories(supabase),
     supabase
       .from("products")
       .select(

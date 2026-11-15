@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import CategoryBanner from "@/components/CategoryBanner";
 import CategoryPanel from "@/components/CategoryPanel";
@@ -24,6 +25,19 @@ import "./category.css";
 
 type RawParams = Record<string, string | string[] | undefined>;
 
+/**
+ * Old category URLs after migration 0007 renames/deactivates five rows.
+ * Bookmarks and any external links keep working instead of landing on an empty
+ * category: phones -> smartphones, laptops -> computers, tablets -> smartphones
+ * (its products move there) and audio -> multimedia (its products move there).
+ */
+const LEGACY_CATEGORY_ALIASES: Record<string, string> = {
+  phones: "smartphones",
+  laptops: "computers",
+  tablets: "smartphones",
+  audio: "multimedia"
+};
+
 export const metadata = {
   title: "Shop — AB Tech",
   description:
@@ -44,6 +58,14 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     : "featured";
 
   const catalog = await loadCatalog();
+
+  if (state.category && !catalog.categories.some(category => category.key === state.category)) {
+    const alias = LEGACY_CATEGORY_ALIASES[state.category];
+    if (alias && catalog.categories.some(category => category.key === alias)) {
+      redirect(shopHref({ ...state, category: alias, page: 1 }));
+    }
+  }
+
   const content = await loadCategoryContent();
   const categoryLabel = (key: string) => labelFor(catalog.categories, key);
 
