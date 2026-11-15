@@ -13,12 +13,20 @@ export type ShopState = {
   sort: string;
   brand: string[];
   colour: string[];
+  /** Connectivity standards such as Wi-Fi or Bluetooth. */
+  connectivity: string[];
+  /** Warranty terms recorded in the catalogue. */
+  warranty: string[];
+  /** Country of origin, once the catalogue records it. */
+  origin: string[];
   /** Technical filters encoded as `Key::Value`. */
   spec: string[];
   min: string;
   max: string;
   /** "in" means in-stock only. */
   stock: string;
+  /** "1" means discounted products only. */
+  sale: string;
   rating: string;
   page: number;
 };
@@ -44,10 +52,14 @@ export function readShopState(sp: RawParams): ShopState {
     sort: one(sp.sort),
     brand: many(sp.brand),
     colour: many(sp.colour),
+    connectivity: many(sp.connectivity),
+    warranty: many(sp.warranty),
+    origin: many(sp.origin),
     spec: many(sp.spec),
     min: one(sp.min),
     max: one(sp.max),
     stock: one(sp.stock),
+    sale: one(sp.sale),
     rating: one(sp.rating),
     page: Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
   };
@@ -61,10 +73,14 @@ export function shopParams(state: ShopState): [string, string][] {
   if (state.sort && state.sort !== "featured") params.push(["sort", state.sort]);
   for (const value of state.brand) params.push(["brand", value]);
   for (const value of state.colour) params.push(["colour", value]);
+  for (const value of state.connectivity) params.push(["connectivity", value]);
+  for (const value of state.warranty) params.push(["warranty", value]);
+  for (const value of state.origin) params.push(["origin", value]);
   for (const value of state.spec) params.push(["spec", value]);
   if (state.min) params.push(["min", state.min]);
   if (state.max) params.push(["max", state.max]);
   if (state.stock) params.push(["stock", state.stock]);
+  if (state.sale) params.push(["sale", state.sale]);
   if (state.rating) params.push(["rating", state.rating]);
   if (state.page > 1) params.push(["page", String(state.page)]);
   return params;
@@ -86,13 +102,21 @@ export function isSelected(list: readonly string[], value: string): boolean {
   return list.includes(value);
 }
 
-/** True when at least one non-category filter is applied (used for UI badges). */
+/** Number of distinct filters applied (used for the sidebar badges). */
 export function activeFilterCount(state: ShopState): number {
-  let count = state.brand.length + state.colour.length + state.spec.length;
+  let count =
+    state.brand.length +
+    state.colour.length +
+    state.connectivity.length +
+    state.warranty.length +
+    state.origin.length +
+    state.spec.length;
   if (state.min) count += 1;
   if (state.max) count += 1;
   if (state.stock) count += 1;
+  if (state.sale) count += 1;
   if (state.rating) count += 1;
   if (state.q) count += 1;
+  if (state.category) count += 1;
   return count;
 }

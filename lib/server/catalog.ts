@@ -34,10 +34,12 @@ type ProductRow = {
   reviews: number;
   /** PostgREST returns the embedded to-one relation as an object or a one-element array. */
   category: unknown;
+  brand: unknown;
 };
 
 type ImageRow = { product_id: string; kind: string; path: string };
 type InventoryRow = { product_id: string; variant_id: string | null; on_hand: number };
+type VariantRow = { product_id: string; options: Record<string, unknown> | null };
 
 type SettingsRow = {
   store_name: string;
@@ -62,7 +64,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
   const supabase = getServiceClient();
   if (!supabase) return null;
 
-  const [categoriesRes, productsRes, imagesRes, inventoryRes, settingsRes] = await Promise.all([
+  const [categoriesRes, productsRes, imagesRes, inventoryRes, variantsRes, settingsRes] = await Promise.all([
     // TODO(0007): category visibility is filtered in PostgreSQL once
     // `categories.is_active` exists (migration 0007_categories_taxonomy.sql).
     // The column is NOT in the current production schema, and PostgREST rejects
@@ -74,17 +76,26 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     supabase
       .from("products")
       .select(
-        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,category:categories(slug,label)"
+        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,category:categories(slug,label),brand:brands(name)"
       )
       .eq("is_active", true)
       .order("created_at"),
     supabase.from("product_images").select("product_id,kind,path").in("kind", ["primary", "hover"]),
     supabase.from("inventory").select("product_id,variant_id,on_hand"),
+    // Real colourways live in the variant options ({"colour": "Pink", ...}),
+    // which is what the admin editor writes. One extra query per request; the
+    // whole catalogue is cached for the request by `loadCatalog`.
+    supabase.from("product_variants").select("product_id,options").eq("is_active", true),
     supabase.from("store_settings").select("*").eq("id", true).maybeSingle()
   ]);
 
   const firstError =
-    categoriesRes.error ?? productsRes.error ?? imagesRes.error ?? inventoryRes.error ?? settingsRes.error;
+    categoriesRes.error ??
+    productsRes.error ??
+    imagesRes.error ??
+    inventoryRes.error ??
+    variantsRes.error ??
+    settingsRes.error;
   if (firstError) throw new Error(`Supabase catalogue query failed: ${firstError.message}`);
 
   const categories: CategoryOption[] = ((categoriesRes.data ?? []) as CategoryRow[]).map(row => ({
@@ -112,6 +123,18 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     }
   }
 
+  // Colourways per product, from active variant options only.
+  const coloursByProduct = new Map<string, string[]>();
+  for (const row of (variantsRes.data ?? []) as VariantRow[]) {
+    const options = row.options ?? {};
+    const raw = options.colour ?? options.color ?? options.Colour ?? options.Color;
+    if (typeof raw !== "string" || !raw.trim()) continue;
+    const value = raw.trim();
+    const list = coloursByProduct.get(row.product_id) ?? [];
+    if (!list.some(colour => colour.toLowerCase() === value.toLowerCase())) list.push(value);
+    coloursByProduct.set(row.product_id, list);
+  }
+
   const products: Product[] = ((productsRes.data ?? []) as ProductRow[]).map(row => {
     const images = imagesByProduct.get(row.id) ?? {};
     const fallback = productMap[row.slug];
@@ -120,10 +143,15 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     const stock = stockByProduct.has(row.id)
       ? stockByProduct.get(row.id)!
       : (variantStockByProduct.get(row.id) ?? 0);
+    const brandRelation = Array.isArray(row.brand) ? row.brand[0] : row.brand;
+    const brandName = (brandRelation as { name?: string } | null | undefined)?.name?.trim();
+    const colours = coloursByProduct.get(row.id) ?? [];
     return {
       slug: row.slug,
       title: row.title,
       category: categorySlug || fallback?.category || "",
+      ...(brandName ? { brand: brandName } : {}),
+      ...(colours.length > 0 ? { colours } : {}),
       image: images.primary ?? fallback?.image ?? "",
       hover: images.hover ?? images.primary ?? fallback?.hover ?? "",
       price: row.price_cents / 100,

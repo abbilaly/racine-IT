@@ -48,6 +48,18 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     : catalog.products;
   const facets = buildFacetGroups(scoped);
 
+  // Category counts come from the whole active catalogue, not the current
+  // category scope, so the sidebar still shows where the other products live.
+  const countsByCategory = new Map<string, number>();
+  for (const product of catalog.products) {
+    countsByCategory.set(product.category, (countsByCategory.get(product.category) ?? 0) + 1);
+  }
+  const categories = catalog.categories.map(category => ({
+    key: category.key,
+    label: category.label,
+    count: countsByCategory.get(category.key) ?? 0
+  }));
+
   const specs = state.spec
     .map(parseSpecParam)
     .filter((value): value is { key: string; value: string } => value !== null);
@@ -56,9 +68,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     q: state.q,
     brands: state.brand,
     colours: state.colour,
+    connectivities: state.connectivity,
+    warranties: state.warranty,
+    origins: state.origin,
     minPrice: toNumber(state.min),
     maxPrice: toNumber(state.max),
     inStockOnly: state.stock === "in",
+    onSaleOnly: state.sale === "1",
     minRating: toNumber(state.rating),
     specs
   });
@@ -74,8 +90,19 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const hasFilters =
     state.brand.length > 0 ||
     state.colour.length > 0 ||
+    state.connectivity.length > 0 ||
+    state.warranty.length > 0 ||
+    state.origin.length > 0 ||
     state.spec.length > 0 ||
-    Boolean(state.min || state.max || state.stock || state.rating || state.q || state.category);
+    Boolean(
+      state.min ||
+        state.max ||
+        state.stock ||
+        state.sale ||
+        state.rating ||
+        state.q ||
+        state.category
+    );
 
   return (
     <main className="site-shell page">
@@ -96,7 +123,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       <ShopControls state={{ ...state, sort }} total={paged.total} />
 
       <div className="shop-layout">
-        <ShopFacets state={state} facets={facets} />
+        <ShopFacets state={state} facets={facets} categories={categories} total={paged.total} />
 
         <div className="shop-results">
           {paged.items.length === 0 ? (
