@@ -75,6 +75,7 @@ export function CategoriesManager({
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "hidden">("all");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const load = useCallback(async () => {
@@ -159,26 +160,66 @@ export function CategoriesManager({
     setNotice(null);
   };
 
-  const uploadBanner = async (file: File) => {
-    setUploading(true);
-    setError(null);
-    try {
-      const body = new FormData();
-      body.append("file", file);
-      const res = await fetch("/api/admin/catalogue/images?kind=category-banner", {
-        method: "POST",
-        body
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "The banner could not be uploaded.");
-      setForm(prev => ({ ...prev, bannerPath: data.path }));
-      setNotice("Banner uploaded. Save the category to apply it.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "The banner could not be uploaded.");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
+  const resetFileInput = () => {
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  /**
+   * Uploads through the existing admin endpoint, which owns the MIME, file
+   * signature and size validation. XMLHttpRequest is used instead of fetch so
+   * the operator sees real upload progress rather than an indefinite spinner.
+   */
+  const uploadBanner = (file: File) => {
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+    if (!allowed.includes(file.type)) {
+      setError("Images must be JPEG, PNG, WebP or AVIF.");
+      resetFileInput();
+      return;
     }
+    if (file.size > 3 * 1024 * 1024) {
+      setError("Images must be 3 MB or smaller.");
+      resetFileInput();
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+    setError(null);
+    setNotice(null);
+
+    const body = new FormData();
+    body.append("file", file);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/admin/catalogue/images?kind=category-banner");
+    xhr.upload.onprogress = event => {
+      if (event.lengthComputable) {
+        setUploadProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      let data: { path?: string; error?: string } = {};
+      try {
+        data = JSON.parse(xhr.responseText || "{}");
+      } catch {
+        data = {};
+      }
+      if (xhr.status >= 200 && xhr.status < 300 && data.path) {
+        setForm(prev => ({ ...prev, bannerPath: data.path as string }));
+        setNotice("Banner uploaded. Save the category to publish it.");
+      } else {
+        setError(data.error || "The banner could not be uploaded.");
+      }
+      setUploading(false);
+      setUploadProgress(null);
+      resetFileInput();
+    };
+    xhr.onerror = () => {
+      setError("The upload failed. Check your connection and try again.");
+      setUploading(false);
+      setUploadProgress(null);
+      resetFileInput();
+    };
+    xhr.send(body);
   };
 
   const validate = (): string | null => {
@@ -513,34 +554,72 @@ export function CategoriesManager({
                 No banner
               </div>
             )}
-            <div className="admin-catalogue-media-actions">
-              <label className="btn-outline">
-                <Upload size={14} /> {uploading ? "Uploading…" : "Upload banner"}
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  className="admin-upload-input"
-                  disabled={uploading}
-                  onChange={event => {
-                    const file = event.target.files?.[0];
-                    if (file) void uploadBanner(file);
-                  }}
-                />
-              </label>
-              {form.bannerPath && (
-                <button
-                  type="button"
-                  className="btn-outline"
-                  onClick={() => setForm(prev => ({ ...prev, bannerPath: "" }))}
+            <div className="admin-catalogue-media-body">
+              <div className="admin-catalogue-media-actions">
+                <label className={`btn-outline${uploading ? " is-busy" : ""}`}>
+                  <Upload size={14} />
+                  {uploading
+                    ? `Uploading… ${uploadProgress ?? 0}%`
+                    : form.bannerPath
+                      ? "Replace banner"
+                      : "Upload banner"}
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    className="admin-upload-input"
+                    disabled={uploading}
+                    onChange={event => {
+                      const file = event.target.files?.[0];
+                      if (file) uploadBanner(file);
+                    }}
+                  />
+                </label>
+                {form.bannerPath && !uploading && (
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    onClick={() => {
+                      setForm(prev => ({ ...prev, bannerPath: "" }));
+                      setNotice("Banner cleared. Save the category to remove it from the storefront.");
+                    }}
+                  >
+                    Remove banner
+                  </button>
+                )}
+              </div>
+
+              {uploading && (
+                <div
+                  className="admin-upload-progress"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={uploadProgress ?? 0}
+                  aria-label="Banner upload progress"
                 >
-                  Remove
-                </button>
+                  <span style={{ width: `${uploadProgress ?? 0}%` }} />
+                </div>
               )}
+
+              <div className="admin-field admin-field--inline">
+                <label className="admin-label admin-label--small" htmlFor="cat-banner-url">
+                  Or paste an image URL
+                </label>
+                <input
+                  id="cat-banner-url"
+                  className="admin-input"
+                  placeholder="/images/banner.jpg or https://…"
+                  value={form.bannerPath}
+                  disabled={uploading}
+                  onChange={event => setForm(prev => ({ ...prev, bannerPath: event.target.value }))}
+                />
+              </div>
             </div>
           </div>
           <p className="admin-assistive-text">
-            JPEG, PNG, WebP or AVIF, up to 3 MB. Without a banner the category page uses a product image.
+            JPEG, PNG, WebP or AVIF, up to 3 MB. Uploads go to the shared product-images bucket under
+            categories/banners/. Without a banner the category page uses a product image.
           </p>
         </div>
 

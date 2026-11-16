@@ -41,6 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </button>
       </div>
       <div className="product-copy">
+        {product.brand && <span className="product-brand">{product.brand}</span>}
         <Link href={`/product/${product.slug}`}>{product.title}</Link>
         <div className="rating" aria-label={`${product.rating} out of 5 stars, ${product.reviews} reviews`}>
           ★★★★★ <small>({product.reviews})</small>

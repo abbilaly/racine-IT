@@ -846,10 +846,48 @@
   gap: 12px;
 }
 
+.admin-catalogue-media-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+  flex: 1 1 280px;
+}
+
 .admin-catalogue-media-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.admin-catalogue-media-actions .btn-outline.is-busy {
+  opacity: .7;
+  pointer-events: none;
+}
+
+.admin-upload-progress {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.admin-upload-progress span {
+  display: block;
+  height: 100%;
+  background: #111827;
+  border-radius: inherit;
+  transition: width .15s ease;
+}
+
+.admin-field--inline {
+  gap: 6px;
+}
+
+.admin-label--small {
+  font-size: 11px;
+  color: #6b7280;
 }
 
 .admin-catalogue-preview {

@@ -118,22 +118,39 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       ? categoryLabel(state.category)
       : "All Products";
 
-  const hasFilters =
+  // Refinements narrow results *inside* the current scope. The category itself
+  // is tracked separately: an empty category is not an empty filter result.
+  const hasRefinements =
     state.brand.length > 0 ||
     state.colour.length > 0 ||
     state.connectivity.length > 0 ||
     state.warranty.length > 0 ||
     state.origin.length > 0 ||
     state.spec.length > 0 ||
-    Boolean(
-      state.min ||
-        state.max ||
-        state.stock ||
-        state.sale ||
-        state.rating ||
-        state.q ||
-        state.category
-    );
+    Boolean(state.min || state.max || state.stock || state.sale || state.rating || state.q);
+
+  const hasFilters = hasRefinements || Boolean(state.category);
+
+  // No product in this scope at all: the category is genuinely empty, not
+  // filtered down to nothing. The two states must never be confused.
+  const scopeIsEmpty = scoped.length === 0;
+  const categoryComingSoon = scopeIsEmpty && !hasRefinements;
+  const clearRefinementsHref = shopHref({
+    ...state,
+    q: "",
+    brand: [],
+    colour: [],
+    connectivity: [],
+    warranty: [],
+    origin: [],
+    spec: [],
+    min: "",
+    max: "",
+    stock: "",
+    sale: "",
+    rating: "",
+    page: 1
+  });
 
   // Optional hierarchy/presentation data. Empty on the current production
   // schema (before migration 0008), so everything below degrades to flat
@@ -225,16 +242,43 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
 
         <div className="shop-results">
           {paged.items.length === 0 ? (
-            <div className="empty-state">
-              <h2>No products found</h2>
-              <p>Nothing matches these filters yet. Try removing a filter or browsing the full catalogue.</p>
-              <div className="empty-actions">
-                {hasFilters && <Link href="/shop" className="btn-dark">Clear all filters</Link>}
-                <Link href={shopHref({ ...state, category: "", q: "", page: 1 })} className="btn-ghost">
-                  Browse all products
-                </Link>
+            categoryComingSoon ? (
+              <div className="empty-state empty-state--category">
+                <h2>Products coming soon</h2>
+                <p>
+                  {state.category
+                    ? "We are preparing this category with verified stock, specifications and pricing."
+                    : "The catalogue is being prepared with verified products and pricing."}
+                </p>
+                <div className="empty-actions">
+                  <Link href={state.category ? "/shop" : "/"} className="btn-dark">
+                    {state.category ? "Browse all products" : "Back to home"}
+                  </Link>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="empty-state empty-state--filters">
+                <h2>No products match these filters</h2>
+                <p>
+                  {state.q
+                    ? `Nothing matches “${state.q}” with the filters applied. Try a different search or clear the filters.`
+                    : "Nothing matches the filters applied. Try removing one or widening the price range."}
+                </p>
+                <div className="empty-actions">
+                  {hasRefinements && (
+                    <Link href={clearRefinementsHref} className="btn-dark">
+                      Clear all filters
+                    </Link>
+                  )}
+                  <Link
+                    href={shopHref({ ...state, category: "", q: "", page: 1 })}
+                    className="btn-ghost"
+                  >
+                    Browse all products
+                  </Link>
+                </div>
+              </div>
+            )
           ) : (
             <>
               <div className="deal-grid shop-grid">

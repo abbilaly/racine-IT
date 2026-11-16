@@ -14,7 +14,7 @@ const MAX_BYTES = 3 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 
 const FOLDERS = {
-  "category-banner": "categories",
+  "category-banner": "categories/banners",
   "brand-logo": "brands"
 } as const;
 
