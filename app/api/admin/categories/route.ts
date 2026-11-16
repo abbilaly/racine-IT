@@ -91,7 +91,10 @@ function readCategoryInput(body: Record<string, unknown>): CategoryInput {
     input.icon = icon;
   }
 
-  const bannerPath = readOptionalText(body.banner_path ?? body.bannerPath, "Banner path", 300);
+  // `null` is a real instruction here: it clears the banner. Falling back with
+  // `??` would turn that null into "absent" and silently keep the old image.
+  const bannerRaw = body.banner_path !== undefined ? body.banner_path : body.bannerPath;
+  const bannerPath = readOptionalText(bannerRaw, "Banner path", 300);
   if (bannerPath !== undefined) {
     if (bannerPath !== null && /^(javascript|data):/i.test(bannerPath)) {
       throw new Error("Banner path must be an image path or URL.");
