@@ -1,3 +1,111 @@
+/* ==========================================================================
+   AB Tech admin — design foundation (Phase 0)
+   --------------------------------------------------------------------------
+   Tailwind is imported here only. This stylesheet is loaded by the admin
+   layout alone, so no Tailwind layer (and no preflight) reaches the storefront.
+
+   Preflight is intentionally NOT loaded in Phase 0: the existing admin pages
+   still depend on browser default element styles, and this phase must not
+   change how they look. It lands with the Phase 1 shell migration.
+
+   Themes are scoped to `.admin-shell[data-admin-theme]`, never to `<html>`:
+   the storefront shares the root document and must never inherit admin theming.
+   ========================================================================== */
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+
+@custom-variant dark (&:where([data-admin-theme="dark"], [data-admin-theme="dark"] *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+.admin-shell {
+  --background: #f7f8fa;
+  --foreground: #0f1320;
+  --card: #ffffff;
+  --card-foreground: #0f1320;
+  --popover: #ffffff;
+  --popover-foreground: #0f1320;
+  --primary: #100024;
+  --primary-foreground: #f8f7ff;
+  --secondary: #f1f2f6;
+  --secondary-foreground: #0f1320;
+  --muted: #f3f4f8;
+  --muted-foreground: #6b7280;
+  --accent: #f1f2f6;
+  --accent-foreground: #0f1320;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e7e9ee;
+  --input: #e2e4ea;
+  --ring: #6d5bd0;
+  --chart-1: #100024;
+  --chart-2: #6d5bd0;
+  --chart-3: #a78bfa;
+  --chart-4: #22c55e;
+  --chart-5: #f59e0b;
+  --radius: 0.75rem;
+  color-scheme: light;
+}
+
+.admin-shell[data-admin-theme="dark"] {
+  --background: #0b0d14;
+  --foreground: #e8eaf0;
+  --card: #12151d;
+  --card-foreground: #e8eaf0;
+  --popover: #12151d;
+  --popover-foreground: #e8eaf0;
+  --primary: #c9bdf5;
+  --primary-foreground: #14101f;
+  --secondary: #1b1f2a;
+  --secondary-foreground: #e8eaf0;
+  --muted: #171b25;
+  --muted-foreground: #98a0b3;
+  --accent: #1b1f2a;
+  --accent-foreground: #e8eaf0;
+  --destructive: #f87171;
+  --destructive-foreground: #1b0b0b;
+  --border: #232735;
+  --input: #2a2f3d;
+  --ring: #c9bdf5;
+  --chart-1: #c9bdf5;
+  --chart-2: #a78bfa;
+  --chart-3: #6d5bd0;
+  --chart-4: #34d399;
+  --chart-5: #fbbf24;
+  color-scheme: dark;
+}
+
 .admin-layout {
   display: flex;
   min-height: 100vh;

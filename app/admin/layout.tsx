@@ -2,6 +2,7 @@ import { getAdminSession } from "@/lib/server/admin-auth";
 import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { EmailCenterNav } from "@/components/admin/EmailCenterNav";
+import { AdminThemeProvider } from "@/components/admin/theme/theme-provider";
 import "./globals.css";
 import "./email-center.css";
 import "./admin-pages.css";
@@ -34,12 +35,12 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="admin-layout">
+    <AdminThemeProvider>
       <AdminSidebar />
       <main className="admin-main">
         <EmailCenterNav />
         {children}
       </main>
-    </div>
+    </AdminThemeProvider>
   );
 }
