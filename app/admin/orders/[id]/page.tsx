@@ -12,14 +12,15 @@ import { formatCents } from "@/lib/server/admin-data";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
+export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const order = await getOrderDetail(db, params.id);
+  const order = await getOrderDetail(db, id);
   if (!order) notFound();
 
-  const notes = await listAdminNotes(db, "orders", params.id, { page: 1, limit: 50 });
+  const notes = await listAdminNotes(db, "orders", id, { page: 1, limit: 50 });
 
   return (
     <div className="admin-page">
@@ -33,15 +34,15 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
           <p className="admin-page-subtitle">{order.ref}</p>
         </div>
         <div className="admin-page-actions">
-          <Link href={`/admin/orders/${params.id}/email-preview`} className="btn-outline">
+          <Link href={`/admin/orders/${id}/email-preview`} className="btn-outline">
             <Eye size={16} />
             Email preview
           </Link>
-          <Link href={`/admin/orders/${params.id}/status`} className="btn-outline">
+          <Link href={`/admin/orders/${id}/status`} className="btn-outline">
             <RefreshCw size={16} />
             Update status
           </Link>
-          <OrderStatusForm orderId={params.id} currentStatus={order.status} />
+          <OrderStatusForm orderId={id} currentStatus={order.status} />
         </div>
       </div>
 
@@ -127,7 +128,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
         <section className="admin-card">
           <div className="admin-card-header">
             <h2>Notes</h2>
-            <OrderNotes orderId={params.id} />
+            <OrderNotes orderId={id} />
           </div>
           {notes.rows.length > 0 ? (
             <div className="admin-notes-list">

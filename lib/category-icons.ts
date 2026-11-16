@@ -50,7 +50,39 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   audio: Headphones
 };
 
-export function categoryIcon(slug: string): LucideIcon {
+/**
+ * Icon keys an operator can choose in the admin (migration 0008
+ * `categories.icon`). Every key here is also the label shown in the picker.
+ */
+const ICON_BY_KEY: Record<string, LucideIcon> = {
+  laptop: Laptop,
+  desktop: Monitor,
+  server: Server,
+  router: Router,
+  cpu: Cpu,
+  smartphone: Smartphone,
+  tablet: Tablet,
+  watch: Watch,
+  gamepad: Gamepad2,
+  printer: Printer,
+  monitor: Monitor,
+  headset: Headphones,
+  keyboard: Keyboard,
+  storage: HardDrive,
+  app: AppWindow,
+  battery: BatteryCharging
+};
+
+/** Keys offered by the admin category icon picker. */
+export const CATEGORY_ICON_KEYS = Object.keys(ICON_BY_KEY);
+
+/**
+ * Resolves the icon for a category: an operator-chosen key wins, then the
+ * built-in mapping for the slug, then a neutral grid icon. Unknown keys are
+ * ignored rather than rendered as empty space.
+ */
+export function categoryIcon(slug: string, iconKey?: string | null): LucideIcon {
+  if (iconKey && ICON_BY_KEY[iconKey]) return ICON_BY_KEY[iconKey];
   return CATEGORY_ICONS[slug] ?? LayoutGrid;
 }
 

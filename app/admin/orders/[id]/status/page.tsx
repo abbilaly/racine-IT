@@ -10,14 +10,15 @@ import { AdminBadgeStatus } from "@/lib/server/admin-ui";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrderStatusPage({ params }: { params: { id: string } }) {
+export default async function AdminOrderStatusPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const order = await getOrderDetail(db, params.id);
+  const order = await getOrderDetail(db, id);
   if (!order) notFound();
 
-  const notes = await listAdminNotes(db, "orders", params.id, { page: 1, limit: 50 });
+  const notes = await listAdminNotes(db, "orders", id, { page: 1, limit: 50 });
 
   return (
     <div className="admin-page">
@@ -31,7 +32,7 @@ export default async function AdminOrderStatusPage({ params }: { params: { id: s
           <p className="admin-page-subtitle">{order.ref}</p>
         </div>
         <div className="admin-page-actions">
-          <OrderStatusForm orderId={params.id} currentStatus={order.status} />
+          <OrderStatusForm orderId={id} currentStatus={order.status} />
         </div>
       </div>
 
@@ -88,7 +89,7 @@ export default async function AdminOrderStatusPage({ params }: { params: { id: s
           <div className="admin-card-header">
             <h2>Internal notes</h2>
           </div>
-          <OrderNotes orderId={params.id} notes={notes.rows} />
+          <OrderNotes orderId={id} notes={notes.rows} />
         </section>
       </div>
     </div>

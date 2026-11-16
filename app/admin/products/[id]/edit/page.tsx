@@ -10,11 +10,12 @@ import { ArrowLeft, Package, Edit2, Trash2, Plus, History, Upload } from "lucide
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductEditPage({ params }: { params: { id: string } }) {
+export default async function AdminProductEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const product = await getProductDetail(db, params.id);
+  const product = await getProductDetail(db, id);
   if (!product) notFound();
 
   const categories = await listCategories(db);
@@ -32,11 +33,11 @@ export default async function AdminProductEditPage({ params }: { params: { id: s
           <p className="admin-page-subtitle">{product.title}</p>
         </div>
         <div className="admin-page-actions">
-          <Link href={`/admin/products/${params.id}/images`} className="btn-outline">
+          <Link href={`/admin/products/${id}/images`} className="btn-outline">
             <Upload size={16} />
             Manage images
           </Link>
-          <Link href={`/admin/products/${params.id}/stock`} className="btn-outline">
+          <Link href={`/admin/products/${id}/stock`} className="btn-outline">
             <History size={16} />
             Stock history
           </Link>
@@ -49,7 +50,7 @@ export default async function AdminProductEditPage({ params }: { params: { id: s
             <h2>Product details</h2>
           </div>
           <ProductForm
-            productId={params.id}
+            productId={id}
             initial={{
               title: product.title,
               slug: product.slug,
@@ -61,6 +62,8 @@ export default async function AdminProductEditPage({ params }: { params: { id: s
               priceCents: product.price_cents,
               compareAtPriceCents: product.compare_at_price_cents,
               badge: product.badge,
+              origin: product.origin,
+              sourceUrl: product.source_url,
               is_active: product.is_active,
               is_featured: product.is_featured,
             }}
@@ -72,21 +75,21 @@ export default async function AdminProductEditPage({ params }: { params: { id: s
         <section className="admin-card admin-card--wide">
           <div className="admin-card-header">
             <h2>Stock and inventory</h2>
-            <Link href={`/admin/products/${params.id}/stock`} className="admin-card-link">
+            <Link href={`/admin/products/${id}/stock`} className="admin-card-link">
               View full history
             </Link>
           </div>
-          <StockAdjustmentForm productId={params.id} />
+          <StockAdjustmentForm productId={id} />
         </section>
 
         <section className="admin-card">
           <div className="admin-card-header">
             <h2>Product images</h2>
-            <Link href={`/admin/products/${params.id}/images`} className="admin-card-link">
+            <Link href={`/admin/products/${id}/images`} className="admin-card-link">
               Manage all images
             </Link>
           </div>
-          <ProductImages productId={params.id} images={product.images} />
+          <ProductImages productId={id} images={product.images} />
         </section>
       </div>
     </div>

@@ -46,6 +46,8 @@ export default async function AdminNewProductPage() {
               priceCents: 0,
               compareAtPriceCents: null,
               badge: null,
+              origin: null,
+              sourceUrl: null,
               is_active: true,
               is_featured: false,
             }}

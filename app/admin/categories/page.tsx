@@ -1,5 +1,5 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { listCategories } from "@/lib/server/admin-data";
+import { listCategories, categoryProductCounts } from "@/lib/server/admin-data";
 import { CategoriesManager } from "@/components/admin/CategoriesManager";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +9,7 @@ export default async function AdminCategoriesPage() {
   const db = adminClient(session);
 
   const categories = await listCategories(db);
+  const counts = await categoryProductCounts(db);
 
   return (
     <div className="admin-page">
@@ -16,12 +17,16 @@ export default async function AdminCategoriesPage() {
         <div className="admin-page-title">
           <h1>Categories</h1>
           <p className="admin-page-subtitle">
-            Category slugs power storefront URLs — they cannot be renamed after creation
+            {categories.filter(category => category.is_active).length} visible ·{" "}
+            {categories.length} total. Slugs power storefront URLs and cannot be renamed.
           </p>
         </div>
       </div>
 
-      <CategoriesManager initial={categories} />
+      <CategoriesManager
+        initial={categories}
+        initialCounts={Object.fromEntries(counts)}
+      />
     </div>
   );
 }

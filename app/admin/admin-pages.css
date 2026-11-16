@@ -780,3 +780,136 @@
     grid-row: auto;
   }
 }
+
+/* Catalogue management (categories and brands) */
+.admin-catalogue {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-catalogue .admin-card {
+  padding: 20px;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.admin-category-child::before {
+  content: "↳ ";
+  color: var(--admin-muted, #6b7280);
+}
+
+.admin-category-desc {
+  font-size: 12px;
+  margin-top: 2px;
+  max-width: 46ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-order-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-status-pill.is-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-status-pill.is-hidden {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.admin-catalogue-media {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-catalogue-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-catalogue-preview {
+  width: 100%;
+  max-width: 260px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.admin-catalogue-preview--logo {
+  width: 120px;
+  height: 72px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.admin-catalogue-preview--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.admin-catalogue-thumb {
+  width: 44px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px 16px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.admin-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .admin-catalogue-preview {
+    max-width: 100%;
+  }
+  .admin-form-row {
+    grid-template-columns: 1fr;
+  }
+}

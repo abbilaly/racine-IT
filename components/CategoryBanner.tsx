@@ -13,6 +13,8 @@ type Props = {
   slug: string;
   label: string;
   description: string;
+  /** Operator-chosen icon key from `categories.icon` (0008), if any. */
+  icon?: string | null;
   image?: string | null;
   total: number;
   subcategories: CategoryBannerLink[];
@@ -33,13 +35,14 @@ export default function CategoryBanner({
   slug,
   label,
   description,
+  icon,
   image,
   total,
   subcategories,
   brands,
   allBrandsHref
 }: Props) {
-  const Icon = categoryIcon(slug);
+  const Icon = categoryIcon(slug, icon);
   const noBrandSelected = brands.every(brand => !brand.active);
 
   return (

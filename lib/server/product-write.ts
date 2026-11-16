@@ -13,6 +13,10 @@ export type ProductPayload = {
   priceCents: number;
   compareAtPriceCents: number | null;
   badge: string | null;
+  /** Country of origin, only when documented (0008). */
+  origin: string | null;
+  /** Supplier or manufacturer page the data was verified against (0008). */
+  sourceUrl: string | null;
   isActive: boolean;
   isFeatured: boolean;
 };
@@ -86,6 +90,31 @@ export function parseProductPayload(raw: unknown): ProductPayload {
     badge = body.badge.trim();
   }
 
+  // Provenance is optional and shown only when an operator records it: an
+  // absent origin must stay null, never guessed from the brand or the shop.
+  let origin: string | null = null;
+  if (body.origin != null && body.origin !== "") {
+    if (typeof body.origin !== "string") throw new Error("Country of origin must be text.");
+    origin = body.origin.trim().slice(0, 80) || null;
+  }
+
+  let sourceUrl: string | null = null;
+  if (body.sourceUrl != null && body.sourceUrl !== "") {
+    if (typeof body.sourceUrl !== "string") throw new Error("Source URL must be text.");
+    const raw = body.sourceUrl.trim();
+    if (raw.length > 500) throw new Error("Source URL must be at most 500 characters.");
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(raw);
+    } catch {
+      throw new Error("Source URL must be a full address starting with https://");
+    }
+    if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+      throw new Error("Source URL must start with https:// or http://");
+    }
+    sourceUrl = raw;
+  }
+
   return {
     slug,
     title,
@@ -96,6 +125,8 @@ export function parseProductPayload(raw: unknown): ProductPayload {
     priceCents,
     compareAtPriceCents,
     badge,
+    origin,
+    sourceUrl,
     isActive: body.is_active !== false,
     isFeatured: body.is_featured === true
   };
@@ -112,6 +143,8 @@ function rowFromPayload(payload: ProductPayload) {
     price_cents: payload.priceCents,
     compare_at_price_cents: payload.compareAtPriceCents,
     badge: payload.badge,
+    origin: payload.origin,
+    source_url: payload.sourceUrl,
     is_active: payload.isActive,
     is_featured: payload.isFeatured
   };

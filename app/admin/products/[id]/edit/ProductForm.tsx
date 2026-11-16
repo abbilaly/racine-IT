@@ -17,11 +17,37 @@ interface ProductFormProps {
     priceCents: number;
     compareAtPriceCents: number | null;
     badge: string | null;
+    origin: string | null;
+    sourceUrl: string | null;
     is_active: boolean;
     is_featured: boolean;
   };
-  categories: Array<{ id: string; slug: string; label: string }>;
+  categories: Array<{ id: string; slug: string; label: string; parent_id?: string | null }>;
   brands: Array<{ id: string; name: string; slug: string }>;
+}
+
+/**
+ * Orders categories parent-first and indents subcategories, so the product
+ * editor can file a product onto either. Orphans are still listed.
+ */
+function orderedCategories<T extends { id: string; label: string; parent_id?: string | null }>(
+  categories: T[]
+): Array<{ category: T; depth: number }> {
+  const out: Array<{ category: T; depth: number }> = [];
+  const seen = new Set<string>();
+  const walk = (parentId: string | null, depth: number) => {
+    for (const category of categories) {
+      if ((category.parent_id ?? null) !== parentId || seen.has(category.id)) continue;
+      seen.add(category.id);
+      out.push({ category, depth });
+      walk(category.id, depth + 1);
+    }
+  };
+  walk(null, 0);
+  for (const category of categories) {
+    if (!seen.has(category.id)) out.push({ category, depth: 0 });
+  }
+  return out;
 }
 
 export function ProductForm({ productId, initial, categories, brands }: ProductFormProps) {
@@ -104,7 +130,7 @@ export function ProductForm({ productId, initial, categories, brands }: ProductF
     }
   };
 
-  const slugStatus = slugsCheck.slug;
+  const slugStatus = slugsCheck.slug ?? { checking: false, taken: false };
 
   return (
     <form onSubmit={handleSubmit} className="admin-form">
@@ -173,8 +199,9 @@ export function ProductForm({ productId, initial, categories, brands }: ProductF
             required
           >
             <option value="">Select a category…</option>
-            {categories.map((category) => (
+            {orderedCategories(categories).map(({ category, depth }) => (
               <option key={category.id} value={category.id}>
+                {depth > 0 ? `${"— ".repeat(depth)}` : ""}
                 {category.label}
               </option>
             ))}
@@ -313,6 +340,47 @@ export function ProductForm({ productId, initial, categories, brands }: ProductF
             <option value="Best seller">Best seller</option>
             <option value="Limited">Limited</option>
           </select>
+        </div>
+      </div>
+
+      <div className="admin-form-section">
+        <h3 className="admin-form-section-title">Catalogue provenance</h3>
+        <p className="admin-assistive-text">
+          Both fields are optional and are only shown when recorded. Leave the origin empty
+          unless the supplier or manufacturer documents it — never infer it from the brand.
+        </p>
+
+        <div className="admin-field">
+          <label htmlFor="product-origin" className="admin-label">
+            Country of origin
+          </label>
+          <input
+            id="product-origin"
+            type="text"
+            className="admin-input"
+            value={form.origin ?? ""}
+            onChange={update("origin")}
+            maxLength={80}
+            placeholder="Documented country of origin"
+          />
+        </div>
+
+        <div className="admin-field">
+          <label htmlFor="product-source-url" className="admin-label">
+            Source URL
+          </label>
+          <input
+            id="product-source-url"
+            type="url"
+            className="admin-input"
+            value={form.sourceUrl ?? ""}
+            onChange={update("sourceUrl")}
+            maxLength={500}
+            placeholder="https://supplier.example/products/sku"
+          />
+          <p className="admin-assistive-text">
+            The supplier or manufacturer page this product&rsquo;s data was verified against.
+          </p>
         </div>
       </div>
 

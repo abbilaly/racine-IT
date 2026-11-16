@@ -64,6 +64,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     if (alias && catalog.categories.some(category => category.key === alias)) {
       redirect(shopHref({ ...state, category: alias, page: 1 }));
     }
+    // The catalogue only exposes active categories, so a hidden category (or a
+    // typo) must not stay browsable by direct URL.
+    redirect(shopHref({ ...state, category: "", page: 1 }));
   }
 
   const content = await loadCategoryContent();
@@ -197,6 +200,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
           slug={state.category}
           label={categoryLabel(state.category)}
           description={activeContent?.description ?? categoryDescription(state.category)}
+          icon={activeContent?.icon ?? null}
           image={heroImage}
           total={paged.total}
           subcategories={subcategoryLinks}

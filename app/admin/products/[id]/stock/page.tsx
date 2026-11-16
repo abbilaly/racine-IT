@@ -7,14 +7,15 @@ import { ArrowLeft, Package, ArrowUpDown, Edit2, Trash2, Plus, History } from "l
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductStockPage({ params }: { params: { id: string } }) {
+export default async function AdminProductStockPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const product = await getProductDetail(db, params.id);
+  const product = await getProductDetail(db, id);
   if (!product) notFound();
 
-  const adjustments = await listStockAdjustments(db, params.id, { page: 1, limit: 100 });
+  const adjustments = await listStockAdjustments(db, id, { page: 1, limit: 100 });
 
   return (
     <div className="admin-page">
@@ -27,7 +28,7 @@ export default async function AdminProductStockPage({ params }: { params: { id: 
           <h1>Stock history</h1>
           <p className="admin-page-subtitle">{product.title}</p>
         </div>
-        <Link href={`/admin/products/${params.id}/edit`} className="btn-dark">
+        <Link href={`/admin/products/${id}/edit`} className="btn-dark">
           <Edit2 size={16} />
           Edit product
         </Link>
@@ -54,17 +55,39 @@ export default async function AdminProductStockPage({ params }: { params: { id: 
           <div className="admin-card-header">
             <h2>Adjustments</h2>
           </div>
-          <AdminTable
-            columns={[
-              { key: "created_at", label: "Date", render: (row) => new Date(row.created_at).toLocaleString() },
-              { key: "change", label: "Change", render: (row) => <span className={row.change > 0 ? "admin-text-success" : "admin-text-danger"}>{row.change > 0 ? "+" : ""}{row.change}</span> },
-              { key: "reason", label: "Reason" },
-              { key: "note", label: "Note" },
-              { key: "adjusted_by", label: "Adjusted by" },
-            ]}
-            rows={adjustments.rows}
-            emptyMessage="No adjustments recorded."
-          />
+          {adjustments.rows.length === 0 ? (
+            <AdminEmptyState title="No adjustments recorded" description="Stock changes made through the product page will appear here." />
+          ) : (
+            <div className="admin-table-responsive">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Change</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Note</th>
+                    <th scope="col">Adjusted by</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adjustments.rows.map(row => (
+                    <tr key={row.id}>
+                      <td>{new Date(row.created_at).toLocaleString()}</td>
+                      <td>
+                        <span className={row.change > 0 ? "admin-text-success" : "admin-text-danger"}>
+                          {row.change > 0 ? "+" : ""}
+                          {row.change}
+                        </span>
+                      </td>
+                      <td>{row.reason}</td>
+                      <td className="admin-muted">{row.note ?? "—"}</td>
+                      <td className="admin-muted">{row.adjusted_by ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </div>
     </div>

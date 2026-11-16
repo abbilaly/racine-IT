@@ -8,14 +8,15 @@ import { ArrowLeft, Package, ArrowUpDown, Edit2, Trash2, Plus, History } from "l
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductDetailPage({ params }: { params: { id: string } }) {
+export default async function AdminProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const product = await getProductDetail(db, params.id);
+  const product = await getProductDetail(db, id);
   if (!product) notFound();
 
-  const stockHistory = await listStockAdjustments(db, params.id, { page: 1, limit: 20 });
+  const stockHistory = await listStockAdjustments(db, id, { page: 1, limit: 20 });
 
   return (
     <div className="admin-page">
@@ -29,11 +30,11 @@ export default async function AdminProductDetailPage({ params }: { params: { id:
           <p className="admin-page-subtitle">{product.title}</p>
         </div>
         <div className="admin-page-actions">
-          <Link href={`/admin/products/${params.id}/edit`} className="btn-dark">
+          <Link href={`/admin/products/${id}/edit`} className="btn-dark">
             <Edit2 size={16} />
             Edit product
           </Link>
-          <Link href={`/admin/products/${params.id}/images`} className="btn-outline">
+          <Link href={`/admin/products/${id}/images`} className="btn-outline">
             <Package size={16} />
             Manage images
           </Link>
@@ -44,7 +45,7 @@ export default async function AdminProductDetailPage({ params }: { params: { id:
         <section className="admin-card">
           <div className="admin-card-header">
             <h2>Current stock</h2>
-            <Link href={`/admin/products/${params.id}/stock`} className="admin-card-link">
+            <Link href={`/admin/products/${id}/stock`} className="admin-card-link">
               View full history
             </Link>
           </div>
@@ -89,23 +90,40 @@ export default async function AdminProductDetailPage({ params }: { params: { id:
         <section className="admin-card admin-card--wide">
           <div className="admin-card-header">
             <h2>Stock movement history</h2>
-            <Link href={`/admin/products/${params.id}/stock`} className="admin-card-link">
+            <Link href={`/admin/products/${id}/stock`} className="admin-card-link">
               View all
             </Link>
           </div>
           {stockHistory.rows.length === 0 ? (
             <AdminEmptyState title="No stock adjustments yet" description="Adjustments you make through the product page will appear here." />
           ) : (
-            <AdminTable
-              columns={[
-                { key: "created_at", label: "Date" },
-                { key: "change", label: "Change", render: (row) => <span className={`admin-stock-change ${row.change > 0 ? "positive" : "negative"}`}>{row.change > 0 ? "+" : ""}{row.change}</span> },
-                { key: "reason", label: "Reason" },
-                { key: "note", label: "Note" },
-              ]}
-              rows={stockHistory.rows.slice(0, 20)}
-              emptyMessage="No stock adjustments yet"
-            />
+            <div className="admin-table-responsive">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Change</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stockHistory.rows.slice(0, 20).map(row => (
+                    <tr key={row.id}>
+                      <td>{new Date(row.created_at).toLocaleString()}</td>
+                      <td>
+                        <span className={`admin-stock-change ${row.change > 0 ? "positive" : "negative"}`}>
+                          {row.change > 0 ? "+" : ""}
+                          {row.change}
+                        </span>
+                      </td>
+                      <td>{row.reason}</td>
+                      <td className="admin-muted">{row.note ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
 

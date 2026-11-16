@@ -34,42 +34,98 @@ export type CategoryRow = {
   description: string | null;
   position: number;
   /** False for categories kept in the database but hidden from the storefront
-   *  (for example the retired ``tablets`` and ``audio`` rows). */
+   *  (for example the retired ``tablets`` and ``audio`` rows). Requires 0007. */
   is_active: boolean;
+  /** Hierarchy from migration 0008: null means a top-level category. */
+  parent_id: string | null;
+  /** Storefront icon key (0008); null uses the built-in icon for the slug. */
+  icon: string | null;
+  /** Optional category banner image path (0008). */
+  banner_path: string | null;
 };
 
-const CATEGORY_COLUMNS = "id, slug, label, position, is_active";
-/** Column list for a database where migration 0007 has not been applied yet. */
+/** Fields an operator can change on a category. The slug is immutable. */
+export type CategoryInput = {
+  label?: string;
+  description?: string | null;
+  parentId?: string | null;
+  icon?: string | null;
+  bannerPath?: string | null;
+  isActive?: boolean;
+  position?: number;
+};
+
+/** Full column set: 0007 (is_active) plus 0008 presentation columns. */
+const CATEGORY_COLUMNS =
+  "id, slug, label, position, is_active, description, parent_id, icon, banner_path";
+/** 0007 applied, 0008 not yet. */
+const CATEGORY_COLUMNS_0007 = "id, slug, label, position, is_active";
+/** Pre-0007: no is_active column. */
 const CATEGORY_COLUMNS_LEGACY = "id, slug, label, position";
 
+const CATEGORY_COLUMN_TIERS = [
+  CATEGORY_COLUMNS,
+  CATEGORY_COLUMNS_0007,
+  CATEGORY_COLUMNS_LEGACY
+] as const;
+
+type PgError = { code?: string; message?: string } | null;
+
 /**
- * `categories.is_active` is created by migration 0007. Until that migration is
- * applied and verified, admin category queries must not fail: they fall back to
- * the legacy column list and treat every existing category as active (which is
- * exactly the pre-0007 truth — every category is visible).
+ * PostgREST reports a column the database does not have with 42703 (unknown
+ * column) or PGRST204 (missing from the schema cache). Only those errors are
+ * safe to retry with a narrower column list; anything else (network, RLS,
+ * missing table) is a real failure and is surfaced to the operator.
  */
-function missingIsActive(error: { code?: string; message?: string } | null): boolean {
+function isMissingColumn(error: PgError): boolean {
   if (!error) return false;
   const code = error.code ?? "";
-  const message = error.message ?? "";
   return (
     code === "42703" ||
     code === "PGRST204" ||
-    (/is_active/i.test(message) && /does not exist|schema cache/i.test(message))
+    /does not exist|schema cache/i.test(error.message ?? "")
   );
 }
 
-function normaliseCategory(
-  row: Record<string, unknown>,
-  description: string | null = null
-): CategoryRow {
+function pickColumns(payload: Record<string, unknown>, columns: string): Record<string, unknown> {
+  const allowed = new Set(columns.split(",").map(column => column.trim()).filter(Boolean));
+  const picked: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (allowed.has(key)) picked[key] = value;
+  }
+  return picked;
+}
+
+/**
+ * Runs a category query against the newest schema first and falls back one
+ * migration at a time, so the same build works on a database with 0007+0008,
+ * with 0007 only, or with neither.
+ */
+async function runCategoryQuery<T>(
+  db: AdminClient,
+  build: (columns: string) => PromiseLike<{ data: unknown; error: PgError }>
+): Promise<{ data: T | null }> {
+  let failure: PgError = null;
+  for (const columns of CATEGORY_COLUMN_TIERS) {
+    const result = await build(columns);
+    if (!result.error) return { data: (result.data ?? null) as T | null };
+    failure = result.error;
+    if (!isMissingColumn(result.error)) break;
+  }
+  throw new Error(failure?.message ?? "The category query failed.");
+}
+
+function normaliseCategory(row: Record<string, unknown>): CategoryRow {
   return {
     id: row.id as string,
     slug: row.slug as string,
     label: row.label as string,
-    position: row.position as number,
+    description: typeof row.description === "string" ? row.description : null,
+    position: typeof row.position === "number" ? row.position : 0,
     is_active: typeof row.is_active === "boolean" ? row.is_active : true,
-    description
+    parent_id: typeof row.parent_id === "string" ? row.parent_id : null,
+    icon: typeof row.icon === "string" ? row.icon : null,
+    banner_path: typeof row.banner_path === "string" ? row.banner_path : null
   };
 }
 
@@ -77,13 +133,10 @@ function normaliseCategory(
  *  product EDIT selector, so an operator can always see — and move a product
  *  off — a category that has been deactivated. */
 export async function listCategories(db: AdminClient): Promise<CategoryRow[]> {
-  const { data, error } = await db.from("categories").select(CATEGORY_COLUMNS).order("position");
-  if (!error) return (data ?? []).map((row) => normaliseCategory(row as Record<string, unknown>));
-  if (!missingIsActive(error)) throw new Error(error.message);
-
-  const legacy = await db.from("categories").select(CATEGORY_COLUMNS_LEGACY).order("position");
-  if (legacy.error) throw new Error(legacy.error.message);
-  return (legacy.data ?? []).map((row) => normaliseCategory(row as Record<string, unknown>));
+  const { data } = await runCategoryQuery<Record<string, unknown>[]>(db, columns =>
+    db.from("categories").select(columns).order("position")
+  );
+  return (data ?? []).map(normaliseCategory);
 }
 
 /** Active categories only. Used where a NEW product gets filed (create form and
@@ -93,87 +146,122 @@ export async function listActiveCategories(db: AdminClient): Promise<CategoryRow
   return rows.filter((row) => row.is_active);
 }
 
-export async function getCategoryById(db: AdminClient, id: string): Promise<CategoryRow | null> {
-  const { data, error } = await db.from("categories").select(CATEGORY_COLUMNS).eq("id", id).maybeSingle();
-  if (!error) return data ? normaliseCategory(data as Record<string, unknown>) : null;
-  if (!missingIsActive(error)) throw new Error(error.message);
+/** Live product counts per category id, for the admin category list. Counts
+ *  include hidden products because the admin needs to know a category is still
+ *  in use before it can be deleted. */
+export async function categoryProductCounts(db: AdminClient): Promise<Map<string, number>> {
+  const { data, error } = await db.from("products").select("category_id");
+  if (error) throw new Error(error.message);
+  const counts = new Map<string, number>();
+  for (const row of (data ?? []) as Array<{ category_id: string | null }>) {
+    if (!row.category_id) continue;
+    counts.set(row.category_id, (counts.get(row.category_id) ?? 0) + 1);
+  }
+  return counts;
+}
 
-  const legacy = await db.from("categories").select(CATEGORY_COLUMNS_LEGACY).eq("id", id).maybeSingle();
-  if (legacy.error) throw new Error(legacy.error.message);
-  return legacy.data ? normaliseCategory(legacy.data as Record<string, unknown>) : null;
+export async function getCategoryById(db: AdminClient, id: string): Promise<CategoryRow | null> {
+  const { data } = await runCategoryQuery<Record<string, unknown>>(db, columns =>
+    db.from("categories").select(columns).eq("id", id).maybeSingle()
+  );
+  return data ? normaliseCategory(data) : null;
 }
 
 /** Active categories only: every caller resolves a category so that a new
  *  product can be filed onto it, and a deactivated category must not accept
  *  new products. The admin UI uses listCategories() when it needs everything. */
 export async function getCategoryBySlug(db: AdminClient, slug: string): Promise<CategoryRow | null> {
-  const { data, error } = await db
-    .from("categories")
-    .select(CATEGORY_COLUMNS)
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .maybeSingle();
-  if (!error) return data ? normaliseCategory(data as Record<string, unknown>) : null;
-  if (!missingIsActive(error)) throw new Error(error.message);
-
-  // Pre-0007 there is no inactive category to exclude.
-  const legacy = await db
-    .from("categories")
-    .select(CATEGORY_COLUMNS_LEGACY)
-    .eq("slug", slug)
-    .maybeSingle();
-  if (legacy.error) throw new Error(legacy.error.message);
-  return legacy.data ? normaliseCategory(legacy.data as Record<string, unknown>) : null;
+  const { data } = await runCategoryQuery<Record<string, unknown>>(db, columns => {
+    const query = db.from("categories").select(columns).eq("slug", slug);
+    // Pre-0007 there is no inactive category to exclude.
+    const activeOnly = columns.includes("is_active") ? query.eq("is_active", true) : query;
+    return activeOnly.maybeSingle();
+  });
+  return data ? normaliseCategory(data) : null;
 }
 
-export async function createCategory(db: AdminClient, input: { slug: string; label: string; description?: string | null }): Promise<CategoryRow> {
-  const first = await db
-    .from("categories")
-    .insert({ slug: input.slug, label: input.label, is_active: true })
-    .select(CATEGORY_COLUMNS)
-    .single();
-  if (!first.error && first.data) {
-    return normaliseCategory(first.data as Record<string, unknown>, input.description ?? null);
-  }
-  if (!missingIsActive(first.error)) {
-    throw new Error(first.error?.message ?? "The category could not be created.");
-  }
+export async function createCategory(
+  db: AdminClient,
+  input: CategoryInput & { slug: string; label: string }
+): Promise<CategoryRow> {
+  const row: Record<string, unknown> = {
+    slug: input.slug,
+    label: input.label,
+    is_active: input.isActive ?? true
+  };
+  if (input.position !== undefined) row.position = input.position;
+  if (input.description != null) row.description = input.description;
+  if (input.parentId != null) row.parent_id = input.parentId;
+  if (input.icon != null) row.icon = input.icon;
+  if (input.bannerPath != null) row.banner_path = input.bannerPath;
 
-  // Pre-0007: the column does not exist, so it is omitted from the insert.
-  const legacy = await db
-    .from("categories")
-    .insert({ slug: input.slug, label: input.label })
-    .select(CATEGORY_COLUMNS_LEGACY)
-    .single();
-  if (legacy.error || !legacy.data) {
-    throw new Error(legacy.error?.message ?? "The category could not be created.");
+  let failure: PgError = null;
+  for (const tier of CATEGORY_COLUMN_TIERS) {
+    // Widen to `string`: a literal union makes PostgREST's parser generic infer
+    // an error type for `.select()`.
+    const columns: string = tier;
+    const result = await db
+      .from("categories")
+      .insert(pickColumns(row, columns))
+      .select(columns)
+      .single();
+    if (!result.error && result.data) return normaliseCategory(result.data as unknown as Record<string, unknown>);
+    failure = result.error;
+    if (!isMissingColumn(result.error)) break;
   }
-  return normaliseCategory(legacy.data as Record<string, unknown>, input.description ?? null);
+  throw new Error(failure?.message ?? "The category could not be created.");
 }
 
-export async function updateCategory(db: AdminClient, id: string, input: { label?: string; description?: string | null; position?: number }): Promise<CategoryRow> {
+/** Refuses a parent that is the category itself or one of its descendants. */
+async function assertValidParent(db: AdminClient, id: string, parentId: string): Promise<void> {
+  if (parentId === id) throw new Error("A category cannot be its own parent.");
+  const rows = await listCategories(db);
+  const byId = new Map(rows.map(row => [row.id, row]));
+  if (!byId.has(parentId)) throw new Error("The selected parent category no longer exists.");
+  const seen = new Set<string>();
+  let cursor = byId.get(parentId)?.parent_id ?? null;
+  while (cursor && !seen.has(cursor)) {
+    if (cursor === id) throw new Error("That parent would create a loop in the category tree.");
+    seen.add(cursor);
+    cursor = byId.get(cursor)?.parent_id ?? null;
+  }
+}
+
+export async function updateCategory(
+  db: AdminClient,
+  id: string,
+  input: CategoryInput
+): Promise<CategoryRow> {
+  if (input.parentId != null) await assertValidParent(db, id, input.parentId);
+
   const patch: Record<string, unknown> = {};
   if (input.label !== undefined) patch.label = input.label;
   if (input.position !== undefined) patch.position = input.position;
-  // is_active is deliberately not patchable here: it is preserved by omission,
-  // so editing a label can never accidentally reactivate or deactivate a row.
-  const first = await db.from("categories").update(patch).eq("id", id).select(CATEGORY_COLUMNS).single();
-  if (!first.error && first.data) {
-    return normaliseCategory(first.data as Record<string, unknown>, input.description ?? null);
-  }
-  if (!missingIsActive(first.error)) {
-    throw new Error(first.error?.message ?? "The category could not be updated.");
-  }
+  // Only sent when the caller asks for it, so editing copy can never flip a
+  // retired category back into the storefront by accident.
+  if (input.isActive !== undefined) patch.is_active = input.isActive;
+  if (input.description !== undefined) patch.description = input.description;
+  if (input.parentId !== undefined) patch.parent_id = input.parentId;
+  if (input.icon !== undefined) patch.icon = input.icon;
+  if (input.bannerPath !== undefined) patch.banner_path = input.bannerPath;
 
-  const legacy = await db
-    .from("categories")
-    .update(patch)
-    .eq("id", id)
-    .select(CATEGORY_COLUMNS_LEGACY)
-    .single();
-  if (legacy.error) throw new Error(legacy.error.message);
-  if (!legacy.data) throw new Error("Category not found.");
-  return normaliseCategory(legacy.data as Record<string, unknown>, input.description ?? null);
+  let failure: PgError = null;
+  for (const tier of CATEGORY_COLUMN_TIERS) {
+    const columns: string = tier;
+    const result = await db
+      .from("categories")
+      .update(pickColumns(patch, columns))
+      .eq("id", id)
+      .select(columns)
+      .maybeSingle();
+    if (!result.error) {
+      if (!result.data) throw new Error("Category not found.");
+      return normaliseCategory(result.data as unknown as Record<string, unknown>);
+    }
+    failure = result.error;
+    if (!isMissingColumn(result.error)) break;
+  }
+  throw new Error(failure?.message ?? "The category could not be updated.");
 }
 
 export async function deleteCategory(db: AdminClient, id: string): Promise<void> {
@@ -190,6 +278,14 @@ export async function deleteCategory(db: AdminClient, id: string): Promise<void>
     throw new Error("Cannot delete this category: products still use it. Reassign them to another category first.");
   }
 
+  // Subcategories are a real relationship (0008), so a parent cannot be
+  // deleted out from under its children either.
+  const rows = await listCategories(db);
+  const child = rows.find(row => row.parent_id === id);
+  if (child) {
+    throw new Error(`Cannot delete this category: "${child.label}" is filed under it. Move or delete the child category first.`);
+  }
+
   const { error } = await db.from("categories").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
@@ -200,40 +296,45 @@ export type BrandRow = {
   slug: string;
   description: string | null;
   position: number;
+  /** Brand logo path (0002). Null means no logo has been uploaded yet. */
+  logo_path: string | null;
 };
+
+const BRAND_COLUMNS = "id, name, slug, description, position, logo_path";
 
 export async function listBrands(db: AdminClient, pagination?: Page) {
   const { offset, limit } = range(pagination);
-  const { data, error, count } = await db.from("brands").select("id, name, slug, description, position", { count: "exact" }).order("position").order("name").range(offset, offset + limit - 1);
+  const { data, error, count } = await db.from("brands").select(BRAND_COLUMNS, { count: "exact" }).order("position").order("name").range(offset, offset + limit - 1);
   if (error) throw new Error(error.message);
   return { rows: (data ?? []) as BrandRow[], total: count ?? 0 };
 }
 
 export async function allBrands(db: AdminClient): Promise<BrandRow[]> {
-  const { data, error } = await db.from("brands").select("id, name, slug, description, position").order("name");
+  const { data, error } = await db.from("brands").select(BRAND_COLUMNS).order("name");
   if (error) throw new Error(error.message);
   return (data ?? []) as BrandRow[];
 }
 
 export async function getBrandBySlug(db: AdminClient, slug: string): Promise<BrandRow | null> {
-  const { data, error } = await db.from("brands").select("id, name, slug, description, position").eq("slug", slug).maybeSingle();
+  const { data, error } = await db.from("brands").select(BRAND_COLUMNS).eq("slug", slug).maybeSingle();
   if (error) throw new Error(error.message);
   return (data ?? null) as BrandRow | null;
 }
 
-export async function createBrand(db: AdminClient, input: { name: string; slug: string; description?: string | null; position?: number }): Promise<BrandRow> {
-  const { data, error } = await db.from("brands").insert({ name: input.name, slug: input.slug, description: input.description ?? null, position: input.position ?? 0 }).select("id, name, slug, description, position").single();
+export async function createBrand(db: AdminClient, input: { name: string; slug: string; description?: string | null; logoPath?: string | null; position?: number }): Promise<BrandRow> {
+  const { data, error } = await db.from("brands").insert({ name: input.name, slug: input.slug, description: input.description ?? null, logo_path: input.logoPath ?? null, position: input.position ?? 0 }).select(BRAND_COLUMNS).single();
   if (error) throw new Error(error.message);
   return data as BrandRow;
 }
 
-export async function updateBrand(db: AdminClient, id: string, input: { name?: string; slug?: string; description?: string | null; position?: number }): Promise<BrandRow> {
+export async function updateBrand(db: AdminClient, id: string, input: { name?: string; slug?: string; description?: string | null; logoPath?: string | null; position?: number }): Promise<BrandRow> {
   const patch: Record<string, unknown> = {};
   if (input.name !== undefined) patch.name = input.name;
   if (input.slug !== undefined) patch.slug = input.slug;
   if (input.description !== undefined) patch.description = input.description;
+  if (input.logoPath !== undefined) patch.logo_path = input.logoPath;
   if (input.position !== undefined) patch.position = input.position;
-  const { data, error } = await db.from("brands").update(patch).eq("id", id).select("id, name, slug, description, position").single();
+  const { data, error } = await db.from("brands").update(patch).eq("id", id).select(BRAND_COLUMNS).single();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Brand not found.");
   return data as BrandRow;
@@ -241,6 +342,37 @@ export async function updateBrand(db: AdminClient, id: string, input: { name?: s
 
 export async function deleteBrand(db: AdminClient, id: string): Promise<void> {
   const { error } = await db.from("brands").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Categories a brand is represented in (table `brand_categories`, 0008).
+ * Returns an empty list when the link table has not been created yet, so the
+ * brand editor still loads on an older database.
+ */
+export async function listBrandCategoryIds(db: AdminClient, brandId: string): Promise<string[]> {
+  const { data, error } = await db.from("brand_categories").select("category_id").eq("brand_id", brandId);
+  if (error) {
+    if (error.code === "42P01" || /does not exist/i.test(error.message ?? "")) return [];
+    throw new Error(error.message);
+  }
+  return ((data ?? []) as Array<{ category_id: string }>).map(row => row.category_id);
+}
+
+/** Replaces the brand's category links with exactly the supplied set. */
+export async function setBrandCategories(db: AdminClient, brandId: string, categoryIds: string[]): Promise<void> {
+  const unique = Array.from(new Set(categoryIds.filter(Boolean)));
+  const { error: clearError } = await db.from("brand_categories").delete().eq("brand_id", brandId);
+  if (clearError) {
+    if (clearError.code === "42P01" || /does not exist/i.test(clearError.message ?? "")) {
+      throw new Error("Brand/category links need migration 0008_catalogue_presentation.sql, which is not applied to this database.");
+    }
+    throw new Error(clearError.message);
+  }
+  if (unique.length === 0) return;
+  const { error } = await db
+    .from("brand_categories")
+    .insert(unique.map(categoryId => ({ brand_id: brandId, category_id: categoryId })));
   if (error) throw new Error(error.message);
 }
 
@@ -269,6 +401,10 @@ export type ProductRow = {
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
+  /** Country of origin, only when documented (0008). */
+  origin: string | null;
+  /** Supplier or manufacturer page the data was verified against (0008). */
+  source_url: string | null;
   images: ProductImageRow[];
   stock: number;
 };
@@ -276,7 +412,7 @@ export type ProductRow = {
 export type ProductDetailRow = ProductRow & { on_hand: number | null };
 
 const PRODUCT_COLUMNS =
-  "id, slug, title, category:categories(id, slug, label), brand:brands(id, slug, name), short_description, description, specs, price_cents, compare_at_price_cents, badge, rating, reviews, is_active, is_featured, created_at, product_images(id, kind, path, position), inventory(on_hand, variant_id)";
+  "id, slug, title, category:categories(id, slug, label), brand:brands(id, slug, name), short_description, description, specs, price_cents, compare_at_price_cents, badge, rating, reviews, is_active, is_featured, origin, source_url, created_at, product_images(id, kind, path, position), inventory(on_hand, variant_id)";
 
 function normaliseProduct(row: Record<string, unknown>): ProductRow {
   const categoryRaw = row.category;

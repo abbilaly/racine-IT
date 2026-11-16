@@ -8,11 +8,12 @@ import { ArrowLeft, Package, Edit2, Trash2, Plus, History, Upload } from "lucide
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductImagesPage({ params }: { params: { id: string } }) {
+export default async function AdminProductImagesPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
 
-  const product = await getProductDetail(db, params.id);
+  const product = await getProductDetail(db, id);
   if (!product) notFound();
 
   return (
@@ -26,7 +27,7 @@ export default async function AdminProductImagesPage({ params }: { params: { id:
           <h1>Manage images</h1>
           <p className="admin-page-subtitle">{product.title}</p>
         </div>
-        <Link href={`/admin/products/${params.id}/edit`} className="btn-dark">
+        <Link href={`/admin/products/${id}/edit`} className="btn-dark">
           <Edit2 size={16} />
           Edit product
         </Link>
@@ -38,7 +39,7 @@ export default async function AdminProductImagesPage({ params }: { params: { id:
             <h2>Product images</h2>
             <p className="admin-card-subtitle">Primary image is shown on the storefront.</p>
           </div>
-          <ProductImages productId={params.id} images={product.images} />
+          <ProductImages productId={id} images={product.images} />
         </section>
       </div>
     </div>

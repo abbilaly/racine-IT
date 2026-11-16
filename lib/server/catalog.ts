@@ -35,6 +35,8 @@ type ProductRow = {
   /** PostgREST returns the embedded to-one relation as an object or a one-element array. */
   category: unknown;
   brand: unknown;
+  /** Country of origin, only when the catalogue documents it (0008). */
+  origin: string | null;
 };
 
 type ImageRow = { product_id: string; kind: string; path: string };
@@ -101,7 +103,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     supabase
       .from("products")
       .select(
-        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,category:categories(slug,label),brand:brands(name)"
+        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,origin,category:categories(slug,label),brand:brands(name)"
       )
       .eq("is_active", true)
       .order("created_at"),
@@ -176,6 +178,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
       title: row.title,
       category: categorySlug || fallback?.category || "",
       ...(brandName ? { brand: brandName } : {}),
+      ...(row.origin ? { origin: row.origin } : {}),
       ...(colours.length > 0 ? { colours } : {}),
       image: images.primary ?? fallback?.image ?? "",
       hover: images.hover ?? images.primary ?? fallback?.hover ?? "",
