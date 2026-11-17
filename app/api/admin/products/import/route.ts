@@ -54,9 +54,9 @@ type PreviewRow = ImportRow & {
 };
 
 function parseCsV(body: string): string[][] {
-  const lines: string[][] = [];
-  let current = "";
-  let field: string[] = [];
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
   let inQuotes = false;
 
   for (let i = 0; i < body.length; i++) {
@@ -66,13 +66,13 @@ function parseCsV(body: string): string[][] {
     if (inQuotes) {
       if (ch === '"') {
         if (next === '"') {
-          field.push('"');
+          field += '"';
           i++;
         } else {
           inQuotes = false;
         }
       } else {
-        field.push(ch);
+        field += ch;
       }
       continue;
     }
@@ -82,29 +82,28 @@ function parseCsV(body: string): string[][] {
       continue;
     }
     if (ch === ",") {
-      field.push(current);
-      current = "";
-      lines.push(field);
-      field = [];
+      row.push(field.trim());
+      field = "";
       continue;
     }
     if (ch === "\n" || ch === "\r") {
       if (next === "\r" || next === "\n") i++;
-      field.push(current.trim());
-      current = "";
-      lines.push(field.filter(Boolean));
-      field = [];
+      row.push(field.trim());
+      rows.push(row);
+      row = [];
+      field = "";
       continue;
     }
-    current += ch;
+    field += ch;
   }
 
-  if (current || field.length) {
-    field.push(current.trim());
-    lines.push(field.filter(Boolean));
+  if (field !== "" || row.length > 0) {
+    row.push(field.trim());
+    rows.push(row);
   }
 
-  return lines;
+  // Preserve empty cells (columns are read by index) but drop blank lines.
+  return rows.filter(cells => cells.some(cell => cell !== ""));
 }
 
 function parseFloatField(value: string | undefined, field: string): number | null {

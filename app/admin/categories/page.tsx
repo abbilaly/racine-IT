@@ -1,6 +1,7 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { listCategories, categoryProductCounts } from "@/lib/server/admin-data";
 import { CategoriesManager } from "@/components/admin/CategoriesManager";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -10,18 +11,14 @@ export default async function AdminCategoriesPage() {
 
   const categories = await listCategories(db);
   const counts = await categoryProductCounts(db);
+  const visible = categories.filter(category => category.is_active).length;
 
   return (
-    <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-title">
-          <h1>Categories</h1>
-          <p className="admin-page-subtitle">
-            {categories.filter(category => category.is_active).length} visible ·{" "}
-            {categories.length} total. Slugs power storefront URLs and cannot be renamed.
-          </p>
-        </div>
-      </div>
+    <div className="admin-page admin-manager-page">
+      <TablePageHeader
+        title="Categories"
+        subtitle={`${visible} visible · ${categories.length} total · slugs power storefront URLs and cannot be renamed`}
+      />
 
       <CategoriesManager
         initial={categories}

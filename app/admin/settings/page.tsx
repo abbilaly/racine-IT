@@ -1,5 +1,7 @@
 import SettingsForm, { type AdminSettings } from "@/components/admin/SettingsForm";
 import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
+import { TableCard } from "@/components/admin/tables/table";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +20,16 @@ export default async function AdminSettingsPage() {
   if (error || !data) {
     return (
       <div className="admin-page">
-        <div className="empty-state">
-          <h2>Store settings are unavailable</h2>
-          <p>{error?.message ?? "The settings row is missing from the database."}</p>
-        </div>
+        <TablePageHeader
+          title="Store settings"
+          subtitle="Shipping fees and checkout availability, read by the storefront and by checkout"
+        />
+        <TableCard className="p-6">
+          <h2 className="m-0 text-[14px] font-semibold text-foreground">Store settings are unavailable</h2>
+          <p className="m-0 mt-1 text-[13px] text-muted-foreground">
+            {error?.message ?? "The settings row is missing from the database."}
+          </p>
+        </TableCard>
       </div>
     );
   }
@@ -36,12 +44,10 @@ export default async function AdminSettingsPage() {
 
   return (
     <div className="admin-page">
-      <div className="page-heading">
-        <div>
-          <h1>Store settings</h1>
-          <p>Shipping fees and checkout availability, read by the storefront and by checkout</p>
-        </div>
-      </div>
+      <TablePageHeader
+        title="Store settings"
+        subtitle="Shipping fees and checkout availability, read by the storefront and by checkout"
+      />
       <SettingsForm initial={initial} />
     </div>
   );

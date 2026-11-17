@@ -1482,7 +1482,7 @@ body:has(.admin-shell[data-admin-theme="dark"]) {
    The brand CRUD component keeps its behaviour; these rules map its legacy
    classes onto the shared tokens so it matches the migrated tables.
    ========================================================================== */
-.admin-brands-page :is(.admin-card, .admin-form) {
+.admin-manager-page :is(.admin-card, .admin-form) {
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--card);
@@ -1490,11 +1490,11 @@ body:has(.admin-shell[data-admin-theme="dark"]) {
   box-shadow: none;
 }
 
-.admin-brands-page .admin-card-header {
+.admin-manager-page .admin-card-header {
   border-color: var(--border);
 }
 
-.admin-brands-page .admin-table th {
+.admin-manager-page .admin-table th {
   background: var(--muted);
   color: var(--muted-foreground);
   font-size: 10px;
@@ -1502,46 +1502,46 @@ body:has(.admin-shell[data-admin-theme="dark"]) {
   letter-spacing: 0.08em;
 }
 
-.admin-brands-page .admin-table td {
+.admin-manager-page .admin-table td {
   border-color: var(--border);
 }
 
-.admin-brands-page .admin-table tr:hover {
+.admin-manager-page .admin-table tr:hover {
   background: var(--accent);
 }
 
-.admin-brands-page :is(.admin-input, .admin-textarea, .admin-search-input, .admin-search, .admin-select) {
+.admin-manager-page :is(.admin-input, .admin-textarea, .admin-search-input, .admin-search, .admin-select) {
   border-color: var(--input);
   border-radius: 8px;
   background: var(--card);
   color: var(--foreground);
 }
 
-.admin-brands-page .admin-label {
+.admin-manager-page .admin-label {
   color: var(--muted-foreground);
   font-size: 11px;
   font-weight: 500;
 }
 
-.admin-brands-page .btn-dark {
+.admin-manager-page .btn-dark {
   border-radius: 8px;
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-.admin-brands-page .btn-outline {
+.admin-manager-page .btn-outline {
   border-radius: 8px;
   border-color: var(--border);
   background: var(--card);
   color: var(--foreground);
 }
 
-.admin-brands-page .admin-catalogue {
+.admin-manager-page .admin-catalogue {
   border-color: var(--border);
   border-radius: 12px;
 }
 
-.admin-brands-page .admin-catalogue-preview {
+.admin-manager-page .admin-catalogue-preview {
   background: var(--muted);
 }
 
@@ -1567,4 +1567,81 @@ body:has(.admin-shell[data-admin-theme="dark"]) {
 [data-slot="sheet-content"] :is(input, select, textarea, button, a):focus-visible,
 [data-slot="dropdown-menu-content"] :is(input, select, textarea, button, a):focus-visible {
   outline: none;
+}
+
+/* Shared skin for the client-side CRUD managers (brands, categories,
+   suppliers). They keep their own behaviour and markup; only the legacy
+   visual layer is re-pointed at the design tokens. */
+.admin-manager-page :is(.admin-action-btn) {
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--muted-foreground);
+}
+
+.admin-manager-page :is(.admin-action-btn):hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.admin-manager-page .admin-action-btn--danger:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.admin-manager-page .admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.admin-manager-page .admin-status-pill.is-active {
+  background: color-mix(in oklab, #10b981 14%, transparent);
+  color: #047857;
+}
+
+.admin-manager-page .admin-status-pill.is-hidden {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+html:has(.admin-shell[data-admin-theme="dark"]) .admin-manager-page .admin-status-pill.is-active {
+  color: #34d399;
+}
+
+.admin-manager-page :is(.admin-assistive-text, .admin-muted, .admin-category-desc) {
+  color: var(--muted-foreground);
+}
+
+.admin-manager-page :is(.admin-checkbox) {
+  color: var(--foreground);
+  font-size: 12px;
+}
+
+.admin-manager-page .admin-form-error {
+  border-color: color-mix(in oklab, var(--destructive) 35%, transparent);
+  background: color-mix(in oklab, var(--destructive) 10%, transparent);
+  color: var(--destructive);
+}
+
+.admin-manager-page .admin-form-success {
+  border-color: color-mix(in oklab, #10b981 35%, transparent);
+  background: color-mix(in oklab, #10b981 12%, transparent);
+  color: #047857;
+}
+
+html:has(.admin-shell[data-admin-theme="dark"]) .admin-manager-page .admin-form-success {
+  color: #34d399;
+}
+
+.admin-manager-page .admin-upload-progress > span {
+  background: var(--primary);
+}
+
+.admin-manager-page .admin-catalogue-media-body :is(.admin-input) {
+  background: var(--card);
 }

@@ -13,7 +13,7 @@ export default async function AdminBrandsPage() {
   const categories = await listCategories(db);
 
   return (
-    <div className="admin-page admin-brands-page">
+    <div className="admin-page admin-manager-page">
       <TablePageHeader
         title="Brands"
         subtitle={`${brands.length.toLocaleString()} brand${brands.length === 1 ? "" : "s"} · logos, display order and category coverage`}
