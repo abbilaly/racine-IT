@@ -28,8 +28,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ logs });
     }
 
-    const rows = await db.from("suppliers").select("id, name, slug, contact_name, email, phone, website, notes, enabled, last_sync_at").order("name");
-    return NextResponse.json({ suppliers: rows });
+    const { data, error } = await db
+      .from("suppliers")
+      .select("id, name, slug, contact_name, email, phone, website, notes, enabled, last_sync_at")
+      .order("name");
+    if (error) throw new Error(error.message);
+    return NextResponse.json({ suppliers: data ?? [] });
   } catch (error) {
     return fail(error instanceof Error ? error.message : "Could not load suppliers.", 500);
   }

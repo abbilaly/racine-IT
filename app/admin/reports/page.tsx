@@ -34,6 +34,12 @@ function shortDay(period: string): string {
   }).format(new Date(`${period}T00:00:00.000Z`));
 }
 
+function isCalendarDate(value: string | undefined): value is string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
 function displayDate(date: string): string {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -53,8 +59,8 @@ export default async function AdminReportsPage({
   const params = await searchParams;
 
   const today = new Date().toISOString().slice(0, 10);
-  const to = /^\d{4}-\d{2}-\d{2}$/.test(params.to ?? "") ? (params.to as string) : today;
-  const from = /^\d{4}-\d{2}-\d{2}$/.test(params.from ?? "") ? (params.from as string) : last30Days().slice(0, 10);
+  const to = isCalendarDate(params.to) ? params.to : today;
+  const from = isCalendarDate(params.from) ? params.from : last30Days().slice(0, 10);
 
   const fromISO = `${from}T00:00:00.000Z`;
   const toISO = `${to}T23:59:59.999Z`;

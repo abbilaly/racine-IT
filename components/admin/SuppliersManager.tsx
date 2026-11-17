@@ -59,10 +59,10 @@ export function SuppliersManager() {
       ]);
       const suppliersData = await suppliersRes.json().catch(() => ({}));
       if (!suppliersRes.ok) throw new Error(suppliersData.error || "Could not load suppliers.");
-      setRows(suppliersData.suppliers ?? []);
+      setRows(Array.isArray(suppliersData.suppliers) ? suppliersData.suppliers : []);
 
       const logsData = await logsRes.json().catch(() => ({}));
-      if (logsRes.ok) setLogs(logsData.logs ?? []);
+      if (logsRes.ok) setLogs(Array.isArray(logsData.logs) ? logsData.logs : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load suppliers.");
       setRows([]);
