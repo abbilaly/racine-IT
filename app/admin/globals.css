@@ -1309,3 +1309,158 @@
 
 /* signed-out shell: only the sign-in page renders inside this */
 .admin-anonymous { min-height: 100vh; }
+
+/* ==========================================================================
+   Phase 1 — admin shell
+   ========================================================================== */
+
+/* The shell chrome and the content area share one background token so the
+   header does not sit on a visibly different grey than the page below it. */
+.admin-shell .admin-main {
+  background: var(--background);
+}
+
+/* Route entrance: subtle, short, and disabled for reduced-motion users. */
+@keyframes admin-route-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .admin-main > * {
+    animation: admin-route-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell *,
+  .admin-shell *::before,
+  .admin-shell *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- Dark-theme compatibility for not-yet-migrated pages -------------------
+   Phase 1 themes the shell. The page bodies still carry the legacy light
+   palette; these overrides map their main surfaces onto the same tokens so a
+   dark admin stays legible. Page-by-page polish replaces this block as each
+   page migrates in later phases. */
+.admin-shell[data-admin-theme="dark"] .admin-main {
+  color: var(--foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(
+  .admin-card,
+  .admin-card--wide,
+  .admin-card-header,
+  .admin-card-subtitle,
+  .admin-page-section,
+  .admin-stats,
+  .admin-stat,
+  .admin-toolbar,
+  .admin-search,
+  .admin-form-section,
+  .admin-input,
+  .admin-select,
+  .admin-table-wrap,
+  .admin-table-wrapper,
+  .admin-table-responsive,
+  .admin-pagination-btn
+) {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--card-foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(h1, h2, h3, h4) {
+  color: var(--foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(
+  .admin-page-subtitle,
+  .admin-card-subtitle,
+  .muted-note,
+  .admin-meta
+) {
+  color: var(--muted-foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(input, select, textarea) {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--input);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(table, th, td, tr) {
+  border-color: var(--border);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main th {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main tbody tr:hover {
+  background: var(--muted);
+}
+
+/* The admin renders inside the storefront root layout. That layout exists so
+   catalogue outages cannot take /admin offline, but its shop chrome (promo
+   bar, shop header, footer, mobile bars) must not frame the admin screens.
+   Scoped to admin stylesheets and to pages where the shell is present, so the
+   storefront is untouched. */
+body:has(.admin-shell) :is(
+  .promo-bar,
+  .topbar,
+  .main-header,
+  .main-nav,
+  .footer,
+  .bottom-nav,
+  .compare-tray,
+  .menu-sheet
+) {
+  display: none !important;
+}
+
+/* The content column is a flex item inside the shell. Some not-yet-migrated
+   pages (wide tables, toolbars) still have a min-content width larger than the
+   viewport, which used to push the whole document sideways. Sizing the column
+   to the shell and containing its inline size keeps the document at viewport
+   width, while `.admin-table-*` wrappers keep their own horizontal scroll. */
+.admin-main {
+  width: 100%;
+  max-width: 100%;
+  contain: inline-size;
+}
+
+/* Dark-mode legibility for the legacy table/toolbar text that still hard-codes
+   the light palette. Removed page by page as those screens migrate. */
+.admin-shell[data-admin-theme="dark"] .admin-main :is(
+  .admin-table td,
+  .admin-table td strong,
+  .admin-table a,
+  .admin-card a
+) {
+  color: var(--foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(
+  .admin-toolbar label,
+  .admin-form-row label,
+  .field label
+) {
+  color: var(--muted-foreground);
+}
+
+.admin-shell[data-admin-theme="dark"] .admin-main :is(input, textarea)::placeholder {
+  color: var(--muted-foreground);
+}

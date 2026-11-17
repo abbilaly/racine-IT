@@ -1,132 +1,116 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Package,
-  Tag,
-  ShoppingCart,
-  Settings,
-  Users,
-  BarChart3,
-  FileText,
-  Upload,
-  Box,
-  Mail,
-  ChevronRight,
-  LogOut,
-  AlertTriangle,
-  type LucideIcon,
-} from "lucide-react";
-import { EMAIL_CENTER_ENABLED } from "@/lib/site-config";
+import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { SidebarNav } from "./shell/sidebar-nav";
+import { LogoutForm } from "./shell/logout-form";
 
-type NavLinkItem = { href: string; label: string; icon: LucideIcon };
-type NavSectionItem = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  section: string;
-  sub: ReadonlyArray<{ href: string; label: string }>;
-};
+function initials(email: string): string {
+  const name = email.split("@")[0] ?? "";
+  const parts = name.split(/[._-]+/).filter(Boolean);
+  const letters = parts.length > 1 ? parts[0][0] + parts[1][0] : name.slice(0, 2);
+  return (letters || "AB").toUpperCase();
+}
 
-const NAV: ReadonlyArray<NavLinkItem | NavSectionItem> = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/categories", label: "Categories", icon: Tag },
-  { href: "/admin/brands", label: "Brands", icon: Tag },
-  { href: "/admin/inventory", label: "Inventory", icon: Box },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/customers", label: "Customers", icon: Users },
-  { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-  { href: "/admin/quotations", label: "Quotations", icon: FileText },
-  { href: "/admin/suppliers", label: "Suppliers", icon: Tag },
-  { href: "/admin/products/import", label: "Import", icon: Upload },
-  {
-    href: "/admin/emails",
-    label: "Email Center",
-    icon: Mail,
-    section: "Email Center",
-    sub: [
-      { href: "/admin/emails", label: "Overview" },
-      { href: "/admin/emails/history", label: "History" },
-      { href: "/admin/templates", label: "Templates" },
-      { href: "/admin/campaigns", label: "Campaigns" },
-      { href: "/admin/followups", label: "Follow-ups" },
-      { href: "/admin/webhooks", label: "Webhooks" },
-    ],
-  },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
-];
-
-export function AdminSidebar() {
-  const pathname = usePathname();
-
+/**
+ * Desktop navigation rail. Collapses to an icon rail; the mobile drawer lives
+ * in AdminShell so this component stays a single-purpose aside.
+ */
+export function AdminSidebar({
+  collapsed,
+  onToggle,
+  email,
+  role
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+  email: string;
+  role: string;
+}) {
   return (
-    <aside className="admin-sidebar">
-      <div className="admin-sidebar-section">
-        <nav className="admin-sidebar-nav">
-          {NAV.filter(item => EMAIL_CENTER_ENABLED || !("section" in item)).map((item) => {
-            if ("section" in item) {
-              return (
-                <div key={item.href} className="admin-sidebar-section admin-sidebar-email">
-                  <div className="admin-sidebar-heading">{item.label}</div>
-                  <nav className="admin-sidebar-nav admin-sidebar-nav--sub">
-                    {item.sub.map((sub) => {
-                      const active =
-                        pathname === sub.href ||
-                        pathname.startsWith(sub.href + "/");
-                      return (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
-                          className={`admin-sidebar-link${active ? " active" : ""}`}
-                        >
-                          {sub.label}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </div>
-              );
-            }
+    <aside
+      aria-label="Admin navigation"
+      className={cn(
+        "sticky top-0 hidden h-screen shrink-0 flex-col bg-[#100024] font-sans text-white lg:flex",
+        "transition-[width] duration-200 ease-out",
+        collapsed ? "w-[76px]" : "w-[264px]"
+      )}
+    >
+      <div
+        className={cn(
+          "flex h-14 items-center border-b border-white/[0.07]",
+          collapsed ? "justify-center px-0" : "gap-2.5 px-4"
+        )}
+      >
+        <Link
+          href="/admin"
+          className="flex min-w-0 items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          aria-label="AB Tech admin dashboard"
+        >
+          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white/10 text-[11px] font-bold tracking-wide text-[#c9bdf5]">
+            AB
+          </span>
+          {!collapsed && (
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-[13px] font-semibold text-white">AB Tech</span>
+              <span className="block text-[10px] uppercase tracking-[0.14em] text-white/40">Admin</span>
+            </span>
+          )}
+        </Link>
+      </div>
 
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`admin-sidebar-link${active ? " active" : ""}`}
+      <div className={cn("flex-1 overflow-y-auto overflow-x-hidden", collapsed ? "px-2" : "px-3")}>
+        <SidebarNav collapsed={collapsed} />
+      </div>
+
+      <div className="border-t border-white/[0.07] p-3">
+        <div className={cn("flex items-center gap-2", collapsed && "justify-center")}>
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/10 text-[11px] font-semibold text-white">
+            {initials(email)}
+          </span>
+          {!collapsed && (
+            <span className="min-w-0 flex-1 leading-tight">
+              <span className="block truncate text-[12px] font-medium text-white/90" title={email}>
+                {email}
+              </span>
+              <span className="block text-[10px] uppercase tracking-[0.1em] text-white/40">{role}</span>
+            </span>
+          )}
+          {!collapsed && (
+            <LogoutForm>
+              <button
+                type="submit"
+                title="Sign out"
+                aria-label="Sign out"
+                className="grid size-8 place-items-center rounded-md border-0 bg-transparent text-white/45 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
               >
-                <item.icon size={18} />
-                <span>{item.label}</span>
-                {active && <ChevronRight size={14} className="admin-sidebar-link-arrow" />}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      <div className="admin-sidebar-section">
-        <div className="admin-sidebar-header">
-          <h2 className="admin-sidebar-heading">Admin</h2>
+                <LogOut size={15} aria-hidden="true" />
+              </button>
+            </LogoutForm>
+          )}
         </div>
-        <nav className="admin-sidebar-nav">
-          <Link
-            href="/admin/login"
-            className={`admin-sidebar-link${pathname === "/admin/login" ? " active" : ""}`}
-          >
-            <LogOut size={18} />
-            <span>Sign out</span>
-          </Link>
-        </nav>
-      </div>
 
-      <div className="admin-sidebar-footer">
-        <div className="admin-sidebar-footer-notice">
-          <AlertTriangle size={14} />
-          <span>AB Tech Admin · Private</span>
-        </div>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          className={cn(
+            "mt-2 flex w-full items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1.5 text-[11px] font-medium text-white/40",
+            "transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
+            collapsed && "justify-center px-0"
+          )}
+        >
+          {collapsed ? (
+            <PanelLeftOpen size={15} aria-hidden="true" />
+          ) : (
+            <>
+              <PanelLeftClose size={15} aria-hidden="true" />
+              <span>Collapse</span>
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );

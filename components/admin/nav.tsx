@@ -37,23 +37,13 @@ export default function AdminNav() {
   );
 }
 
-export function AdminBreadcrumbs({
-  items,
-}: {
+/**
+ * Breadcrumbs now live in the admin shell header, derived from the URL, so
+ * page-level copies would duplicate them. The export stays so existing pages
+ * keep compiling; it intentionally renders nothing.
+ */
+export function AdminBreadcrumbs(_props: {
   items: Array<{ label: string; href?: string }>;
 }) {
-  return (
-    <nav className="admin-breadcrumbs" aria-label="Breadcrumb">
-      {items.map((item, i) => (
-        <span key={i} className="admin-breadcrumb-item">
-          {i > 0 && <span className="admin-breadcrumb-sep" aria-hidden="true">/</span>}
-          {item.href ? (
-            <Link href={item.href}>{item.label}</Link>
-          ) : (
-            <span aria-current="page">{item.label}</span>
-          )}
-        </span>
-      ))}
-    </nav>
-  );
+  return null;
 }

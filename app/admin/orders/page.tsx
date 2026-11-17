@@ -46,12 +46,6 @@ export default async function AdminOrdersPage({
           <h1>Orders</h1>
           <p className="admin-page-subtitle">{total.toLocaleString()} order{total !== 1 ? "s" : ""}</p>
         </div>
-        <div className="admin-page-actions admin-page-actions--right">
-          <Link href="/admin/orders/import" className="btn-outline">
-            <Search size={16} />
-            Import orders
-          </Link>
-        </div>
       </div>
 
       <form className="admin-toolbar" method="get" action="/admin/orders">
