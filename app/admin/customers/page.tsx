@@ -1,15 +1,40 @@
-import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { listCustomers, formatCents } from "@/lib/server/admin-data";
-import { AdminPager, AdminEmptyState } from "@/lib/server/admin-ui";
 import Link from "next/link";
-import { Users, Search } from "lucide-react";
+import { Users } from "lucide-react";
+import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import { formatCents, listCustomers } from "@/lib/server/admin-data";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
+import { TablePagination } from "@/components/admin/tables/pagination";
+import { SortHeader } from "@/components/admin/tables/sort-header";
+import { TableToolbar } from "@/components/admin/tables/toolbar";
+import {
+  Table,
+  TableCard,
+  TableScroll,
+  TBody,
+  Td,
+  TdMuted,
+  Th,
+  THead,
+  Tr
+} from "@/components/admin/tables/table";
+import { TableEmpty } from "@/components/admin/tables/table-empty";
 
 export const dynamic = "force-dynamic";
 
+function shortDate(iso: string | null): string {
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(iso));
+}
+
 export default async function AdminCustomersPage({
-  searchParams,
+  searchParams
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; sort?: string; dir?: "asc" | "desc" }>;
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
@@ -18,83 +43,100 @@ export default async function AdminCustomersPage({
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
   const limit = 50;
 
-  const { rows: customers, total } = await listCustomers(db, { q: params.q, page, limit });
+  const { rows: customers, total } = await listCustomers(db, {
+    q: params.q,
+    page,
+    limit,
+    sort: params.sort,
+    dir: params.dir
+  });
+
   const totalPages = Math.ceil(total / limit);
+  const tableParams = { q: params.q, sort: params.sort, dir: params.dir };
 
   return (
     <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-title">
-          <h1>Customers</h1>
-          <p className="admin-page-subtitle">
-            {total.toLocaleString()} customer{total !== 1 ? "s" : ""} · aggregated from stored orders
-          </p>
-        </div>
-      </div>
+      <TablePageHeader
+        title="Customers"
+        subtitle={`${total.toLocaleString()} customer${total !== 1 ? "s" : ""} · aggregated from stored orders`}
+      />
 
-      <div className="admin-toolbar">
-        <form className="admin-search" method="get" action="/admin/customers">
-          <Search size={16} className="admin-icon" />
-          <input
-            type="search"
-            name="q"
-            defaultValue={params.q ?? ""}
-            placeholder="Search by name or email…"
-            className="admin-search-input"
-          />
-          <input type="hidden" name="page" value="1" />
-        </form>
-      </div>
-
-      {customers.length === 0 ? (
-        <AdminEmptyState
-          icon={<Users size={24} />}
-          title="No customers found"
-          description="Customers appear here once orders are placed."
+      <TableCard>
+        <TableToolbar
+          action="/admin/customers"
+          q={params.q}
+          placeholder="Search by name or email…"
+          hidden={{ sort: params.sort, dir: params.dir }}
         />
-      ) : (
-        <section className="admin-card admin-card--wide">
-          <div className="admin-table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Location</th>
-                  <th scope="col">Orders</th>
-                  <th scope="col">Total spent</th>
-                  <th scope="col">Last order</th>
-                </tr>
-              </thead>
-              <tbody>
-                {customers.map((customer) => (
-                  <tr key={customer.email}>
-                    <td>
+
+        {customers.length === 0 ? (
+          <TableEmpty
+            icon={<Users size={20} aria-hidden="true" />}
+            title="No customers found"
+            description="Customers appear here once orders are placed. Try a different search."
+          />
+        ) : (
+          <TableScroll>
+            <Table label="Customers" tableId="customers">
+              <THead>
+                <SortHeader label="Customer" column="name" base="/admin/customers" params={tableParams} />
+                <Th className="hidden md:table-cell">Location</Th>
+                <SortHeader label="Orders" column="orders" base="/admin/customers" params={tableParams} className="text-right" />
+                <SortHeader label="Total spent" column="spent" base="/admin/customers" params={tableParams} className="text-right" />
+                <SortHeader label="Last order" column="last" base="/admin/customers" params={tableParams} className="hidden sm:table-cell" />
+                <Th className="text-right">History</Th>
+              </THead>
+              <TBody>
+                {customers.map(customer => (
+                  <Tr key={customer.email}>
+                    <Td>
                       <Link
                         href={`/admin/customers/${encodeURIComponent(customer.email)}`}
-                        className="admin-link-muted"
+                        className="block truncate font-medium text-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {customer.name || customer.email}
                       </Link>
-                    </td>
-                    <td className="admin-muted">{customer.email}</td>
-                    <td className="admin-muted">
-                      {[customer.city, customer.country].filter(Boolean).join(", ") || "—"}
-                    </td>
-                    <td>{customer.order_count}</td>
-                    <td>{formatCents(customer.total_spent_cents)}</td>
-                    <td className="admin-muted">
-                      {customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString() : "—"}
-                    </td>
-                  </tr>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {customer.email}
+                      </span>
+                    </Td>
+                    <Td className="hidden md:table-cell">
+                      <TdMuted>
+                        {[customer.city, customer.country].filter(Boolean).join(", ") || "—"}
+                      </TdMuted>
+                    </Td>
+                    <Td className="text-right tabular-nums">{customer.order_count}</Td>
+                    <Td className="text-right font-medium tabular-nums">
+                      {formatCents(customer.total_spent_cents)}
+                    </Td>
+                    <Td className="hidden whitespace-nowrap text-[12px] tabular-nums sm:table-cell">
+                      <TdMuted>{shortDate(customer.last_order_at)}</TdMuted>
+                    </Td>
+                    <Td className="text-right">
+                      <Link
+                        href={`/admin/customers/${encodeURIComponent(customer.email)}`}
+                        className="text-[12px] font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        View
+                      </Link>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+              </TBody>
+            </Table>
+          </TableScroll>
+        )}
 
-      <AdminPager page={page} totalPages={totalPages} totalItems={total} params={{ q: params.q }} />
+        <TablePagination
+          base="/admin/customers"
+          params={tableParams}
+          page={page}
+          totalPages={totalPages}
+          totalItems={total}
+          pageSize={limit}
+          label="customers"
+        />
+      </TableCard>
     </div>
   );
 }

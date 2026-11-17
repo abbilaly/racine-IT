@@ -1,18 +1,49 @@
-import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { listQuotations, formatCents } from "@/lib/server/admin-data";
-import { AdminPager, AdminEmptyState, AdminBadgeStatus } from "@/lib/server/admin-ui";
-import { QuotationCreateForm } from "@/components/admin/QuotationCreateForm";
 import Link from "next/link";
-import { FileText, Search } from "lucide-react";
+import { FileText } from "lucide-react";
+import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import { formatCents, listQuotations } from "@/lib/server/admin-data";
+import { QuotationCreateForm } from "@/components/admin/QuotationCreateForm";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
+import { TablePagination } from "@/components/admin/tables/pagination";
+import { SortHeader } from "@/components/admin/tables/sort-header";
+import { StatusBadge } from "@/components/admin/tables/status-badge";
+import { FilterField, SelectInput, TableToolbar } from "@/components/admin/tables/toolbar";
+import {
+  Table,
+  TableCard,
+  TableScroll,
+  TBody,
+  Td,
+  TdMuted,
+  Th,
+  THead,
+  Tr
+} from "@/components/admin/tables/table";
+import { TableEmpty } from "@/components/admin/tables/table-empty";
 
 export const dynamic = "force-dynamic";
 
 const STATUSES = ["all", "draft", "sent", "accepted", "rejected", "expired"];
 
+function shortDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(iso));
+}
+
 export default async function AdminQuotationsPage({
-  searchParams,
+  searchParams
 }: {
-  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    q?: string;
+    page?: string;
+    sort?: string;
+    dir?: "asc" | "desc";
+  }>;
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
@@ -27,120 +58,122 @@ export default async function AdminQuotationsPage({
     q: params.q,
     page,
     limit,
+    sort: params.sort,
+    dir: params.dir
   });
+
   const totalPages = Math.ceil(total / limit);
+  const tableParams = {
+    status: params.status,
+    q: params.q,
+    sort: params.sort,
+    dir: params.dir
+  };
 
   return (
     <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-title">
-          <h1>Quotations</h1>
-          <p className="admin-page-subtitle">
-            {total.toLocaleString()} quotation{total !== 1 ? "s" : ""} · B2B requests kept separate from checkout orders
-          </p>
-        </div>
-        <QuotationCreateForm />
-      </div>
+      <TablePageHeader
+        title="Quotations"
+        subtitle={`${total.toLocaleString()} quotation${total !== 1 ? "s" : ""} · B2B requests kept separate from checkout orders`}
+        actions={<QuotationCreateForm />}
+      />
 
-      <form className="admin-toolbar" method="get" action="/admin/quotations">
-        <div className="admin-search">
-          <Search size={16} className="admin-icon" />
-          <input
-            type="search"
-            name="q"
-            defaultValue={params.q ?? ""}
-            placeholder="Search reference, name or email…"
-            className="admin-search-input"
-          />
-        </div>
-        <div className="admin-filters">
-          <label className="admin-filter">
-            <span>Status</span>
-            <select name="status" defaultValue={params.status ?? "all"} className="admin-select">
-              {STATUSES.map((value) => (
+      <TableCard>
+        <TableToolbar
+          action="/admin/quotations"
+          q={params.q}
+          placeholder="Search reference, name or email…"
+          hidden={{ sort: params.sort, dir: params.dir }}
+        >
+          <FilterField label="Status">
+            <SelectInput name="status" defaultValue={params.status ?? "all"}>
+              {STATUSES.map(value => (
                 <option key={value} value={value}>
                   {value === "all" ? "All statuses" : value[0].toUpperCase() + value.slice(1)}
                 </option>
               ))}
-            </select>
-          </label>
-          <input type="hidden" name="page" value="1" />
-          <button className="btn-outline" type="submit">
-            Apply filters
-          </button>
-        </div>
-      </form>
+            </SelectInput>
+          </FilterField>
+        </TableToolbar>
 
-      {quotations.length === 0 ? (
-        <AdminEmptyState
-          icon={<FileText size={24} />}
-          title="No quotations found"
-          description="Create a quotation for a business customer buying in volume."
-        />
-      ) : (
-        <section className="admin-card admin-card--wide">
-          <div className="admin-table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th scope="col">Reference</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Valid until</th>
-                  <th scope="col">Order</th>
-                  <th scope="col">Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quotations.map((quotation) => (
-                  <tr key={quotation.id}>
-                    <td>
-                      <Link href={`/admin/quotations/${quotation.id}`} className="admin-link-muted">
+        {quotations.length === 0 ? (
+          <TableEmpty
+            icon={<FileText size={20} aria-hidden="true" />}
+            title="No quotations found"
+            description="Create a quotation for a business customer buying in volume."
+          />
+        ) : (
+          <TableScroll>
+            <Table label="Quotations" tableId="quotations" minWidth="min-w-[760px]">
+              <THead>
+                <Th>Reference</Th>
+                <Th>Customer</Th>
+                <SortHeader label="Status" column="status" base="/admin/quotations" params={tableParams} />
+                <SortHeader label="Total" column="total" base="/admin/quotations" params={tableParams} className="text-right" />
+                <SortHeader label="Valid until" column="valid" base="/admin/quotations" params={tableParams} className="hidden md:table-cell" />
+                <Th className="hidden lg:table-cell">Order</Th>
+                <SortHeader label="Created" column="created" base="/admin/quotations" params={tableParams} className="hidden sm:table-cell" />
+              </THead>
+              <TBody>
+                {quotations.map(quotation => (
+                  <Tr key={quotation.id}>
+                    <Td>
+                      <Link
+                        href={`/admin/quotations/${quotation.id}`}
+                        className="font-medium text-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                      >
                         {quotation.ref}
                       </Link>
-                    </td>
-                    <td>
-                      <span className="admin-product-title">{quotation.customer_name}</span>
-                      <br />
-                      <span className="admin-muted">{quotation.customer_company || quotation.customer_email}</span>
-                    </td>
-                    <td>
-                      <AdminBadgeStatus status={quotation.status} />
-                    </td>
-                    <td>{formatCents(quotation.total_cents)}</td>
-                    <td className="admin-muted">
-                      {new Date(quotation.valid_until).toLocaleDateString()}
-                    </td>
-                    <td>
+                    </Td>
+                    <Td>
+                      <span className="block max-w-[220px] truncate font-medium text-foreground">
+                        {quotation.customer_name}
+                      </span>
+                      <span className="block max-w-[220px] truncate text-[11px] text-muted-foreground">
+                        {quotation.customer_company || quotation.customer_email}
+                      </span>
+                    </Td>
+                    <Td>
+                      <StatusBadge status={quotation.status} />
+                    </Td>
+                    <Td className="text-right font-medium tabular-nums">
+                      {formatCents(quotation.total_cents)}
+                    </Td>
+                    <Td className="hidden whitespace-nowrap text-[12px] tabular-nums md:table-cell">
+                      <TdMuted>{shortDate(quotation.valid_until)}</TdMuted>
+                    </Td>
+                    <Td className="hidden lg:table-cell">
                       {quotation.converted_order_id ? (
                         <Link
                           href={`/admin/orders/${quotation.converted_order_id}`}
-                          className="admin-link-muted"
+                          className="text-[12px] font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           View order
                         </Link>
                       ) : (
-                        <span className="admin-muted">—</span>
+                        <TdMuted>—</TdMuted>
                       )}
-                    </td>
-                    <td className="admin-muted">
-                      {new Date(quotation.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
+                    </Td>
+                    <Td className="hidden whitespace-nowrap text-[12px] tabular-nums sm:table-cell">
+                      <TdMuted>{shortDate(quotation.created_at)}</TdMuted>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+              </TBody>
+            </Table>
+          </TableScroll>
+        )}
 
-      <AdminPager
-        page={page}
-        totalPages={totalPages}
-        totalItems={total}
-        params={{ status: params.status, q: params.q }}
-      />
+        <TablePagination
+          base="/admin/quotations"
+          params={tableParams}
+          page={page}
+          totalPages={totalPages}
+          totalItems={total}
+          pageSize={limit}
+          label="quotations"
+        />
+      </TableCard>
     </div>
   );
 }

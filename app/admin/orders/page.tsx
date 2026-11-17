@@ -1,8 +1,31 @@
-import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { listOrders, formatCents } from "@/lib/server/admin-data";
-import { AdminPager, AdminEmptyState, AdminBadgeStatus } from "@/lib/server/admin-ui";
 import Link from "next/link";
-import { Search, Package, ArrowUpDown, Filter, Calendar } from "lucide-react";
+import { Eye, Package, Pencil } from "lucide-react";
+import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import { formatCents, listOrders } from "@/lib/server/admin-data";
+import { Button } from "@/components/admin/ui/button";
+import { ColumnToggle } from "@/components/admin/tables/column-toggle";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
+import { TablePagination } from "@/components/admin/tables/pagination";
+import { SortHeader } from "@/components/admin/tables/sort-header";
+import { StatusBadge } from "@/components/admin/tables/status-badge";
+import {
+  DateInput,
+  FilterField,
+  SelectInput,
+  TableToolbar
+} from "@/components/admin/tables/toolbar";
+import {
+  Table,
+  TableCard,
+  TableScroll,
+  TBody,
+  Td,
+  TdMuted,
+  Th,
+  THead,
+  Tr
+} from "@/components/admin/tables/table";
+import { TableEmpty } from "@/components/admin/tables/table-empty";
 
 export const dynamic = "force-dynamic";
 
@@ -12,13 +35,30 @@ const STATUS_OPTIONS = [
   { value: "processing", label: "Processing" },
   { value: "shipped", label: "Shipped" },
   { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
+  { value: "cancelled", label: "Cancelled" }
 ];
 
+function shortDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(iso));
+}
+
 export default async function AdminOrdersPage({
-  searchParams,
+  searchParams
 }: {
-  searchParams: Promise<{ status?: string; q?: string; from?: string; to?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+    page?: string;
+    sort?: string;
+    dir?: "asc" | "desc";
+  }>;
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
@@ -26,169 +66,152 @@ export default async function AdminOrdersPage({
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
   const limit = 50;
-  const offset = (page - 1) * limit;
 
   const { rows: orders, total } = await listOrders(db, {
-    status: params.status as string,
     q: params.q,
+    status: params.status,
     from: params.from,
     to: params.to,
     page,
     limit,
+    sort: params.sort,
+    dir: params.dir
   });
 
   const totalPages = Math.ceil(total / limit);
+  const tableParams = {
+    q: params.q,
+    status: params.status,
+    from: params.from,
+    to: params.to,
+    sort: params.sort,
+    dir: params.dir
+  };
 
   return (
     <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-title">
-          <h1>Orders</h1>
-          <p className="admin-page-subtitle">{total.toLocaleString()} order{total !== 1 ? "s" : ""}</p>
-        </div>
-      </div>
-
-      <form className="admin-toolbar" method="get" action="/admin/orders">
-        <div className="admin-search">
-          <Search size={16} className="admin-icon" />
-          <input
-            type="search"
-            name="q"
-            defaultValue={params.q ?? ""}
-            placeholder="Search by email, name, or reference…"
-            className="admin-search-input"
+      <TablePageHeader
+        title="Orders"
+        subtitle={`${total.toLocaleString()} order${total !== 1 ? "s" : ""} · checkout orders with fulfilment status`}
+        actions={
+          <ColumnToggle
+            tableId="orders"
+            columns={[
+              { id: "email", label: "Email" },
+              { id: "items", label: "Items" },
+              { id: "created", label: "Created" }
+            ]}
           />
-        </div>
+        }
+      />
 
-        <div className="admin-filters">
-          <label className="admin-filter">
-            <Filter size={14} />
-            <span>Status</span>
-            <select name="status" defaultValue={params.status ?? "all"} className="admin-select">
-              {STATUS_OPTIONS.map((option) => (
+      <TableCard>
+        <TableToolbar
+          action="/admin/orders"
+          q={params.q}
+          placeholder="Search reference, name or email…"
+          hidden={{ sort: params.sort, dir: params.dir }}
+          resultLabel={total ? `${total.toLocaleString()} orders` : undefined}
+        >
+          <FilterField label="Status">
+            <SelectInput name="status" defaultValue={params.status ?? "all"}>
+              {STATUS_OPTIONS.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </select>
-          </label>
+            </SelectInput>
+          </FilterField>
+          <FilterField label="From">
+            <DateInput name="from" defaultValue={params.from ?? ""} />
+          </FilterField>
+          <FilterField label="To">
+            <DateInput name="to" defaultValue={params.to ?? ""} />
+          </FilterField>
+        </TableToolbar>
 
-          <label className="admin-filter">
-            <Calendar size={14} />
-            <span>From</span>
-            <input
-              type="date"
-              name="from"
-              defaultValue={params.from ?? ""}
-              className="admin-input admin-input--date"
-            />
-          </label>
+        {orders.length === 0 ? (
+          <TableEmpty
+            icon={<Package size={20} aria-hidden="true" />}
+            title="No orders found"
+            description="Orders appear here once customers complete checkout. Adjust the filters to widen the search."
+          />
+        ) : (
+          <TableScroll>
+            <Table label="Orders" tableId="orders">
+              <THead>
+                <SortHeader label="Reference" column="ref" base="/admin/orders" params={tableParams} />
+                <Th>Customer</Th>
+                <Th col="email" className="hidden md:table-cell">Email</Th>
+                <Th col="items" className="hidden sm:table-cell">Items</Th>
+                <SortHeader label="Total" column="total" base="/admin/orders" params={tableParams} className="text-right" />
+                <SortHeader label="Status" column="status" base="/admin/orders" params={tableParams} />
+                <SortHeader label="Created" column="created" base="/admin/orders" params={tableParams} className="hidden lg:table-cell" />
+                <Th className="text-right">Actions</Th>
+              </THead>
+              <TBody>
+                {orders.map(order => (
+                  <Tr key={order.id}>
+                    <Td>
+                      <Link
+                        href={`/admin/orders/${order.id}`}
+                        className="font-medium text-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {order.ref}
+                      </Link>
+                    </Td>
+                    <Td>
+                      <span className="block truncate font-medium text-foreground">
+                        {order.first_name} {order.last_name}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground md:hidden">
+                        {order.email}
+                      </span>
+                    </Td>
+                    <Td col="email" className="hidden max-w-[200px] truncate md:table-cell">
+                      <TdMuted>{order.email}</TdMuted>
+                    </Td>
+                    <Td col="items" className="hidden tabular-nums sm:table-cell">
+                      {order.item_count}
+                    </Td>
+                    <Td className="text-right font-medium tabular-nums">{formatCents(order.total)}</Td>
+                    <Td>
+                      <StatusBadge status={order.status} />
+                    </Td>
+                    <Td col="created" className="hidden whitespace-nowrap text-[12px] tabular-nums lg:table-cell">
+                      <TdMuted>{shortDate(order.created_at)}</TdMuted>
+                    </Td>
+                    <Td>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button asChild variant="ghost" size="icon" className="size-7">
+                          <Link href={`/admin/orders/${order.id}`} aria-label={`View ${order.ref}`}>
+                            <Eye size={14} aria-hidden="true" />
+                          </Link>
+                        </Button>
+                        <Button asChild variant="ghost" size="icon" className="size-7">
+                          <Link href={`/admin/orders/${order.id}/edit`} aria-label={`Edit ${order.ref}`}>
+                            <Pencil size={13} aria-hidden="true" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </Td>
+                  </Tr>
+                ))}
+              </TBody>
+            </Table>
+          </TableScroll>
+        )}
 
-          <label className="admin-filter">
-            <span>To</span>
-            <input
-              type="date"
-              name="to"
-              defaultValue={params.to ?? ""}
-              className="admin-input admin-input--date"
-            />
-          </label>
-
-          <input type="hidden" name="page" value="1" />
-          <button className="btn-outline" type="submit">
-            Apply filters
-          </button>
-          <a href="/admin/orders" className="btn-outline">
-            Clear
-          </a>
-        </div>
-      </form>
-
-      {orders.length === 0 ? (
-        <AdminEmptyState
-          icon={<Package size={32} />}
-          title="No orders found"
-          description="Orders will appear here once customers complete checkout."
+        <TablePagination
+          base="/admin/orders"
+          params={tableParams}
+          page={page}
+          totalPages={totalPages}
+          totalItems={total}
+          pageSize={limit}
+          label="orders"
         />
-      ) : (
-        <div className="admin-table-responsive">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th scope="col">Reference</th>
-                <th scope="col">Customer</th>
-                <th scope="col">Email</th>
-                <th scope="col">Items</th>
-                <th scope="col">Total</th>
-                <th scope="col">Status</th>
-                <th scope="col">Created</th>
-                <th scope="col" className="admin-table-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td>
-                    <Link href={`/admin/orders/${order.id}`} className="admin-order-link">
-                      <span className="admin-order-ref">{order.ref}</span>
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href={`/admin/orders/${order.id}`} className="admin-order-customer">
-                      {order.first_name} {order.last_name}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link href={`/admin/orders/${order.id}`} className="admin-link-muted admin-order-email">
-                      {order.email}
-                    </Link>
-                  </td>
-                  <td>
-                    <span className="admin-order-items">{order.item_count} {order.item_count === 1 ? "item" : "items"}</span>
-                  </td>
-                  <td>
-                    <span className="admin-order-total">{formatCents(order.total)}</span>
-                  </td>
-                  <td>
-                    <AdminBadgeStatus status={order.status} />
-                  </td>
-                  <td>
-                    <span className="admin-order-date">{new Date(order.created_at).toLocaleString()}</span>
-                  </td>
-                  <td className="admin-table-actions">
-                    <Link
-                      href={`/admin/orders/${order.id}`}
-                      className="admin-action-btn"
-                      title="View"
-                    >
-                      <ArrowUpDown size={14} />
-                    </Link>
-                    <Link
-                      href={`/admin/orders/${order.id}/edit`}
-                      className="admin-action-btn"
-                      title="Edit"
-                    >
-                      <Filter size={14} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <AdminPager
-        page={page}
-        totalPages={totalPages}
-        totalItems={total}
-        params={{
-          q: params.q,
-          status: params.status && params.status !== "all" ? params.status : undefined,
-          from: params.from,
-          to: params.to,
-        }}
-      />
+      </TableCard>
     </div>
   );
 }

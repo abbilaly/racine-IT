@@ -445,10 +445,15 @@ export async function listProducts(
     status?: "active" | "hidden" | "all";
     page?: number;
     limit?: number;
+    sort?: string;
+    dir?: "asc" | "desc";
   } = {}
 ): Promise<{ rows: ProductRow[]; total: number }> {
   const { offset, limit } = range({ page: params.page, limit: params.limit });
-  let query = db.from("products").select(PRODUCT_COLUMNS, { count: "exact" }).order("title");
+  const productColumns: Record<string, string> = { title: "title", price: "price_cents" };
+  const productColumn = productColumns[params.sort ?? "title"] ?? "title";
+  const productAscending = params.dir ? params.dir === "asc" : true;
+  let query = db.from("products").select(PRODUCT_COLUMNS, { count: "exact" }).order(productColumn, { ascending: productAscending });
   if (params.q) query = query.or(`title.ilike.%${params.q}%, short_description.ilike.%${params.q}%`);
   if (params.category) {
     const cat = await getCategoryBySlug(db, params.category);
@@ -493,13 +498,16 @@ export type OrderListRow = {
 
 export async function listOrders(
   db: AdminClient,
-  params: { status?: string; q?: string; from?: string | null; to?: string | null; page?: number; limit?: number } = {}
+  params: { status?: string; q?: string; from?: string | null; to?: string | null; page?: number; limit?: number; sort?: string; dir?: "asc" | "desc" } = {}
 ): Promise<{ rows: OrderListRow[]; total: number }> {
   const { offset, limit } = range({ page: params.page, limit: params.limit });
+  const orderColumns: Record<string, string> = { created: "created_at", total: "total", ref: "ref", status: "status" };
+  const orderColumn = orderColumns[params.sort ?? "created"] ?? "created_at";
+  const orderAscending = params.dir ? params.dir === "asc" : orderColumn !== "created_at";
   let query = db
     .from("orders")
     .select("id, ref, status, first_name, last_name, email, item_count, subtotal, shipping, total, delivery, payment, note, created_at", { count: "exact" })
-    .order("created_at", { ascending: false });
+    .order(orderColumn, { ascending: orderAscending });
   if (params.status && params.status !== "all") query = query.eq("status", params.status);
   if (params.q) query = query.or(`email.ilike.%${params.q}%, first_name.ilike.%${params.q}%, last_name.ilike.%${params.q}%, ref.ilike.%${params.q}%`);
   if (params.from) query = query.gte("created_at", params.from);
@@ -670,9 +678,12 @@ export type QuotationRow = {
 const QUOTATION_COLUMNS =
   "id, ref, customer_name, customer_company, customer_email, customer_phone, status, valid_from, valid_until, notes, terms, subtotal_cents, tax_cents, total_cents, currency, converted_order_id, created_by, created_at";
 
-export async function listQuotations(db: AdminClient, params: { status?: string; q?: string; page?: number; limit?: number } = {}): Promise<{ rows: QuotationRow[]; total: number }> {
+export async function listQuotations(db: AdminClient, params: { status?: string; q?: string; page?: number; limit?: number; sort?: string; dir?: "asc" | "desc" } = {}): Promise<{ rows: QuotationRow[]; total: number }> {
   const { offset, limit } = range({ page: params.page, limit: params.limit });
-  let query = db.from("quotations").select(QUOTATION_COLUMNS, { count: "exact" }).order("created_at", { ascending: false });
+  const quotationColumns: Record<string, string> = { created: "created_at", total: "total_cents", status: "status", valid: "valid_until" };
+  const quotationColumn = quotationColumns[params.sort ?? "created"] ?? "created_at";
+  const quotationAscending = params.dir ? params.dir === "asc" : quotationColumn !== "created_at";
+  let query = db.from("quotations").select(QUOTATION_COLUMNS, { count: "exact" }).order(quotationColumn, { ascending: quotationAscending });
   if (params.status && params.status !== "all") query = query.eq("status", params.status);
   if (params.q) query = query.or(`customer_email.ilike.%${params.q}%, customer_name.ilike.%${params.q}%, ref.ilike.%${params.q}%`);
   const { data, error, count } = await query.range(offset, offset + limit - 1);
@@ -852,7 +863,7 @@ export type CustomerRow = {
   country: string | null;
 };
 
-export async function listCustomers(db: AdminClient, params: { q?: string; page?: number; limit?: number } = {}): Promise<{ rows: CustomerRow[]; total: number }> {
+export async function listCustomers(db: AdminClient, params: { q?: string; page?: number; limit?: number; sort?: string; dir?: "asc" | "desc" } = {}): Promise<{ rows: CustomerRow[]; total: number }> {
   const { offset, limit } = range({ page: params.page, limit: params.limit });
   let query = db.from("orders").select("email, first_name, last_name, phone, city, country, status, total, created_at");
   if (params.q) query = query.or(`email.ilike.%${params.q}%, first_name.ilike.%${params.q}%, last_name.ilike.%${params.q}%`);
@@ -869,7 +880,15 @@ export async function listCustomers(db: AdminClient, params: { q?: string; page?
       map.set(key, { email: row.email, name: `${row.first_name} ${row.last_name}`.trim(), order_count: row.status === "cancelled" ? 0 : 1, total_spent_cents: row.status === "cancelled" ? 0 : row.total, last_order_at: row.created_at, phone: row.phone, city: row.city, country: row.country });
     }
   }
-  const rows = Array.from(map.values()).sort((a, b) => b.total_spent_cents - a.total_spent_cents);
+  const sorters: Record<string, (a: CustomerRow, b: CustomerRow) => number> = {
+    spent: (a, b) => b.total_spent_cents - a.total_spent_cents,
+    orders: (a, b) => b.order_count - a.order_count,
+    name: (a, b) => (b.name || b.email).localeCompare(a.name || a.email),
+    last: (a, b) => (b.last_order_at ?? "").localeCompare(a.last_order_at ?? "")
+  };
+  const sorter = sorters[params.sort ?? "spent"] ?? sorters.spent;
+  const rows = Array.from(map.values()).sort(sorter);
+  if (params.dir === "asc") rows.reverse();
   return { rows: rows.slice(offset, offset + limit), total: rows.length };
 }
 

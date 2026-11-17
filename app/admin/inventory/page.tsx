@@ -1,15 +1,36 @@
-import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { listProducts, lowStockProducts, listStockAdjustments } from "@/lib/server/admin-data";
-import { AdminPager, AdminEmptyState, AdminBadgeStatus } from "@/lib/server/admin-ui";
 import Link from "next/link";
-import { Package, Search, AlertTriangle, History } from "lucide-react";
+import { AlertTriangle, History, Package, Upload } from "lucide-react";
+import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
+import { listProducts, listStockAdjustments, lowStockProducts } from "@/lib/server/admin-data";
+import { Button } from "@/components/admin/ui/button";
+import { TablePageHeader } from "@/components/admin/tables/page-header";
+import { TablePagination } from "@/components/admin/tables/pagination";
+import { SortHeader } from "@/components/admin/tables/sort-header";
+import { StatusBadge } from "@/components/admin/tables/status-badge";
+import { TableToolbar } from "@/components/admin/tables/toolbar";
+import {
+  Table,
+  TableCard,
+  TableScroll,
+  TBody,
+  Td,
+  TdMuted,
+  Th,
+  THead,
+  Tr
+} from "@/components/admin/tables/table";
+import { TableEmpty } from "@/components/admin/tables/table-empty";
 
 export const dynamic = "force-dynamic";
 
+function stockStatus(stock: number): string {
+  return stock === 0 ? "out of stock" : stock < 5 ? "low stock" : "in stock";
+}
+
 export default async function AdminInventoryPage({
-  searchParams,
+  searchParams
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; sort?: string; dir?: "asc" | "desc" }>;
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
@@ -19,178 +40,195 @@ export default async function AdminInventoryPage({
   const limit = 50;
 
   const [{ rows: products, total }, low, { rows: adjustments }] = await Promise.all([
-    listProducts(db, { q: params.q, page, limit }),
+    listProducts(db, { q: params.q, page, limit, sort: params.sort, dir: params.dir }),
     lowStockProducts(db, 5),
-    listStockAdjustments(db, undefined, { page: 1, limit: 20 }),
+    listStockAdjustments(db, undefined, { page: 1, limit: 20 })
   ]);
 
   const totalPages = Math.ceil(total / limit);
+  const tableParams = { q: params.q, sort: params.sort, dir: params.dir };
 
   return (
     <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-title">
-          <h1>Inventory</h1>
-          <p className="admin-page-subtitle">
-            {total.toLocaleString()} product{total !== 1 ? "s" : ""} tracked
-          </p>
-        </div>
-        <Link href="/admin/products/import" className="btn-outline">
-          Import stock
-        </Link>
-      </div>
+      <TablePageHeader
+        title="Inventory"
+        subtitle={`${total.toLocaleString()} product${total !== 1 ? "s" : ""} tracked · low-stock threshold 5 units`}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/products/import">
+              <Upload size={14} aria-hidden="true" />
+              Import stock
+            </Link>
+          </Button>
+        }
+      />
 
       {low.length > 0 && (
-        <section className="admin-card">
-          <div className="admin-card-header">
-            <h2>
-              <AlertTriangle size={16} /> Low stock alerts
+        <TableCard className="mb-4">
+          <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+            <h2 className="m-0 flex items-center gap-1.5 text-[13px] font-semibold text-foreground">
+              <AlertTriangle size={14} className="text-amber-500" aria-hidden="true" />
+              Low stock alerts
             </h2>
-            <span className="admin-muted">Threshold: 5 units</span>
+            <span className="text-[11px] text-muted-foreground">5 units or fewer</span>
           </div>
-          <div className="admin-notes-list">
-            {low.map((row) => (
-              <div key={row.id} className="admin-note">
-                <div className="admin-note-header">
-                  <Link href={`/admin/products/${row.id}/stock`} className="admin-link">
-                    {row.title}
-                  </Link>
-                  <AdminBadgeStatus status={row.stock === 0 ? "out of stock" : "low stock"} />
-                </div>
-                <p className="admin-note-body">
-                  {row.stock} unit{row.stock === 1 ? "" : "s"} remaining · /{row.slug}
-                </p>
-              </div>
+          <ul className="m-0 grid list-none gap-0 p-0 sm:grid-cols-2">
+            {low.map(row => (
+              <li
+                key={row.id}
+                className="flex items-center gap-2 border-b border-border/60 px-4 py-2.5 last:border-b-0 sm:border-r sm:last:border-r-0"
+              >
+                <Link
+                  href={`/admin/products/${row.id}/stock`}
+                  className="min-w-0 flex-1 truncate text-[13px] text-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                  title={row.title}
+                >
+                  {row.title}
+                </Link>
+                <StatusBadge status={stockStatus(row.stock)} />
+                <span className="w-10 text-right text-[12px] tabular-nums text-muted-foreground">
+                  {row.stock}
+                </span>
+              </li>
             ))}
-          </div>
-        </section>
+          </ul>
+        </TableCard>
       )}
 
-      <section className="admin-card admin-card--wide">
-        <div className="admin-card-header">
-          <h2>Stock levels</h2>
-        </div>
-
-        <form className="admin-toolbar" method="get" action="/admin/inventory">
-          <div className="admin-search">
-            <Search size={16} className="admin-icon" />
-            <input
-              type="search"
-              name="q"
-              defaultValue={params.q ?? ""}
-              placeholder="Search products…"
-              className="admin-search-input"
-            />
-          </div>
-          <input type="hidden" name="page" value="1" />
-        </form>
+      <TableCard>
+        <TableToolbar
+          action="/admin/inventory"
+          q={params.q}
+          placeholder="Search products…"
+          hidden={{ sort: params.sort, dir: params.dir }}
+        />
 
         {products.length === 0 ? (
-          <AdminEmptyState
-            icon={<Package size={24} />}
+          <TableEmpty
+            icon={<Package size={20} aria-hidden="true" />}
             title="No products found"
-            description="Adjust the search or add products first."
+            description="Adjust the search or add products before tracking stock."
           />
         ) : (
-          <div className="admin-table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th scope="col">Product</th>
-                  <th scope="col">SKU</th>
-                  <th scope="col">Stock</th>
-                  <th scope="col">Status</th>
-                  <th scope="col" className="admin-table-actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <Link href={`/admin/products/${product.id}`} className="admin-link-muted">
+          <TableScroll>
+            <Table label="Stock levels" tableId="inventory" minWidth="min-w-[620px]">
+              <THead>
+                <SortHeader label="Product" column="title" base="/admin/inventory" params={tableParams} />
+                <Th className="hidden md:table-cell">SKU</Th>
+                <Th className="text-right">On hand</Th>
+                <Th>Status</Th>
+                <Th className="text-right">Adjust</Th>
+              </THead>
+              <TBody>
+                {products.map(product => (
+                  <Tr key={product.id}>
+                    <Td>
+                      <Link
+                        href={`/admin/products/${product.id}`}
+                        className="block max-w-[320px] truncate font-medium text-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                        title={product.title}
+                      >
                         {product.title}
                       </Link>
-                    </td>
-                    <td className="admin-muted">{product.slug}</td>
-                    <td>
+                      <span className="block truncate text-[11px] text-muted-foreground md:hidden">
+                        /{product.slug}
+                      </span>
+                    </Td>
+                    <Td className="hidden md:table-cell">
+                      <TdMuted>/{product.slug}</TdMuted>
+                    </Td>
+                    <Td className="text-right">
                       <span
-                        className={`admin-stock ${
+                        className={`tabular-nums ${
                           product.stock === 0
-                            ? "admin-stock--zero"
+                            ? "font-medium text-rose-600 dark:text-rose-400"
                             : product.stock < 5
-                              ? "admin-stock--low"
-                              : ""
+                              ? "font-medium text-amber-600 dark:text-amber-400"
+                              : "text-foreground"
                         }`}
                       >
                         {product.stock.toLocaleString()}
                       </span>
-                    </td>
-                    <td>
-                      <AdminBadgeStatus
-                        status={
-                          product.stock === 0 ? "out of stock" : product.stock < 5 ? "low stock" : "in stock"
-                        }
-                      />
-                    </td>
-                    <td className="admin-table-actions">
-                      <Link
-                        href={`/admin/products/${product.id}/stock`}
-                        className="admin-action-btn"
-                        title="Adjust stock"
-                      >
-                        <History size={14} />
-                      </Link>
-                    </td>
-                  </tr>
+                    </Td>
+                    <Td>
+                      <StatusBadge status={stockStatus(product.stock)} />
+                    </Td>
+                    <Td className="text-right">
+                      <Button asChild variant="ghost" size="icon" className="size-7">
+                        <Link href={`/admin/products/${product.id}/stock`} aria-label={`Adjust stock for ${product.title}`}>
+                          <History size={14} aria-hidden="true" />
+                        </Link>
+                      </Button>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TBody>
+            </Table>
+          </TableScroll>
         )}
 
-        <AdminPager page={page} totalPages={totalPages} totalItems={total} params={{ q: params.q }} />
-      </section>
+        <TablePagination
+          base="/admin/inventory"
+          params={tableParams}
+          page={page}
+          totalPages={totalPages}
+          totalItems={total}
+          pageSize={limit}
+          label="products"
+        />
+      </TableCard>
 
-      <section className="admin-card admin-card--wide">
-        <div className="admin-card-header">
-          <h2>Recent stock movements</h2>
+      <TableCard className="mt-4">
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="m-0 text-[13px] font-semibold text-foreground">Recent stock movements</h2>
         </div>
         {adjustments.length === 0 ? (
-          <AdminEmptyState
-            icon={<History size={24} />}
+          <TableEmpty
+            icon={<History size={20} aria-hidden="true" />}
             title="No stock adjustments yet"
             description="Manual stock changes are recorded here with a reason."
           />
         ) : (
-          <div className="admin-table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Change</th>
-                  <th scope="col">Reason</th>
-                  <th scope="col">Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {adjustments.map((row) => (
-                  <tr key={row.id}>
-                    <td className="admin-muted">{new Date(row.created_at).toLocaleString()}</td>
-                    <td>
-                      <span className={row.change > 0 ? "admin-text-success" : "admin-text-danger"}>
-                        {row.change > 0 ? "+" : ""}
-                        {row.change}
-                      </span>
-                    </td>
-                    <td>{row.reason}</td>
-                    <td className="admin-muted">{row.note || "—"}</td>
-                  </tr>
+          <TableScroll>
+            <Table label="Recent stock movements" minWidth="min-w-[560px]">
+              <THead>
+                <Th>Date</Th>
+                <Th className="text-right">Change</Th>
+                <Th>Reason</Th>
+                <Th className="hidden sm:table-cell">Note</Th>
+              </THead>
+              <TBody>
+                {adjustments.map(row => (
+                  <Tr key={row.id}>
+                    <Td className="whitespace-nowrap text-[12px] tabular-nums">
+                      <TdMuted>
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          timeZone: "UTC"
+                        }).format(new Date(row.created_at))}
+                      </TdMuted>
+                    </Td>
+                    <Td
+                      className={`text-right font-medium tabular-nums ${
+                        row.change > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                      }`}
+                    >
+                      {row.change > 0 ? "+" : ""}
+                      {row.change}
+                    </Td>
+                    <Td>{row.reason}</Td>
+                    <Td className="hidden max-w-[260px] truncate sm:table-cell">
+                      <TdMuted>{row.note || "—"}</TdMuted>
+                    </Td>
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TBody>
+            </Table>
+          </TableScroll>
         )}
-      </section>
+      </TableCard>
     </div>
   );
 }

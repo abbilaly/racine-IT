@@ -49,7 +49,9 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-.admin-shell {
+/* Tokens live on <html> while an admin screen is mounted so portalled
+   overlays (sheets, dropdowns, dialogs) inherit them too. */
+html:has(.admin-shell) {
   --background: #f7f8fa;
   --foreground: #0f1320;
   --card: #ffffff;
@@ -78,7 +80,7 @@
   color-scheme: light;
 }
 
-.admin-shell[data-admin-theme="dark"] {
+html:has(.admin-shell[data-admin-theme="dark"]) {
   --background: #0b0d14;
   --foreground: #e8eaf0;
   --card: #12151d;
@@ -1473,4 +1475,96 @@ body:has(.admin-shell) :is(
 
 body:has(.admin-shell[data-admin-theme="dark"]) {
   background: #0b0d14;
+}
+
+/* ==========================================================================
+   Phase 3 — brands manager skin
+   The brand CRUD component keeps its behaviour; these rules map its legacy
+   classes onto the shared tokens so it matches the migrated tables.
+   ========================================================================== */
+.admin-brands-page :is(.admin-card, .admin-form) {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: none;
+}
+
+.admin-brands-page .admin-card-header {
+  border-color: var(--border);
+}
+
+.admin-brands-page .admin-table th {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-brands-page .admin-table td {
+  border-color: var(--border);
+}
+
+.admin-brands-page .admin-table tr:hover {
+  background: var(--accent);
+}
+
+.admin-brands-page :is(.admin-input, .admin-textarea, .admin-search-input, .admin-search, .admin-select) {
+  border-color: var(--input);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.admin-brands-page .admin-label {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.admin-brands-page .btn-dark {
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.admin-brands-page .btn-outline {
+  border-radius: 8px;
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.admin-brands-page .admin-catalogue {
+  border-color: var(--border);
+  border-radius: 12px;
+}
+
+.admin-brands-page .admin-catalogue-preview {
+  background: var(--muted);
+}
+
+/* Legacy page CSS colours every `a` inside `.admin-page`, which beat the
+   button's own text colour on link-rendered buttons. Restore the variant
+   colours so primary buttons stay readable. */
+.admin-main a[data-slot="button"] {
+  color: var(--foreground);
+}
+
+.admin-main a[data-slot="button"][data-variant="default"] {
+  color: var(--primary-foreground);
+}
+
+.admin-main a[data-slot="button"][data-variant="destructive"] {
+  color: var(--destructive-foreground);
+}
+
+/* The admin's design-system controls draw their focus ring with a box shadow;
+   the legacy admin CSS adds a second, heavier outline on the same elements.
+   Overlays are portalled to <body>, outside `.admin-main`. */
+.admin-main [class*="focus-visible:ring-ring"]:focus-visible,
+[data-slot="sheet-content"] :is(input, select, textarea, button, a):focus-visible,
+[data-slot="dropdown-menu-content"] :is(input, select, textarea, button, a):focus-visible {
+  outline: none;
 }
