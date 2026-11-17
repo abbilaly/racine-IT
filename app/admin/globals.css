@@ -1464,3 +1464,13 @@ body:has(.admin-shell) :is(
 .admin-shell[data-admin-theme="dark"] .admin-main :is(input, textarea)::placeholder {
   color: var(--muted-foreground);
 }
+
+/* The shell owns the page background, otherwise the storefront's white body
+   shows through below the admin content on tall pages and in dark mode. */
+.admin-shell {
+  background: var(--background);
+}
+
+body:has(.admin-shell[data-admin-theme="dark"]) {
+  background: #0b0d14;
+}

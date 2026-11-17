@@ -885,3 +885,247 @@ export async function getCustomerOrders(db: AdminClient, email: string, paginati
   if (error) throw new Error(error.message);
   return { rows: (data ?? []) as Array<Record<string, unknown>>, total: count ?? 0 };
 }
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard overview                                                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Revenue definitions, fixed by the order lifecycle in `public.orders`:
+ *
+ *   gross      every order placed in the window, cancelled included
+ *   confirmed  orders that were not cancelled (received → delivered)
+ *   realized    orders marked delivered only
+ *
+ * There is no refund/returned status and no payment-captured flag in the
+ * schema, so no refund or "collected cash" figure is invented here.
+ */
+export const DASHBOARD_STATUSES = [
+  "received",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled"
+] as const;
+
+export const DASHBOARD_STATUS_LABELS: Record<string, string> = {
+  received: "Received",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled"
+};
+
+export type DashboardTotals = {
+  gross_cents: number;
+  confirmed_cents: number;
+  realized_cents: number;
+  orders_all: number;
+  orders_confirmed: number;
+  aov_cents: number;
+  customers: number;
+  new_customers: number;
+};
+
+export type DashboardSeriesPoint = {
+  key: string;
+  label: string;
+  revenue_cents: number;
+  orders: number;
+};
+
+type OrderWindowRow = {
+  total: number;
+  status: string;
+  email: string;
+  created_at: string;
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function utcDayKey(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function utcMonthKey(date: Date): string {
+  return date.toISOString().slice(0, 7);
+}
+
+function dayLabel(key: string): string {
+  const date = new Date(`${key}T00:00:00.000Z`);
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(date);
+}
+
+function monthLabel(key: string): string {
+  const date = new Date(`${key}-01T00:00:00.000Z`);
+  return new Intl.DateTimeFormat("en-US", { month: "short", year: "2-digit", timeZone: "UTC" }).format(date);
+}
+
+/** New customers are emails whose first non-cancelled order falls in the window. */
+async function countNewCustomers(db: AdminClient, fromISO: string, emails: string[]): Promise<number> {
+  if (emails.length === 0) return 0;
+  const { data, error } = await db.from("orders").select("email, created_at").neq("status", "cancelled");
+  if (error) throw new Error(error.message);
+
+  const firstOrder = new Map<string, string>();
+  for (const row of (data ?? []) as Array<{ email: string; created_at: string }>) {
+    const key = row.email.toLowerCase();
+    const previous = firstOrder.get(key);
+    if (!previous || row.created_at < previous) firstOrder.set(key, row.created_at);
+  }
+
+  return emails.filter((email) => {
+    const first = firstOrder.get(email.toLowerCase());
+    return Boolean(first && first >= fromISO);
+  }).length;
+}
+
+export async function dashboardTotals(
+  db: AdminClient,
+  fromISO: string,
+  toISO: string
+): Promise<DashboardTotals> {
+  const { data, error } = await db
+    .from("orders")
+    .select("total, status, email, created_at")
+    .gte("created_at", fromISO)
+    .lte("created_at", toISO);
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []) as OrderWindowRow[];
+  const confirmed = rows.filter((row) => row.status !== "cancelled");
+  const realized = rows.filter((row) => row.status === "delivered");
+  const emails = Array.from(new Set(confirmed.map((row) => row.email)));
+
+  const confirmedCents = confirmed.reduce((sum, row) => sum + row.total, 0);
+  const newCustomers = await countNewCustomers(db, fromISO, emails);
+
+  return {
+    gross_cents: rows.reduce((sum, row) => sum + row.total, 0),
+    confirmed_cents: confirmedCents,
+    realized_cents: realized.reduce((sum, row) => sum + row.total, 0),
+    orders_all: rows.length,
+    orders_confirmed: confirmed.length,
+    aov_cents: confirmed.length > 0 ? Math.round(confirmedCents / confirmed.length) : 0,
+    customers: emails.length,
+    new_customers: newCustomers
+  };
+}
+
+/** Continuous series: every day (or month) in the window is present, gaps as zero. */
+export async function salesSeriesInRange(
+  db: AdminClient,
+  fromISO: string,
+  toISO: string,
+  granularity: "day" | "month"
+): Promise<DashboardSeriesPoint[]> {
+  const { data, error } = await db
+    .from("orders")
+    .select("created_at, total, status")
+    .gte("created_at", fromISO)
+    .lte("created_at", toISO);
+  if (error) throw new Error(error.message);
+
+  const buckets = new Map<string, { revenue_cents: number; orders: number }>();
+  for (const row of (data ?? []) as Array<{ created_at: string; total: number; status: string }>) {
+    if (row.status === "cancelled") continue;
+    const key = granularity === "day" ? row.created_at.slice(0, 10) : row.created_at.slice(0, 7);
+    const bucket = buckets.get(key) ?? { revenue_cents: 0, orders: 0 };
+    bucket.revenue_cents += row.total;
+    bucket.orders += 1;
+    buckets.set(key, bucket);
+  }
+
+  const points: DashboardSeriesPoint[] = [];
+  const start = new Date(fromISO);
+  const end = new Date(toISO);
+
+  if (granularity === "day") {
+    for (let time = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+      time <= end.getTime();
+      time += DAY_MS) {
+      const key = utcDayKey(new Date(time));
+      const bucket = buckets.get(key) ?? { revenue_cents: 0, orders: 0 };
+      points.push({ key, label: dayLabel(key), ...bucket });
+    }
+  } else {
+    let cursor = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1);
+    const last = Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 1);
+    while (cursor <= last) {
+      const key = utcMonthKey(new Date(cursor));
+      const bucket = buckets.get(key) ?? { revenue_cents: 0, orders: 0 };
+      points.push({ key, label: monthLabel(key), ...bucket });
+      const date = new Date(cursor);
+      cursor = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
+    }
+  }
+
+  return points;
+}
+
+export async function ordersByStatusInRange(
+  db: AdminClient,
+  fromISO: string,
+  toISO: string
+): Promise<OrdersByStatusRow[]> {
+  const { data, error } = await db
+    .from("orders")
+    .select("status, total")
+    .gte("created_at", fromISO)
+    .lte("created_at", toISO);
+  if (error) throw new Error(error.message);
+
+  const grouped = new Map<string, OrdersByStatusRow>();
+  for (const row of (data ?? []) as Array<{ status: string; total: number }>) {
+    const existing = grouped.get(row.status);
+    if (existing) {
+      existing.count += 1;
+      existing.total_cents += row.total;
+    } else {
+      grouped.set(row.status, { status: row.status, count: 1, total_cents: row.total });
+    }
+  }
+
+  return DASHBOARD_STATUSES.map(
+    (status) => grouped.get(status) ?? { status, count: 0, total_cents: 0 }
+  );
+}
+
+export async function topProductsInRange(
+  db: AdminClient,
+  fromISO: string,
+  toISO: string,
+  limit = 5
+): Promise<BestSellerRow[]> {
+  const { data: orders, error: orderError } = await db
+    .from("orders")
+    .select("id")
+    .gte("created_at", fromISO)
+    .lte("created_at", toISO)
+    .neq("status", "cancelled");
+  if (orderError) throw new Error(orderError.message);
+
+  const ids = ((orders ?? []) as Array<{ id: string }>).map((row) => row.id);
+  if (ids.length === 0) return [];
+
+  const { data: items, error: itemError } = await db
+    .from("order_items")
+    .select("slug, title, qty, line_total")
+    .in("order_id", ids);
+  if (itemError) throw new Error(itemError.message);
+
+  const map = new Map<string, BestSellerRow>();
+  for (const row of (items ?? []) as Array<{ slug: string; title: string; qty: number; line_total: number }>) {
+    const existing = map.get(row.slug);
+    if (existing) {
+      existing.units_sold += row.qty;
+      existing.revenue_cents += row.line_total;
+    } else {
+      map.set(row.slug, { slug: row.slug, title: row.title, units_sold: row.qty, revenue_cents: row.line_total });
+    }
+  }
+
+  return Array.from(map.values())
+    .sort((a, b) => b.revenue_cents - a.revenue_cents)
+    .slice(0, limit);
+}
