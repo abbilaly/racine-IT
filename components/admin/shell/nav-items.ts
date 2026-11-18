@@ -2,6 +2,7 @@ import {
   BarChart3,
   Box,
   FileText,
+  Image as ImageIcon,
   LayoutDashboard,
   Mail,
   Package,
@@ -38,6 +39,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Catalogue",
     items: [
       { href: "/admin/products", label: "Products", icon: Package },
+      { href: "/admin/banners", label: "Homepage", icon: ImageIcon },
       { href: "/admin/products/import", label: "Import", icon: Upload },
       { href: "/admin/categories", label: "Categories", icon: Tag },
       { href: "/admin/brands", label: "Brands", icon: Tag },

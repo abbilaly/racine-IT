@@ -2,7 +2,7 @@ import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getProductDetail, listCategories, listBrands } from "@/lib/server/admin-data";
 import { notFound } from "next/navigation";
 import { AdminSpinner, AdminEmptyState, AdminError, AdminBadgeStatus, AdminTable, AdminPagination, AdminSearchInput } from "@/lib/server/admin-ui";
-import { ProductImages } from "../edit/ProductImages";
+import { ProductImages } from "@/components/admin/products/ProductImages";
 import Link from "next/link";
 import { ArrowLeft, Package, Edit2, Trash2, Plus, History, Upload } from "lucide-react";
 

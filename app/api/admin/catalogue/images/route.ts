@@ -15,7 +15,8 @@ const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/a
 
 const FOLDERS = {
   "category-banner": "categories/banners",
-  "brand-logo": "brands"
+  "brand-logo": "brands",
+  "homepage-banner": "homepage/banners"
 } as const;
 
 type UploadKind = keyof typeof FOLDERS;
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
   const kindParam = new URL(request.url).searchParams.get("kind") ?? "";
   if (!(kindParam in FOLDERS)) {
-    return fail("Upload kind must be category-banner or brand-logo.", 400);
+    return fail("Upload kind must be category-banner, brand-logo or homepage-banner.", 400);
   }
   const kind = kindParam as UploadKind;
 

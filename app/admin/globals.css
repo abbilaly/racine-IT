@@ -1468,9 +1468,12 @@ body:has(.admin-shell) :is(
 }
 
 /* The shell owns the page background, otherwise the storefront's white body
-   shows through below the admin content on tall pages and in dark mode. */
+   shows through below the admin content on tall pages and in dark mode. It also
+   owns the default text colour: the storefront body is #111, which would other-
+   wise show up as near-black text on the dark admin surface. */
 .admin-shell {
   background: var(--background);
+  color: var(--foreground);
 }
 
 body:has(.admin-shell[data-admin-theme="dark"]) {

@@ -9,6 +9,15 @@ import { ASSET } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 import CategoryPanel from "@/components/CategoryPanel";
 
+export type HomeSlide = {
+  image: string;
+  kicker: string;
+  title: string;
+  desc: string;
+  href: string;
+  ctaLabel: string;
+};
+
 type Slide = {
   image: string;
   kicker: string;
@@ -17,9 +26,11 @@ type Slide = {
   href?: string;
   /** Preferred category key plus a label matcher resolved against the live catalogue. */
   category?: { key: string; pattern: RegExp };
+  /** Button label; defaults to “Shop now”. */
+  cta?: string;
 };
 
-const slides: Slide[] = [
+const fallbackSlides: Slide[] = [
   {
     image: `${ASSET}/h-electro-pulse-slide-1.webp`,
     kicker: "WELCOME TO AB TECH",
@@ -49,8 +60,24 @@ const slides: Slide[] = [
  * the hero slider, tabbed product rows and carousels are interactive and read
  * the catalogue from the shared shop store.
  */
-export default function HomeView() {
+export default function HomeView({ slides: managedSlides = [] }: { slides?: HomeSlide[] }) {
   const { products, categories: catalogCategories } = useShop();
+
+  /**
+   * Owner-managed hero banners come from the database. When none are published
+   * (or migration 0009 is not applied yet) the built-in slides below keep the
+   * homepage working exactly as before.
+   */
+  const slides: Slide[] = managedSlides.length
+    ? managedSlides.map(banner => ({
+        image: banner.image,
+        kicker: banner.kicker,
+        title: banner.title,
+        desc: banner.desc,
+        href: banner.href,
+        cta: banner.ctaLabel
+      }))
+    : fallbackSlides;
 
   /**
    * Category links follow the catalogue that is actually loaded. The live
@@ -128,7 +155,7 @@ export default function HomeView() {
                 <h1>{s.title}</h1>
                 <p>{s.desc}</p>
                 <Link href={s.category ? categoryHref(s.category.key, s.category.pattern) : s.href ?? "/shop"}>
-                  Shop now
+                  {s.cta ?? "Shop now"}
                 </Link>
               </div>
             </div>

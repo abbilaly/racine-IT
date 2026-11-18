@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AdminSpinner, AdminEmptyState, AdminError, AdminBadgeStatus, AdminTable, AdminPagination, AdminSearchInput } from "@/lib/server/admin-ui";
 import { StockAdjustmentForm } from "./StockAdjustmentForm";
 import { ProductForm } from "./ProductForm";
-import { ProductImages } from "./ProductImages";
+import { ProductImages } from "@/components/admin/products/ProductImages";
 import Link from "next/link";
 import { ArrowLeft, Package, Edit2, Trash2, Plus, History, Upload } from "lucide-react";
 

@@ -1,4 +1,5 @@
 import { getAdminSession } from "@/lib/server/admin-auth";
+import { getAdminTheme } from "@/lib/server/admin-theme";
 import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import { EmailCenterNav } from "@/components/admin/EmailCenterNav";
 import { AdminThemeProvider } from "@/components/admin/theme/theme-provider";
@@ -28,14 +29,20 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getAdminSession();
+  const [session, theme] = await Promise.all([getAdminSession(), getAdminTheme()]);
 
   if (!session) {
-    return <AdminLoginForm />;
+    // The sign-in wall is themed too: without the provider the login screen had
+    // no `data-admin-theme` scope and no tokens, so it always rendered light.
+    return (
+      <AdminThemeProvider initialTheme={theme} className="admin-shell admin-login-shell">
+        <AdminLoginForm />
+      </AdminThemeProvider>
+    );
   }
 
   return (
-    <AdminThemeProvider>
+    <AdminThemeProvider initialTheme={theme}>
       <AdminShell email={session.email} role={session.role}>
         <EmailCenterNav />
         {children}

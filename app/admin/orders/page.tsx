@@ -189,7 +189,7 @@ export default async function AdminOrdersPage({
                           </Link>
                         </Button>
                         <Button asChild variant="ghost" size="icon" className="size-7">
-                          <Link href={`/admin/orders/${order.id}/edit`} aria-label={`Edit ${order.ref}`}>
+                          <Link href={`/admin/orders/${order.id}/status`} aria-label={`Update status for ${order.ref}`}>
                             <Pencil size={13} aria-hidden="true" />
                           </Link>
                         </Button>
