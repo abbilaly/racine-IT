@@ -1,13 +1,12 @@
 name: sync-release-89e0e27
 
-# Temporary workflow. It imports the reviewed release bundle that is added to
-# this branch through the GitHub web UI, verifies it, and fast-forwards main.
-# It builds nothing, reads no secrets and never forces a ref update.
+# Temporary workflow. It imports the reviewed release bundle that was added to
+# this branch, verifies it, and fast-forwards main. It builds nothing, reads no
+# secrets and never forces a ref update.
 
 on:
   push:
     branches: [sync/release-89e0e27]
-    paths: [release-89e0e27.bundle]
   workflow_dispatch:
 
 permissions:
@@ -22,7 +21,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Locate the bundle
+        id: locate
+        run: |
+          set -euo pipefail
+          BUNDLE=""
+          for candidate in release-89e0e27.bundle racine-it-release.bundle; do
+            if [ -f "$candidate" ]; then BUNDLE="$candidate"; break; fi
+          done
+          if [ -z "$BUNDLE" ]; then
+            echo "No bundle on this branch; nothing to import."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "bundle = $BUNDLE"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "bundle=$BUNDLE" >> "$GITHUB_OUTPUT"
+
       - name: Refuse to run if main moved or already advanced
+        if: steps.locate.outputs.found == 'true'
         run: |
           set -euo pipefail
           git fetch origin main
@@ -38,19 +55,24 @@ jobs:
           fi
 
       - name: Verify the bundle is the reviewed artifact
+        if: steps.locate.outputs.found == 'true'
+        env:
+          BUNDLE: ${{ steps.locate.outputs.bundle }}
         run: |
           set -euo pipefail
-          test -f release-89e0e27.bundle
-          SIZE=$(wc -c < release-89e0e27.bundle)
+          SIZE=$(wc -c < "$BUNDLE")
           echo "bundle size = $SIZE"
           test "$SIZE" = "27250"
-          echo "ba2fecef6239456f955a3f797453574cbb9c7d3ed1410f7a8a0447479c509e4a  release-89e0e27.bundle" | sha256sum -c -
-          git bundle verify ./release-89e0e27.bundle
+          echo "ba2fecef6239456f955a3f797453574cbb9c7d3ed1410f7a8a0447479c509e4a  $BUNDLE" | sha256sum -c -
+          git bundle verify "./$BUNDLE"
 
       - name: Import the exact commits and assert the chain
+        if: steps.locate.outputs.found == 'true'
+        env:
+          BUNDLE: ${{ steps.locate.outputs.bundle }}
         run: |
           set -euo pipefail
-          git fetch ./release-89e0e27.bundle HEAD:refs/heads/release-89e0e27
+          git fetch "./$BUNDLE" HEAD:refs/heads/release-89e0e27
           TIP=$(git rev-parse release-89e0e27)
           echo "imported tip = $TIP"
           test "$TIP" = "89e0e27d6b4805cd716e7d40ebda5bfab79026c4"
@@ -60,6 +82,7 @@ jobs:
           git log --format='%H %s' dcca4ee..release-89e0e27
 
       - name: Fast-forward main without force
+        if: steps.locate.outputs.found == 'true'
         run: |
           set -euo pipefail
           git merge-base --is-ancestor origin/main release-89e0e27
