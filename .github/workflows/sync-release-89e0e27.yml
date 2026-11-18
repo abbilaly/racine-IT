@@ -1,0 +1,69 @@
+name: sync-release-89e0e27
+
+# Temporary workflow. It imports the reviewed release bundle that is added to
+# this branch through the GitHub web UI, verifies it, and fast-forwards main.
+# It builds nothing, reads no secrets and never forces a ref update.
+
+on:
+  push:
+    branches: [sync/release-89e0e27]
+    paths: [release-89e0e27.bundle]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history (bundle prerequisite lives there)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refuse to run if main moved or already advanced
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          MAIN=$(git rev-parse origin/main)
+          echo "origin/main = $MAIN"
+          if [ "$MAIN" = "89e0e27d6b4805cd716e7d40ebda5bfab79026c4" ]; then
+            echo "main is already at the release commit; nothing to do."
+            exit 0
+          fi
+          if [ "$MAIN" != "dcca4ee850f8fa6d30e1bc0fd2ba164a250e7cac" ]; then
+            echo "::error::origin/main is $MAIN, expected dcca4ee. Stopping without changes."
+            exit 1
+          fi
+
+      - name: Verify the bundle is the reviewed artifact
+        run: |
+          set -euo pipefail
+          test -f release-89e0e27.bundle
+          SIZE=$(wc -c < release-89e0e27.bundle)
+          echo "bundle size = $SIZE"
+          test "$SIZE" = "27250"
+          echo "ba2fecef6239456f955a3f797453574cbb9c7d3ed1410f7a8a0447479c509e4a  release-89e0e27.bundle" | sha256sum -c -
+          git bundle verify ./release-89e0e27.bundle
+
+      - name: Import the exact commits and assert the chain
+        run: |
+          set -euo pipefail
+          git fetch ./release-89e0e27.bundle HEAD:refs/heads/release-89e0e27
+          TIP=$(git rev-parse release-89e0e27)
+          echo "imported tip = $TIP"
+          test "$TIP" = "89e0e27d6b4805cd716e7d40ebda5bfab79026c4"
+          test "$(git rev-list --count dcca4ee..release-89e0e27)" = "3"
+          test "$(git rev-parse release-89e0e27~1)" = "adabaebcee88fbee12c97c284d12f2ddd033f63a"
+          test "$(git rev-parse release-89e0e27~2)" = "5210fc43c7069da0c398e32dff8e22ac3f42750e"
+          git log --format='%H %s' dcca4ee..release-89e0e27
+
+      - name: Fast-forward main without force
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor origin/main release-89e0e27
+          git push origin release-89e0e27:main
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "89e0e27d6b4805cd716e7d40ebda5bfab79026c4"
+          echo "origin/main is now 89e0e27d6b4805cd716e7d40ebda5bfab79026c4"
