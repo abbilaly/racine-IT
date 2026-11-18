@@ -69,15 +69,32 @@ export async function POST(request: Request, context: Context) {
 
   const { data: publicUrl } = db.storage.from("product-images").getPublicUrl(objectPath);
 
-  const { error: writeError } = await db.from("product_images").upsert(
-    {
-      product_id: id,
-      kind,
-      path: publicUrl.publicUrl,
-      position: kind === "primary" ? 0 : 1
-    },
-    { onConflict: "product_id,kind" }
-  );
+  /*
+   * Replace rather than upsert with `onConflict`. The deployed database enforces
+   * one image per slot with its own constraint names (for example
+   * `product_images_primary_uq`), so naming `(product_id, kind)` in an upsert
+   * fails with "no unique or exclusion constraint matching the ON CONFLICT
+   * specification". Updating the existing row when there is one, and inserting
+   * otherwise, works against both the repository migration and the live schema.
+   */
+  const { data: existing, error: readError } = await db
+    .from("product_images")
+    .select("id")
+    .eq("product_id", id)
+    .eq("kind", kind)
+    .maybeSingle();
+  if (readError) return fail(readError.message, 500);
+
+  const row = {
+    product_id: id,
+    kind,
+    path: publicUrl.publicUrl,
+    position: kind === "primary" ? 0 : 1
+  };
+
+  const { error: writeError } = existing
+    ? await db.from("product_images").update({ path: row.path }).eq("id", existing.id)
+    : await db.from("product_images").insert(row);
   if (writeError) return fail(writeError.message, 500);
 
   return NextResponse.json(
