@@ -1,4 +1,5 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
+import { isUuid } from "@/lib/utils";
 import { getOrderDetail, listAdminNotes } from "@/lib/server/admin-data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -14,6 +15,8 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  // A malformed id must be a 404, not a database error screen.
+  if (!isUuid(id)) notFound();
   const session = await requireAdmin();
   const db = adminClient(session);
 

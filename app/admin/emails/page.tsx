@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import {
   getEmailMetrics,
@@ -27,6 +28,9 @@ function formatWhen(value: string | null): string {
 
 export default async function EmailOverviewPage() {
   const session = await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
   const db = adminClient(session);
 
   let metrics: EmailMetrics | null = null;

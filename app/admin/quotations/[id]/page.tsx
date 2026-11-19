@@ -1,4 +1,5 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
+import { isUuid } from "@/lib/utils";
 import { getQuotationDetail, formatCents } from "@/lib/server/admin-data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -16,6 +17,8 @@ export default async function AdminQuotationDetailPage({
   const session = await requireAdmin();
   const db = adminClient(session);
   const { id } = await params;
+  // A malformed id must be a 404, not a database error screen.
+  if (!isUuid(id)) notFound();
 
   const quotation = await getQuotationDetail(db, id);
   if (!quotation) notFound();

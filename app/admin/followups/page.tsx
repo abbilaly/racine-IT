@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/server/admin-auth";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { FollowupsClient } from "@/components/admin/FollowupsClient";
 import { AdminBreadcrumbs } from "@/components/admin/nav";
 import Link from "next/link";
@@ -8,6 +9,9 @@ export const metadata = { title: "Follow-ups" };
 
 export default async function FollowupsPage() {
   await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
 
   return (
     <div className="admin-page ec-page">

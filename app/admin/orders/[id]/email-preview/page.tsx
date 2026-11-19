@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { isUuid } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getOrderDetail } from "@/lib/server/admin-data";
@@ -25,6 +26,8 @@ export default async function OrderEmailPreviewPage({
   const session = await requireAdmin();
   const db = adminClient(session);
   const { id } = await params;
+  // A malformed id must be a 404, not a database error screen.
+  if (!isUuid(id)) notFound();
   const { device: requestedDevice } = await searchParams;
 
   const order = await getOrderDetail(db, id);

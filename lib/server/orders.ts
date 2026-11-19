@@ -154,11 +154,25 @@ function parseCustomer(raw: unknown): CustomerInput {
   if (!/^[A-Za-z0-9 -]+$/.test(postal)) {
     throw new OrderError("Postal code may only contain letters, digits, spaces and dashes.", 400);
   }
+  // Phone numbers are international here: a Moroccan local number
+  // (06 12 34 56 78) and an international one (+212 6 12 34 56 78) must both
+  // pass, so the rule is the E.164 digit budget rather than a country pattern.
+  const phone = text(r.phone, "Phone", 5, 40);
+  if (!/^[+()\d\s.\-]+$/.test(phone)) {
+    throw new OrderError("Phone may only contain digits, spaces, +, ( ), . and dashes.", 400);
+  }
+  const phoneDigits = phone.replace(/\D/g, "");
+  if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+    throw new OrderError(
+      "Enter a valid phone number with 8–15 digits, including the country or area code.",
+      400
+    );
+  }
   return {
     firstName: text(r.firstName, "First name", 1, 60),
     lastName: text(r.lastName, "Last name", 1, 60),
     email,
-    phone: text(r.phone, "Phone", 5, 40),
+    phone,
     address: text(r.address, "Address", 3, 160),
     city: text(r.city, "City", 1, 80),
     postal,

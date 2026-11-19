@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { isUuid } from "@/lib/utils";
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getQuotationDetail } from "@/lib/server/admin-data";
 import { renderQuotationEmail } from "@/lib/server/email-send-templates";
@@ -21,6 +22,8 @@ export default async function QuotationEmailPreviewPage({
   const session = await requireAdmin();
   const db = adminClient(session);
   const { id } = await params;
+  // A malformed id must be a 404, not a database error screen.
+  if (!isUuid(id)) notFound();
   const { device: requestedDevice } = await searchParams;
 
   const quotation = await getQuotationDetail(db, id);

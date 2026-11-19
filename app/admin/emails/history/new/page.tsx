@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { Mail } from "lucide-react";
 import { requireAdmin } from "@/lib/server/admin-auth";
 import { SendTestEmailForm } from "@/components/admin/SendTestEmailForm";
@@ -9,6 +10,9 @@ export const metadata = { title: "Send test email" };
 
 export default async function NewEmailTestPage() {
   await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
 
   const testRecipient = (process.env.EMAIL_TEST_RECIPIENT ?? "").trim();
 

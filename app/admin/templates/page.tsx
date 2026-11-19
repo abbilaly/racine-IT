@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { requireAdmin } from "@/lib/server/admin-auth";
 import {
   STUDIO_CATEGORIES,
@@ -20,6 +21,9 @@ export default async function TemplateStudioPage({
   searchParams: SearchParams;
 }) {
   await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
 
   const params = await searchParams;
   const selected = getStudioTemplate(params.template) ?? STUDIO_TEMPLATES[0];

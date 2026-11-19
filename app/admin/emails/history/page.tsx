@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { listEmailLogs, EMAIL_KINDS } from "@/lib/server/email-center";
 import { AdminBreadcrumbs } from "@/components/admin/nav";
@@ -19,6 +20,9 @@ export default async function EmailHistoryPage({
   searchParams: SearchParams;
 }) {
   const session = await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
   const params = await searchParams;
 
   const q = readParam(params.q);

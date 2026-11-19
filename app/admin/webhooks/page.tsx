@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/server/admin-auth";
+import { renderEmailCenterDisabled } from "@/lib/server/email-center-gate";
 import { getWebhookDiagnostics } from "@/lib/server/email-center";
 import { AdminBreadcrumbs } from "@/components/admin/nav";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
@@ -8,6 +9,9 @@ export const metadata = { title: "Email webhooks" };
 
 export default async function WebhooksPage() {
   await requireAdmin();
+  // Screens that need migration 0005 render an explicit disabled state.
+  const emailCenterDisabled = renderEmailCenterDisabled();
+  if (emailCenterDisabled) return emailCenterDisabled;
   const diagnostics = getWebhookDiagnostics();
   const ready = diagnostics.secret_configured && diagnostics.email_provider_configured;
 

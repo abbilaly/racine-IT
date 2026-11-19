@@ -139,7 +139,18 @@ export default function CheckoutView() {
             </label>
             <label className="field">
               Phone
-              <input type="tel" name="phone" autoComplete="tel" required placeholder="+1 555 000 1234" />
+              <input
+                type="tel"
+                name="phone"
+                autoComplete="tel"
+                required
+                inputMode="tel"
+                minLength={8}
+                maxLength={20}
+                pattern="[0-9+()\s.-]{8,20}"
+                title="Include the country or area code, e.g. +212 6 12 34 56 78"
+                placeholder="+212 6 12 34 56 78"
+              />
             </label>
           </div>
         </fieldset>
