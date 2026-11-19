@@ -41,6 +41,9 @@ export default function AdminLoginForm() {
         </div>
 
         <form
+          // No-JS fallback: without `method`, a native submit would put the
+          // password in the URL. A POST keeps it in the request body.
+          method="post"
           className="rounded-xl border border-border bg-card p-6 shadow-sm"
           onSubmit={async event => {
             event.preventDefault();
