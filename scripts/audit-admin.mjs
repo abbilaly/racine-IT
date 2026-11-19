@@ -187,7 +187,34 @@ async function main() {
   });
   record("Unknown currency is rejected", invalidCurrency.status === 400, `HTTP ${invalidCurrency.status}`);
 
-  // 6. Storefront routes the admin work depends on.
+  // 6. Checkout rejects a phone that cannot be dialled, before any write.
+  const badPhone = await fetch(`${BASE}/api/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: [{ slug: "audit-does-not-exist", qty: 1 }],
+      customer: {
+        firstName: "Audit",
+        lastName: "Check",
+        email: "audit@example.com",
+        phone: "abc",
+        address: "1 Test Street",
+        city: "Casablanca",
+        postal: "20000",
+        country: "MA"
+      },
+      delivery: "standard",
+      payment: "cod"
+    })
+  });
+  const badPhoneBody = await badPhone.json().catch(() => ({}));
+  record(
+    "Checkout rejects an invalid phone number",
+    badPhone.status === 400 && /phone/i.test(String(badPhoneBody.error ?? "")),
+    `HTTP ${badPhone.status}: ${String(badPhoneBody.error ?? "").slice(0, 60)}`
+  );
+
+  // 7. Storefront routes the admin work depends on.
   for (const path of ["/", "/categories", "/shop"]) {
     const res = await fetch(`${BASE}${path}`, { redirect: "manual" });
     record(`Storefront ${path}`, res.status === 200, `HTTP ${res.status}`);
