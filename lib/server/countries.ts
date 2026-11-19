@@ -1,4 +1,24 @@
+/**
+ * Countries offered in the checkout address form. Morocco is the store's home
+ * market and the default, followed by the neighbouring North African and
+ * Middle Eastern markets that are realistically served from it.
+ */
+export const DEFAULT_COUNTRY = "MA";
+
 export const COUNTRIES: Array<{ code: string; name: string }> = [
+  { code: "MA", name: "Morocco" },
+  { code: "DZ", name: "Algeria" },
+  { code: "TN", name: "Tunisia" },
+  { code: "LY", name: "Libya" },
+  { code: "MR", name: "Mauritania" },
+  { code: "EG", name: "Egypt" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "QA", name: "Qatar" },
+  { code: "KW", name: "Kuwait" },
+  { code: "BH", name: "Bahrain" },
+  { code: "OM", name: "Oman" },
+  { code: "JO", name: "Jordan" },
   { code: "US", name: "United States" },
   { code: "CA", name: "Canada" },
   { code: "GB", name: "United Kingdom" },
@@ -29,7 +49,6 @@ export const COUNTRIES: Array<{ code: string; name: string }> = [
   { code: "NZ", name: "New Zealand" },
   { code: "ZA", name: "South Africa" },
   { code: "AE", name: "United Arab Emirates" },
-  { code: "SA", name: "Saudi Arabia" },
   { code: "IL", name: "Israel" },
   { code: "BR", name: "Brazil" },
   { code: "MX", name: "Mexico" },

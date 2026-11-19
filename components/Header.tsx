@@ -14,7 +14,7 @@ import {
   X
 } from "lucide-react";
 import SearchBar from "./SearchBar";
-import { formatPrice } from "@/lib/products";
+
 import { useShop } from "@/lib/shop-store";
 import { useMobileMenu } from "./MobileMenu";
 import { BRAND } from "@/lib/site-config";
@@ -22,6 +22,7 @@ import { BRAND } from "@/lib/site-config";
 const NAV = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
+  { label: "Categories", href: "/categories" },
   { label: "Products", href: "/shop?sort=rating" },
   { label: "Wishlist", href: "/wishlist" },
   { label: "Compare", href: "/compare" },
@@ -37,7 +38,7 @@ interface CustomerSession {
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
-  const { cartCount, cartTotal, wishlist } = useShop();
+  const { cartCount, cartTotal, wishlist, money, settings } = useShop();
   const { open: menuOpen, toggle: toggleMenu } = useMobileMenu();
   const [session, setSession] = useState<CustomerSession | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +75,9 @@ export default function Header() {
 
       <div className="topbar">
         <div className="site-shell topbar-inner">
-          <div><span>United States (USD $)</span></div>
+          {/* Morocco is the store's home market; the currency label follows the
+              live store setting instead of a hardcoded USD claim. */}
+          <div><span>Morocco · Prices in {settings.currency}</span></div>
         </div>
       </div>
 
@@ -150,7 +153,7 @@ export default function Header() {
             <Link href="/cart" className="cart-button" aria-label={`Cart with ${cartCount} items`}>
               <ShoppingBag size={18} strokeWidth={1.6} />
               <i>{cartCount}</i>
-              <span>Cart<br /><small>{formatPrice(cartTotal)}</small></span>
+              <span>Cart<br /><small>{money(cartTotal)}</small></span>
             </Link>
           </div>
         </div>

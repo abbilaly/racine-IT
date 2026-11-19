@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { GitCompareArrows, Heart, Minus, Plus, ShoppingCart, Truck } from "lucide-react";
-import { formatPrice, imageUrl, type Product } from "@/lib/products";
+import { imageUrl, type Product } from "@/lib/products";
 import { MAX_COMPARE, useShop } from "@/lib/shop-store";
 
 export default function ProductDetail({ product }: { product: Product }) {
@@ -12,8 +12,17 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const [showBar, setShowBar] = useState(false);
   const buyRef = useRef<HTMLDivElement>(null);
-  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, compare, categoryLabel } =
-    useShop();
+  const {
+    addToCart,
+    toggleWishlist,
+    toggleCompare,
+    inWishlist,
+    inCompare,
+    compare,
+    categoryLabel,
+    money,
+    settings
+  } = useShop();
 
   useEffect(() => {
     setMain(product.image);
@@ -74,9 +83,9 @@ export default function ProductDetail({ product }: { product: Product }) {
         </div>
 
         <div className="pd-price">
-          {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
-          <strong>{formatPrice(product.price)}</strong>
-          {saving > 0 && <em>Save {formatPrice(saving)}</em>}
+          {product.oldPrice && <del>{money(product.oldPrice)}</del>}
+          <strong>{money(product.price)}</strong>
+          {saving > 0 && <em>Save {money(saving)}</em>}
         </div>
 
         <p className="pd-short">{product.short}</p>
@@ -129,17 +138,35 @@ export default function ProductDetail({ product }: { product: Product }) {
           </button>
         </div>
 
+        {/* Only facts the store can stand behind: delivery costs come from the
+            live store settings, and terms link to the published policy pages.
+            No warranty period or returns window is invented here. */}
         <ul className="pd-perks">
-          <li><Truck size={15} /> Free shipping on this item, customs and duties included</li>
-          <li>Free returns within 15 days</li>
-          <li>12-month warranty on every product</li>
+          <li>
+            <Truck size={15} />
+            <span>
+              Delivery:{" "}
+              {settings.standardShipping > 0
+                ? `standard ${money(settings.standardShipping)}`
+                : "standard delivery free"}
+              {settings.expressShipping > 0 && <> · express {money(settings.expressShipping)}</>}
+              {" "}— final cost shown at checkout.
+            </span>
+          </li>
+          <li>
+            <Link href="/returns">Returns policy</Link>
+            <span className="pd-perks-sep">·</span>
+            <Link href="/faq#warranty">Warranty information</Link>
+            <span className="pd-perks-sep">·</span>
+            <Link href="/shipping">Delivery details</Link>
+          </li>
         </ul>
       </div>
 
       {showBar && (
         <div className="mobile-buy-bar">
           <strong className="bar-price">
-            {formatPrice(product.price)}
+            {money(product.price)}
             <small> Qty {qty}</small>
           </strong>
           <button

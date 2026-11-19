@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
-import { formatPrice, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
+import { COUNTRIES, DEFAULT_COUNTRY } from "@/lib/server/countries";
 import { useShop } from "@/lib/shop-store";
 import type { CreateOrderRequest, DeliveryMethod, PaymentMethod } from "@/lib/orders";
 
@@ -18,7 +19,7 @@ type Phase = "form" | "saving" | "done";
 
 export default function CheckoutView() {
   const router = useRouter();
-  const { cart, hydrated, cartCount, cartTotal, clearCart, getProduct, settings } = useShop();
+  const { cart, hydrated, cartCount, cartTotal, clearCart, getProduct, settings, money } = useShop();
   const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
   const [payment, setPayment] = useState<PaymentMethod>("card");
   const [phase, setPhase] = useState<Phase>("form");
@@ -179,12 +180,12 @@ export default function CheckoutView() {
           </div>
           <label className="field">
             Country
-            <select name="country" autoComplete="country" defaultValue="US" required>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-              <option value="GB">United Kingdom</option>
-              <option value="FR">France</option>
-              <option value="DE">Germany</option>
+            <select name="country" autoComplete="country" defaultValue={DEFAULT_COUNTRY} required>
+              {COUNTRIES.map(country => (
+                <option key={country.code} value={country.code}>
+                  {country.name}
+                </option>
+              ))}
             </select>
           </label>
         </fieldset>
@@ -200,7 +201,7 @@ export default function CheckoutView() {
             />
             <span>
               <strong>Standard delivery</strong>
-              <small>5–7 business days, tracked</small>
+              <small>Timing confirmed by our team after your order</small>
             </span>
             <b>FREE</b>
           </label>
@@ -213,8 +214,8 @@ export default function CheckoutView() {
             />
             <span>
               <strong>Express delivery</strong>
-              <small>1–2 business days, tracked</small>
-            </span>                    <b>{formatPrice(settings.expressShipping)}</b>
+              <small>Priority handling — timing confirmed after your order</small>
+            </span>                    <b>{money(settings.expressShipping)}</b>
           </label>
         </fieldset>
 
@@ -241,7 +242,7 @@ export default function CheckoutView() {
 
         {error && <p className="checkout-error" role="alert">{error}</p>}
         <button type="submit" className="btn-dark checkout-submit" disabled={phase === "saving"}>
-          {phase === "saving" ? "Placing your order…" : `Place order · ${formatPrice(total)}`}
+          {phase === "saving" ? "Placing your order…" : `Place order · ${money(total)}`}
         </button>
         <p className="checkout-hint">
           Your order is saved to our order system. No payment is taken on this page — we contact
@@ -257,16 +258,16 @@ export default function CheckoutView() {
               <img src={imageUrl(product!.image)} alt="" width={52} height={52} />
               <span>
                 <strong>{product!.title}</strong>
-                <small>Qty {line.qty} · {formatPrice(product!.price)}</small>
+                <small>Qty {line.qty} · {money(product!.price)}</small>
               </span>
-              <b>{formatPrice(product!.price * line.qty)}</b>
+              <b>{money(product!.price * line.qty)}</b>
             </li>
           ))}
         </ul>
         <dl className="checkout-totals">
-          <div><dt>Subtotal</dt><dd>{formatPrice(cartTotal)}</dd></div>
-          <div><dt>Shipping</dt><dd>{shipping === 0 ? <span className="free">FREE</span> : formatPrice(shipping)}</dd></div>
-          <div className="checkout-grand"><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
+          <div><dt>Subtotal</dt><dd>{money(cartTotal)}</dd></div>
+          <div><dt>Shipping</dt><dd>{shipping === 0 ? <span className="free">FREE</span> : money(shipping)}</dd></div>
+          <div className="checkout-grand"><dt>Total</dt><dd>{money(total)}</dd></div>
         </dl>
         <p className="cart-note"><Lock size={13} /> Your cart is saved on this device only.</p>
       </aside>

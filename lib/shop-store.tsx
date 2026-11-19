@@ -11,6 +11,7 @@ import {
 } from "react";
 import {
   DEFAULT_SETTINGS,
+  formatPrice,
   seedCatalog,
   type Catalog,
   type CategoryOption,
@@ -35,6 +36,8 @@ type ShopState = {
   categories: CategoryOption[];
   settings: StoreSettings;
   getProduct: (slug: string) => Product | undefined;
+  /** Price formatter bound to the store's configured currency. */
+  money: (value: number) => string;
   categoryLabel: (key: string) => string;
   searchProducts: (query: string) => Product[];
   addToCart: (slug: string, qty?: number) => void;
@@ -175,6 +178,7 @@ export function ShopProvider({
       categories: activeCatalog.categories,
       settings: activeCatalog.settings ?? DEFAULT_SETTINGS,
       getProduct,
+      money: (value: number) => formatPrice(value, activeCatalog.settings?.currency ?? "USD"),
       categoryLabel: key => catalogueLookups.labelByKey.get(key) ?? "All Products",
       searchProducts: catalogueLookups.search,
       addToCart,

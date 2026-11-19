@@ -9,6 +9,7 @@ export async function PATCH(request: Request) {
 
   let body: {
     storeName?: unknown;
+    currency?: unknown;
     standardShipping?: unknown;
     expressShipping?: unknown;
     checkoutEnabled?: unknown;
@@ -23,6 +24,18 @@ export async function PATCH(request: Request) {
     typeof body.storeName === "string" ? body.storeName.trim() : "";
   if (storeName.length < 1 || storeName.length > 60) {
     return NextResponse.json({ error: "Store name is required." }, { status: 400 });
+  }
+
+  // Only currencies the storefront formatter knows are accepted. Changing the
+  // currency changes the label of the stored amounts; it never converts them.
+  const ALLOWED_CURRENCIES = ["MAD", "USD", "EUR", "GBP"];
+  const currency =
+    typeof body.currency === "string" ? body.currency.trim().toUpperCase() : "";
+  if (!ALLOWED_CURRENCIES.includes(currency)) {
+    return NextResponse.json(
+      { error: "Currency must be one of MAD, USD, EUR or GBP." },
+      { status: 400 }
+    );
   }
 
   const toCents = (value: unknown, field: string): number | null => {
@@ -56,6 +69,7 @@ export async function PATCH(request: Request) {
     .from("store_settings")
     .update({
       store_name: storeName,
+      currency,
       standard_shipping_cents: standard,
       express_shipping_cents: express,
       checkout_enabled: body.checkoutEnabled !== false

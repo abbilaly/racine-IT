@@ -10,10 +10,12 @@ export default async function AdminBannersPage() {
   const db = adminClient(session);
 
   let available = true;
+  let responsive = true;
   let rows: Awaited<ReturnType<typeof listBanners>>["rows"] = [];
   try {
     const result = await listBanners(db);
     available = result.available;
+    responsive = result.responsive;
     rows = result.rows;
   } catch {
     available = false;
@@ -32,7 +34,7 @@ export default async function AdminBannersPage() {
         }
       />
 
-      <BannersManager initial={rows} available={available} />
+      <BannersManager initial={rows} available={available} responsive={responsive} />
     </div>
   );
 }

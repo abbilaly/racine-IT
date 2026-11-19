@@ -2,16 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CircleUserRound, Home, LayoutGrid, ShoppingBag } from "lucide-react";
+import { CircleUserRound, Heart, Home, LayoutGrid, ShoppingBag } from "lucide-react";
 import { useShop } from "@/lib/shop-store";
-import { useMobileMenu } from "./MobileMenu";
 
+/**
+ * Persistent mobile navigation.
+ *
+ * Categories is a real route (`/categories`), not a drawer or a modal: tapping
+ * it navigates to the full-page Categories Hub, which is the primary discovery
+ * surface on a phone. The bar is five equal items and keeps clear of the iOS
+ * safe area through CSS padding.
+ */
 export default function BottomNav() {
   const pathname = usePathname();
-  const { cartCount } = useShop();
-  const { open, setOpen } = useMobileMenu();
+  const { cartCount, wishlist } = useShop();
 
   const homeActive = pathname === "/";
+  const categoriesActive = pathname.startsWith("/categories");
+  const wishlistActive = pathname.startsWith("/wishlist");
   const cartActive = pathname === "/cart" || pathname === "/checkout";
   const accountActive = pathname.startsWith("/account");
 
@@ -22,15 +30,26 @@ export default function BottomNav() {
         <span>Home</span>
       </Link>
 
-      <button
-        className={open ? "is-active" : ""}
-        aria-expanded={open}
-        aria-controls="mobile-menu"
-        onClick={() => setOpen(!open)}
+      <Link
+        href="/categories"
+        className={categoriesActive ? "is-active" : ""}
+        aria-current={categoriesActive ? "page" : undefined}
       >
         <LayoutGrid size={20} />
         <span>Categories</span>
-      </button>
+      </Link>
+
+      <Link
+        href="/wishlist"
+        className={wishlistActive ? "is-active" : ""}
+        aria-current={wishlistActive ? "page" : undefined}
+      >
+        <span className="nav-icon">
+          <Heart size={20} />
+          {wishlist.length > 0 && <i aria-hidden>{wishlist.length}</i>}
+        </span>
+        <span>Wishlist</span>
+      </Link>
 
       <Link href="/cart" className={cartActive ? "is-active" : ""} aria-current={cartActive ? "page" : undefined}>
         <span className="nav-icon">

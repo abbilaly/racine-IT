@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useEffect, useRef, useState } from "react";
+import { useMemo, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ChevronLeft, ChevronRight, Headphones, RotateCcw, Truck } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import MiniProduct from "@/components/MiniProduct";
@@ -11,6 +11,12 @@ import CategoryPanel from "@/components/CategoryPanel";
 
 export type HomeSlide = {
   image: string;
+  /** Optional mobile crop. Falls back to the desktop image with a focal point. */
+  mobileImage?: string;
+  /** CSS object-position for the desktop slide (defaults to center). */
+  focusDesktop?: string;
+  /** CSS object-position for the mobile slide (defaults to the desktop value). */
+  focusMobile?: string;
   kicker: string;
   title: string;
   desc: string;
@@ -20,6 +26,9 @@ export type HomeSlide = {
 
 type Slide = {
   image: string;
+  mobileImage?: string;
+  focusDesktop?: string;
+  focusMobile?: string;
   kicker: string;
   title: string;
   desc: string;
@@ -36,21 +45,26 @@ const fallbackSlides: Slide[] = [
     kicker: "WELCOME TO AB TECH",
     title: "Latest Tech, One Store",
     desc: "Phones, laptops, tablets and audio — browse the full catalogue.",
-    href: "/shop"
+    href: "/shop",
+    // The artwork places the product on the right, so the narrow mobile crop
+    // keeps that side instead of centring on empty background.
+    focusMobile: "right center"
   },
   {
     image: `${ASSET}/h-electro-pulse-slide-2.webp`,
     kicker: "LAPTOPS & PCs",
     title: "Power for Work & Study",
     desc: "Compare models, specs and prices across our laptop range.",
-    category: { key: "computers", pattern: /computer|laptop|pc|mac/i }
+    category: { key: "computers", pattern: /computer|laptop|pc|mac/i },
+    focusMobile: "right center"
   },
   {
     image: `${ASSET}/h-electro-pulse-slide-3.webp`,
     kicker: "AUDIO & ACCESSORIES",
     title: "Sound That Goes With You",
     desc: "Headphones, speakers and everyday accessories.",
-    category: { key: "multimedia", pattern: /audio|multimedia|headphone|speaker/i }
+    category: { key: "multimedia", pattern: /audio|multimedia|headphone|speaker/i },
+    focusMobile: "right center"
   }
 ];
 
@@ -60,7 +74,20 @@ const fallbackSlides: Slide[] = [
  * the hero slider, tabbed product rows and carousels are interactive and read
  * the catalogue from the shared shop store.
  */
-export default function HomeView({ slides: managedSlides = [] }: { slides?: HomeSlide[] }) {
+export default function HomeView({
+  slides: managedSlides = [],
+  featuredSlugs = [],
+  newArrivalSlugs = [],
+  bestSellers = []
+}: {
+  slides?: HomeSlide[];
+  /** products.is_featured, chosen by the owner in the admin. */
+  featuredSlugs?: string[];
+  /** Newest catalogue rows, by products.created_at. */
+  newArrivalSlugs?: string[];
+  /** Real units sold, counted from non-cancelled orders. */
+  bestSellers?: { slug: string; units: number }[];
+}) {
   const { products, categories: catalogCategories } = useShop();
 
   /**
@@ -75,7 +102,10 @@ export default function HomeView({ slides: managedSlides = [] }: { slides?: Home
         title: banner.title,
         desc: banner.desc,
         href: banner.href,
-        cta: banner.ctaLabel
+        cta: banner.ctaLabel,
+        mobileImage: banner.mobileImage,
+        focusDesktop: banner.focusDesktop,
+        focusMobile: banner.focusMobile
       }))
     : fallbackSlides;
 
@@ -114,6 +144,30 @@ export default function HomeView({ slides: managedSlides = [] }: { slides?: Home
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
   const popularPicks = pick([5, 6, 7, 8]);
   const highlightPicks = pick([11, 9, 6]);
+
+  // Homepage rows follow real catalogue flags, timestamps and sales.
+  const productsBySlug = (slugs: string[]) =>
+    slugs
+      .map(slug => products.find(p => p.slug === slug))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const featuredProducts = productsBySlug(featuredSlugs);
+  // With no product flagged as featured, the first catalogue rows keep the
+  // section populated rather than leaving an empty block.
+  const featuredRow = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 5);
+  const newArrivalProducts = productsBySlug(newArrivalSlugs);
+  const bestSellerProducts = bestSellers
+    .map(entry => ({ product: products.find(p => p.slug === entry.slug), units: entry.units }))
+    .filter(
+      (entry): entry is { product: NonNullable<(typeof products)[number]>; units: number } =>
+        Boolean(entry.product)
+    );
+
+  /** Applies each slide's focal point as CSS custom properties. */
+  const focusStyle = (s: Slide): CSSProperties =>
+    ({
+      "--focus-desktop": s.focusDesktop ?? "center",
+      "--focus-mobile": s.focusMobile ?? s.focusDesktop ?? "center"
+    }) as CSSProperties;
   const [slide, setSlide] = useState(0);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -148,8 +202,15 @@ export default function HomeView({ slides: managedSlides = [] }: { slides?: Home
           }}
         >
           {slides.map((s, i) => (
-            <div className={`hero-slide ${i === slide ? "active" : ""}`} key={s.title}>
-              <img src={s.image} alt="" />
+            <div
+              className={`hero-slide ${i === slide ? "active" : ""}`}
+              key={s.title}
+              style={focusStyle(s)}
+            >
+              <picture>
+                {s.mobileImage && <source media="(max-width: 767px)" srcSet={s.mobileImage} />}
+                <img src={s.image} alt="" />
+              </picture>
               <div className="hero-text">
                 <span>{s.kicker}</span>
                 <h1>{s.title}</h1>
@@ -224,7 +285,7 @@ export default function HomeView({ slides: managedSlides = [] }: { slides?: Home
           <Link href="/shop">View All <ChevronRight size={15} /></Link>
         </div>
         <div className="deal-grid">
-          {products.slice(0, 5).map(p => <ProductCard product={p} key={p.slug} />)}
+          {featuredRow.map(p => <ProductCard product={p} key={p.slug} />)}
         </div>
       </section>
 
@@ -243,12 +304,28 @@ export default function HomeView({ slides: managedSlides = [] }: { slides?: Home
         </div>
       </section>
 
-      <section className="section site-shell">
-        <div className="title-line"><h2>Best Selling</h2><Link href="/shop?sort=rating">View All <ChevronRight size={15} /></Link></div>
-        <div className="best-grid">
-          {products.slice(9, 14).map(p => <ProductCard product={p} key={p.slug} />)}
-        </div>
-      </section>
+      {newArrivalProducts.length > 0 && (
+        <section className="section site-shell">
+          <div className="title-line"><h2>New Arrivals</h2><Link href="/shop?sort=featured">View All <ChevronRight size={15} /></Link></div>
+          <div className="best-grid">
+            {newArrivalProducts.map(p => <ProductCard product={p} key={p.slug} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Shown only when the store has real, non-cancelled sales to rank. */}
+      {bestSellerProducts.length > 0 && (
+        <section className="section site-shell">
+          <div className="title-line">
+            <h2>Best Selling</h2>
+            <Link href="/shop">View All <ChevronRight size={15} /></Link>
+          </div>
+          <div className="best-grid">
+            {bestSellerProducts.map(entry => <ProductCard product={entry.product} key={entry.product.slug} />)}
+          </div>
+          <p className="section-note">Ranked by units sold in actual store orders.</p>
+        </section>
+      )}
 
       <section className="section site-shell brands-section">
         <div className="title-line"><h2>Featured Brands</h2><Link href="/shop">View All <ChevronRight size={15} /></Link></div>

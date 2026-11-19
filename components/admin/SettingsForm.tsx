@@ -10,10 +10,19 @@ import { Button } from "@/components/admin/ui/button";
 
 export type AdminSettings = {
   storeName: string;
+  /** ISO code the stored prices are denominated in. Display only. */
+  currency: string;
   standardShipping: number;
   expressShipping: number;
   checkoutEnabled: boolean;
 };
+
+const CURRENCY_OPTIONS = [
+  { code: "MAD", label: "Moroccan dirham (MAD)" },
+  { code: "USD", label: "US dollar (USD)" },
+  { code: "EUR", label: "Euro (EUR)" },
+  { code: "GBP", label: "Pound sterling (GBP)" }
+] as const;
 
 function FieldHint({ children }: { children: React.ReactNode }) {
   return <p className="m-0 mt-1 text-[11px] text-muted-foreground">{children}</p>;
@@ -28,6 +37,7 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
 
   const dirty =
     settings.storeName !== initial.storeName ||
+    settings.currency !== initial.currency ||
     settings.standardShipping !== initial.standardShipping ||
     settings.expressShipping !== initial.expressShipping ||
     settings.checkoutEnabled !== initial.checkoutEnabled;
@@ -87,6 +97,38 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
 
       <Card className="gap-0 p-5">
         <div className="mb-4">
+          <h2 className="m-0 text-[14px] font-semibold text-foreground">Market &amp; currency</h2>
+          <p className="m-0 mt-0.5 text-[12px] text-muted-foreground">
+            The currency every price, delivery fee and total is displayed in.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="currency" className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
+            Store currency
+          </Label>
+          <select
+            id="currency"
+            value={settings.currency}
+            onChange={e => setSettings(s => ({ ...s, currency: e.target.value }))}
+            className="h-9 max-w-sm rounded-lg border border-input bg-background px-2 text-[13px]"
+          >
+            {CURRENCY_OPTIONS.map(option => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <FieldHint>
+            Display only: stored prices are never converted automatically. Confirm the catalogue is
+            priced in this currency before switching — for example, reprice the products in MAD
+            before changing a USD store to MAD.
+          </FieldHint>
+        </div>
+      </Card>
+
+      <Card className="gap-0 p-5">
+        <div className="mb-4">
           <h2 className="m-0 text-[14px] font-semibold text-foreground">Delivery fees</h2>
           <p className="m-0 mt-0.5 text-[12px] text-muted-foreground">
             Charged at checkout and included in order totals.
@@ -100,7 +142,7 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
             </Label>
             <div className="flex items-center">
               <span className="grid h-9 place-items-center rounded-l-lg border border-r-0 border-input bg-muted px-2.5 text-[12px] text-muted-foreground">
-                $
+                {settings.currency}
               </span>
               <Input
                 id="standard-shipping"
@@ -112,7 +154,7 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
                 className="h-9 rounded-l-none text-[13px] tabular-nums"
               />
             </div>
-            <FieldHint>USD, per order.</FieldHint>
+            <FieldHint>{settings.currency}, per order.</FieldHint>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -121,7 +163,7 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
             </Label>
             <div className="flex items-center">
               <span className="grid h-9 place-items-center rounded-l-lg border border-r-0 border-input bg-muted px-2.5 text-[12px] text-muted-foreground">
-                $
+                {settings.currency}
               </span>
               <Input
                 id="express-shipping"
@@ -133,7 +175,7 @@ export default function SettingsForm({ initial }: { initial: AdminSettings }) {
                 className="h-9 rounded-l-none text-[13px] tabular-nums"
               />
             </div>
-            <FieldHint>USD, per order.</FieldHint>
+            <FieldHint>{settings.currency}, per order.</FieldHint>
           </div>
         </div>
       </Card>

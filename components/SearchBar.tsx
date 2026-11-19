@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
-import { formatPrice, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 const MAX_SUGGESTIONS = 6;
 
 export default function SearchBar() {
   const router = useRouter();
-  const { searchProducts, categoryLabel } = useShop();
+  const { searchProducts, categoryLabel, money } = useShop();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -122,7 +122,7 @@ export default function SearchBar() {
                 <strong>{p.title}</strong>
                 <small>{categoryLabel(p.category)}</small>
               </span>
-              <b>{formatPrice(p.price)}</b>
+              <b>{money(p.price)}</b>
             </Link>
           ))}
           {query.trim() && (

@@ -1,6 +1,7 @@
 import HomeView, { type HomeSlide } from "@/components/HomeView";
 import { requireCatalog } from "@/lib/server/catalog";
 import { bannerImageUrl, listPublicBanners } from "@/lib/server/banners";
+import { listBestSellers } from "@/lib/server/best-sellers";
 
 /**
  * Storefront home page.
@@ -14,13 +15,16 @@ import { bannerImageUrl, listPublicBanners } from "@/lib/server/banners";
  * migration not yet applied) never breaks the shop.
  */
 export default async function HomePage() {
-  await requireCatalog();
+  const catalog = await requireCatalog();
 
-  const { rows } = await listPublicBanners();
+  const [{ rows }, bestSellers] = await Promise.all([listPublicBanners(), listBestSellers(5)]);
   const slides: HomeSlide[] = rows
     .filter(banner => banner.image_path)
     .map(banner => ({
       image: bannerImageUrl(banner.image_path),
+      mobileImage: banner.mobile_image_path ? bannerImageUrl(banner.mobile_image_path) : undefined,
+      focusDesktop: banner.focus_desktop ?? undefined,
+      focusMobile: banner.focus_mobile ?? undefined,
       kicker: banner.kicker,
       title: banner.title,
       desc: banner.subtitle,
@@ -28,5 +32,23 @@ export default async function HomePage() {
       ctaLabel: banner.cta_label || "Shop now"
     }));
 
-  return <HomeView slides={slides} />;
+  // Owner-curated featured products (products.is_featured).
+  const featuredSlugs = catalog.products.filter(product => product.featured).map(product => product.slug);
+
+  // Newest rows, by the timestamp the catalogue records.
+  const newArrivalSlugs = catalog.products
+    .filter(product => product.createdAt)
+    .slice()
+    .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
+    .slice(0, 5)
+    .map(product => product.slug);
+
+  return (
+    <HomeView
+      slides={slides}
+      featuredSlugs={featuredSlugs}
+      newArrivalSlugs={newArrivalSlugs}
+      bestSellers={bestSellers}
+    />
+  );
 }

@@ -3,8 +3,19 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, ImagePlus, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
-import type { HomepageBanner } from "@/lib/server/banners";
+import {
+  ArrowDown,
+  ArrowUp,
+  ImagePlus,
+  Monitor,
+  Pencil,
+  Plus,
+  Smartphone,
+  Trash2,
+  Upload,
+  X
+} from "lucide-react";
+import type { FocusOption, HomepageBanner } from "@/lib/server/banners";
 
 type Draft = {
   id: string | null;
@@ -12,11 +23,22 @@ type Draft = {
   kicker: string;
   subtitle: string;
   imagePath: string;
+  mobileImagePath: string;
+  focusDesktop: FocusOption;
+  focusMobile: FocusOption;
   ctaLabel: string;
   ctaHref: string;
   position: number;
   isActive: boolean;
 };
+
+const FOCUS: { value: FocusOption; label: string }[] = [
+  { value: "center", label: "Center" },
+  { value: "top", label: "Top" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+  { value: "right", label: "Right" }
+];
 
 const EMPTY: Draft = {
   id: null,
@@ -24,6 +46,9 @@ const EMPTY: Draft = {
   kicker: "",
   subtitle: "",
   imagePath: "",
+  mobileImagePath: "",
+  focusDesktop: "center",
+  focusMobile: "center",
   ctaLabel: "Shop now",
   ctaHref: "/shop",
   position: 0,
@@ -37,6 +62,9 @@ function draftFrom(banner: HomepageBanner): Draft {
     kicker: banner.kicker,
     subtitle: banner.subtitle,
     imagePath: banner.image_path,
+    mobileImagePath: banner.mobile_image_path ?? "",
+    focusDesktop: (banner.focus_desktop ?? "center") as FocusOption,
+    focusMobile: (banner.focus_mobile ?? "center") as FocusOption,
     ctaLabel: banner.cta_label,
     ctaHref: banner.cta_href,
     position: banner.position,
@@ -44,17 +72,30 @@ function draftFrom(banner: HomepageBanner): Draft {
   };
 }
 
+/**
+ * Homepage banner CMS.
+ *
+ * Beyond the original single-image editor this provides the responsive fields
+ * the storefront now reads: a dedicated mobile image (optional), a focal point
+ * per breakpoint, and a desktop/mobile preview so the owner can check text
+ * readability and CTA visibility before publishing. When migration 0010 is not
+ * applied the responsive fields are shown as unavailable instead of pretending
+ * to save them.
+ */
 export function BannersManager({
   initial,
-  available
+  available,
+  responsive = true
 }: {
   initial: HomepageBanner[];
   available: boolean;
+  responsive?: boolean;
 }) {
   const router = useRouter();
   const [banners, setBanners] = useState(initial);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<"desktop" | "mobile">("desktop");
+  const [uploading, setUploading] = useState<"desktop" | "mobile" | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -62,8 +103,8 @@ export function BannersManager({
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft(current => (current ? { ...current, [key]: value } : current));
 
-  async function upload(file: File) {
-    setUploading(true);
+  async function upload(file: File, target: "desktop" | "mobile") {
+    setUploading(target);
     setError(null);
     try {
       const body = new FormData();
@@ -77,11 +118,11 @@ export function BannersManager({
         setError(data.error ?? "The banner image could not be uploaded.");
         return;
       }
-      update("imagePath", data.path);
+      update(target === "mobile" ? "mobileImagePath" : "imagePath", data.path);
     } catch {
       setError("We could not reach the server. Check your connection and try again.");
     } finally {
-      setUploading(false);
+      setUploading(null);
     }
   }
 
@@ -159,6 +200,9 @@ export function BannersManager({
               kicker: row.kicker,
               subtitle: row.subtitle,
               imagePath: row.image_path,
+              mobileImagePath: row.mobile_image_path ?? "",
+              focusDesktop: row.focus_desktop ?? "center",
+              focusMobile: row.focus_mobile ?? "center",
               ctaLabel: row.cta_label,
               ctaHref: row.cta_href,
               isActive: row.is_active,
@@ -195,6 +239,17 @@ export function BannersManager({
     );
   }
 
+  const previewImage = draft
+    ? preview === "mobile"
+      ? draft.mobileImagePath || draft.imagePath
+      : draft.imagePath
+    : "";
+  const previewFocus = draft
+    ? preview === "mobile"
+      ? draft.focusMobile
+      : draft.focusDesktop
+    : "center";
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -213,6 +268,14 @@ export function BannersManager({
           <Plus size={14} aria-hidden="true" /> New banner
         </button>
       </div>
+
+      {!responsive && (
+        <p className="m-0 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-700 dark:text-amber-300">
+          Mobile images and focal points need migration{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-[11px]">0010_homepage_banner_responsive.sql</code>.
+          Banners still save and display with a single image until it is applied.
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="m-0 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-[12px] text-destructive">
@@ -311,34 +374,184 @@ export function BannersManager({
             </label>
           </div>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-[200px_1fr] sm:items-start">
-            <div className="relative grid aspect-[16/9] place-items-center overflow-hidden rounded-md border border-border bg-muted">
-              {draft.imagePath ? (
-                <Image src={draft.imagePath} alt="Banner preview" fill sizes="200px" className="object-cover" />
-              ) : (
-                <span className="flex flex-col items-center gap-1 text-[11px] text-muted-foreground">
-                  <ImagePlus size={18} aria-hidden="true" /> No image
-                </span>
-              )}
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <span className="text-[12px] font-medium text-foreground">Desktop image *</span>
+                <div className="relative grid aspect-[16/9] place-items-center overflow-hidden rounded-md border border-border bg-muted">
+                  {draft.imagePath ? (
+                    <Image
+                      src={draft.imagePath}
+                      alt="Desktop banner preview"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 260px"
+                      className="object-cover"
+                      style={{ objectPosition: draft.focusDesktop }}
+                    />
+                  ) : (
+                    <span className="flex flex-col items-center gap-1 text-[11px] text-muted-foreground">
+                      <ImagePlus size={18} aria-hidden="true" /> No image
+                    </span>
+                  )}
+                </div>
+                <label className="inline-flex h-8 w-fit cursor-pointer items-center gap-1.5 rounded-md border border-border px-3 text-[12px] font-medium text-foreground hover:bg-accent">
+                  <Upload size={13} aria-hidden="true" />
+                  {uploading === "desktop" ? "Uploading…" : draft.imagePath ? "Replace image" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    className="sr-only"
+                    disabled={uploading !== null}
+                    onChange={event => {
+                      const file = event.target.files?.[0];
+                      if (file) void upload(file, "desktop");
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-[11px] font-medium text-muted-foreground">
+                  Desktop focal point
+                  <select
+                    value={draft.focusDesktop}
+                    onChange={e => update("focusDesktop", e.target.value as FocusOption)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-[12px] font-normal text-foreground"
+                  >
+                    {FOCUS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="text-[12px] font-medium text-foreground">Mobile image</span>
+                <div className="relative grid aspect-[4/5] place-items-center overflow-hidden rounded-md border border-border bg-muted">
+                  {draft.mobileImagePath || draft.imagePath ? (
+                    <Image
+                      src={draft.mobileImagePath || draft.imagePath}
+                      alt="Mobile banner preview"
+                      fill
+                      sizes="160px"
+                      className="object-cover"
+                      style={{ objectPosition: draft.focusMobile }}
+                    />
+                  ) : (
+                    <span className="flex flex-col items-center gap-1 text-[11px] text-muted-foreground">
+                      <ImagePlus size={18} aria-hidden="true" /> No image
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <label className="inline-flex h-8 w-fit cursor-pointer items-center gap-1.5 rounded-md border border-border px-3 text-[12px] font-medium text-foreground hover:bg-accent">
+                    <Upload size={13} aria-hidden="true" />
+                    {uploading === "mobile" ? "Uploading…" : draft.mobileImagePath ? "Replace" : "Upload"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      className="sr-only"
+                      disabled={uploading !== null || !responsive}
+                      onChange={event => {
+                        const file = event.target.files?.[0];
+                        if (file) void upload(file, "mobile");
+                        event.target.value = "";
+                      }}
+                    />
+                  </label>
+                  {draft.mobileImagePath && (
+                    <button
+                      type="button"
+                      onClick={() => update("mobileImagePath", "")}
+                      className="h-8 rounded-md border border-border px-3 text-[12px] font-medium text-foreground hover:bg-accent"
+                    >
+                      Use desktop image
+                    </button>
+                  )}
+                </div>
+                <label className="flex flex-col gap-1 text-[11px] font-medium text-muted-foreground">
+                  Mobile focal point
+                  <select
+                    value={draft.focusMobile}
+                    onChange={e => update("focusMobile", e.target.value as FocusOption)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-[12px] font-normal text-foreground"
+                  >
+                    {FOCUS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
             </div>
+
             <div className="flex flex-col gap-2">
-              <label className="inline-flex h-8 w-fit cursor-pointer items-center gap-1.5 rounded-md border border-border px-3 text-[12px] font-medium text-foreground hover:bg-accent">
-                <Upload size={13} aria-hidden="true" />
-                {uploading ? "Uploading…" : draft.imagePath ? "Replace image" : "Upload image"}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  className="sr-only"
-                  disabled={uploading}
-                  onChange={event => {
-                    const file = event.target.files?.[0];
-                    if (file) void upload(file);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-medium text-foreground">Live preview</span>
+                <div className="flex rounded-md border border-border p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setPreview("desktop")}
+                    aria-pressed={preview === "desktop"}
+                    className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium ${
+                      preview === "desktop" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    <Monitor size={12} /> Desktop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreview("mobile")}
+                    aria-pressed={preview === "mobile"}
+                    className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium ${
+                      preview === "mobile" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    <Smartphone size={12} /> Mobile
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className={`relative overflow-hidden rounded-lg border border-border bg-[#100024] ${
+                  preview === "desktop" ? "aspect-[16/9]" : "mx-auto aspect-[4/5] w-[210px]"
+                }`}
+              >
+                {previewImage ? (
+                  <Image
+                    src={previewImage}
+                    alt=""
+                    fill
+                    sizes={preview === "desktop" ? "320px" : "210px"}
+                    className="object-cover"
+                    style={{ objectPosition: previewFocus }}
+                  />
+                ) : (
+                  <div className="grid h-full place-items-center text-[11px] text-white/60">
+                    Add an image to preview
+                  </div>
+                )}
+                <div
+                  className={
+                    preview === "desktop"
+                      ? "absolute inset-y-0 left-0 flex w-[54%] flex-col justify-center gap-1.5 p-4 text-white"
+                      : "absolute inset-x-0 top-[26%] flex flex-col gap-1.5 p-4 text-white"
+                  }
+                >
+                  <span className="text-[8px] font-bold uppercase tracking-wide text-white/80">
+                    {draft.kicker || "KICKER"}
+                  </span>
+                  <strong className={`font-bold leading-tight ${preview === "desktop" ? "text-[19px]" : "text-[15px]"}`}>
+                    {draft.title || "Banner title"}
+                  </strong>
+                  <span className="line-clamp-2 text-[9px] text-white/85">
+                    {draft.subtitle || "Short supporting line"}
+                  </span>
+                  <span className="w-fit rounded-full bg-white px-2.5 py-1 text-[8px] font-bold text-[#100024]">
+                    {draft.ctaLabel || "Shop now"}
+                  </span>
+                </div>
+              </div>
               <p className="m-0 text-[11px] text-muted-foreground">
-                Wide images work best (about 16:9). JPEG, PNG, WebP or AVIF up to 3 MB.
+                Check that the title stays readable and the button is not hidden by the crop.
+                {preview === "mobile" && !draft.mobileImagePath && " This mobile preview reuses the desktop image with the mobile focal point."}
               </p>
             </div>
           </div>
@@ -347,7 +560,7 @@ export function BannersManager({
             <button
               type="button"
               onClick={() => void save()}
-              disabled={busy || uploading || !draft.title || !draft.imagePath}
+              disabled={busy || uploading !== null || !draft.title || !draft.imagePath}
               className="h-8 rounded-md bg-primary px-3 text-[12px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
             >
               {busy ? "Saving…" : draft.id ? "Save banner" : "Create banner"}
@@ -378,7 +591,14 @@ export function BannersManager({
                 className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center"
               >
                 <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden rounded-md bg-muted sm:w-[132px]">
-                  <Image src={banner.image_path} alt="" fill sizes="132px" className="object-cover" />
+                  <Image
+                    src={banner.image_path}
+                    alt=""
+                    fill
+                    sizes="132px"
+                    className="object-cover"
+                    style={{ objectPosition: banner.focus_desktop ?? "center" }}
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -393,6 +613,15 @@ export function BannersManager({
                       {banner.is_active ? "Visible" : "Hidden"}
                     </span>
                     <span className="text-[11px] text-muted-foreground">#{banner.position}</span>
+                    {banner.mobile_image_path ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                        <Smartphone size={10} /> Mobile image
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                        <Monitor size={10} /> Desktop image only
+                      </span>
+                    )}
                   </div>
                   {banner.kicker && (
                     <p className="m-0 mt-0.5 truncate text-[11px] uppercase tracking-wide text-muted-foreground">

@@ -32,6 +32,8 @@ type ProductRow = {
   badge: string | null;
   rating: number | string;
   reviews: number;
+  is_featured: boolean;
+  created_at: string;
   /** PostgREST returns the embedded to-one relation as an object or a one-element array. */
   category: unknown;
   brand: unknown;
@@ -103,7 +105,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     supabase
       .from("products")
       .select(
-        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,origin,category:categories(slug,label),brand:brands(name)"
+        "id,slug,title,short_description,description,specs,price_cents,compare_at_price_cents,badge,rating,reviews,origin,is_featured,created_at,category:categories(slug,label),brand:brands(name)"
       )
       .eq("is_active", true)
       .order("created_at"),
@@ -190,7 +192,9 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
       stock,
       short: row.short_description,
       description: row.description ?? [],
-      specs: (row.specs ?? []).map(spec => [spec.name, spec.value] as [string, string])
+      specs: (row.specs ?? []).map(spec => [spec.name, spec.value] as [string, string]),
+      createdAt: row.created_at,
+      featured: row.is_featured
     };
   });
 

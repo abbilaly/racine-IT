@@ -32,6 +32,7 @@ export function useMobileMenu(): MenuContextValue {
 
 const QUICK_LINKS: { label: string; href: string }[] = [
   { label: "Home", href: "/" },
+  { label: "Categories", href: "/categories" },
   { label: "All Products", href: "/shop" },
   { label: "Sale & Offers", href: "/shop?sort=discount" },
   { label: "Top Rated", href: "/shop?sort=rating" },

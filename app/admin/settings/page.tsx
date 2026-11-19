@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 type SettingsRow = {
   store_name: string;
+  currency: string | null;
   standard_shipping_cents: number;
   express_shipping_cents: number;
   checkout_enabled: boolean;
@@ -22,7 +23,7 @@ export default async function AdminSettingsPage() {
       <div className="admin-page">
         <TablePageHeader
           title="Store settings"
-          subtitle="Shipping fees and checkout availability, read by the storefront and by checkout"
+          subtitle="Currency, shipping fees and checkout availability, read by the storefront and by checkout"
         />
         <TableCard className="p-6">
           <h2 className="m-0 text-[14px] font-semibold text-foreground">Store settings are unavailable</h2>
@@ -37,6 +38,7 @@ export default async function AdminSettingsPage() {
   const row = data as SettingsRow;
   const initial: AdminSettings = {
     storeName: row.store_name,
+    currency: row.currency ?? "USD",
     standardShipping: row.standard_shipping_cents / 100,
     expressShipping: row.express_shipping_cents / 100,
     checkoutEnabled: row.checkout_enabled
@@ -46,7 +48,7 @@ export default async function AdminSettingsPage() {
     <div className="admin-page">
       <TablePageHeader
         title="Store settings"
-        subtitle="Shipping fees and checkout availability, read by the storefront and by checkout"
+        subtitle="Currency, shipping fees and checkout availability, read by the storefront and by checkout"
       />
       <SettingsForm initial={initial} />
     </div>

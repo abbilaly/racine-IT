@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
-import { formatPrice, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function CartView() {
-  const { cart, hydrated, setQty, removeFromCart, cartCount, cartTotal, getProduct } = useShop();
+  const { cart, hydrated, setQty, removeFromCart, cartCount, cartTotal, getProduct, money } = useShop();
 
   if (!hydrated) return <p className="muted-note">Loading your cart…</p>;
 
@@ -45,7 +45,7 @@ export default function CartView() {
 
             <div className="cart-line-info">
               <Link href={`/product/${product.slug}`}>{product.title}</Link>
-              <small>{formatPrice(product.price)} each</small>
+              <small>{money(product.price)} each</small>
               <button className="cart-remove" onClick={() => removeFromCart(product.slug)}>
                 <Trash2 size={13} /> Remove
               </button>
@@ -65,7 +65,7 @@ export default function CartView() {
               </button>
             </div>
 
-            <strong className="cart-line-total">{formatPrice(product.price * line.qty)}</strong>
+            <strong className="cart-line-total">{money(product.price * line.qty)}</strong>
           </article>
         ))}
 
@@ -77,7 +77,7 @@ export default function CartView() {
         <dl>
           <div>
             <dt>Items ({cartCount})</dt>
-            <dd>{formatPrice(cartTotal)}</dd>
+            <dd>{money(cartTotal)}</dd>
           </div>
           <div>
             <dt>Shipping</dt>
@@ -90,7 +90,7 @@ export default function CartView() {
         </dl>
         <div className="cart-total-row">
           <span>Total</span>
-          <strong>{formatPrice(cartTotal)}</strong>
+          <strong>{money(cartTotal)}</strong>
         </div>
         <Link href="/checkout" className="btn-dark cart-checkout">Proceed to Checkout</Link>
         <p className="cart-note"><Truck size={14} /> Delivery options and costs are confirmed at checkout.</p>

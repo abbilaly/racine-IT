@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import { formatPrice, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function CompareTable() {
-  const { compare, hydrated, toggleCompare, clearCompare, addToCart, getProduct, categoryLabel } =
+  const { compare, hydrated, toggleCompare, clearCompare, addToCart, getProduct, categoryLabel, money } =
     useShop();
 
   if (!hydrated) return <p className="muted-note">Loading comparison…</p>;
@@ -35,10 +35,10 @@ export default function CompareTable() {
     getProduct(slug)?.specs.find(([t]) => t === term)?.[1] ?? "—";
 
   const rows: { label: string; render: (slug: string) => React.ReactNode }[] = [
-    { label: "Price", render: slug => <strong className="compare-price">{formatPrice(getProduct(slug)!.price)}</strong> },
+    { label: "Price", render: slug => <strong className="compare-price">{money(getProduct(slug)!.price)}</strong> },
     {
       label: "Regular price",
-      render: slug => getProduct(slug)!.oldPrice ? <del>{formatPrice(getProduct(slug)!.oldPrice!)}</del> : "—"
+      render: slug => getProduct(slug)!.oldPrice ? <del>{money(getProduct(slug)!.oldPrice!)}</del> : "—"
     },
     {
       label: "Rating",

@@ -1,5 +1,6 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
-import { getCustomer, getCustomerOrders, formatCents } from "@/lib/server/admin-data";
+import { getCustomer, getCustomerOrders, formatCents, listAdminNotes } from "@/lib/server/admin-data";
+import { CustomerCrm, type CrmOrder, type CrmSegment } from "@/components/admin/CustomerCrm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, MapPin, Calendar } from "lucide-react";
@@ -21,6 +22,45 @@ export default async function AdminCustomerDetailPage({
   if (!customer) notFound();
 
   const { rows: orders } = await getCustomerOrders(db, customer.email, { page: 1, limit: 100 });
+
+  // Internal notes live in admin_notes keyed by the email the CRM lists by.
+  const notesResult = await listAdminNotes(db, "customers", customer.email.toLowerCase(), {
+    page: 1,
+    limit: 100
+  }).catch(() => ({ rows: [], total: 0 }));
+
+  const settingsResult = await db
+    .from("store_settings")
+    .select("currency")
+    .eq("id", true)
+    .maybeSingle();
+  const currency = (settingsResult.data?.currency as string | undefined) ?? "USD";
+
+  const crmOrders: CrmOrder[] = orders.map(order => ({
+    id: String(order.id),
+    ref: String(order.ref),
+    status: String(order.status),
+    total: Number(order.total),
+    item_count: Number(order.item_count),
+    created_at: String(order.created_at)
+  }));
+
+  // Segments are rules over stored orders, with the rule stated in the UI.
+  const liveOrders = crmOrders.filter(order => order.status !== "cancelled");
+  const lastOrderMs = customer.last_order_at ? new Date(customer.last_order_at).getTime() : 0;
+  const daysSinceLastOrder = lastOrderMs ? (Date.now() - lastOrderMs) / 86_400_000 : Infinity;
+  const segments: CrmSegment[] = [];
+  if (liveOrders.length === 1) segments.push({ label: "New customer", reason: "1 order" });
+  if (liveOrders.length >= 2 && liveOrders.length <= 4) {
+    segments.push({ label: "Repeat buyer", reason: "2–4 orders" });
+  }
+  if (liveOrders.length >= 5) segments.push({ label: "Loyal", reason: "5+ orders" });
+  if (liveOrders.length > 0 && daysSinceLastOrder <= 90) {
+    segments.push({ label: "Active", reason: "ordered in the last 90 days" });
+  }
+  if (liveOrders.length > 0 && daysSinceLastOrder > 90) {
+    segments.push({ label: "Lapsed", reason: "no order in 90 days" });
+  }
 
   return (
     <div className="admin-page">
@@ -86,6 +126,16 @@ export default async function AdminCustomerDetailPage({
             Totals are calculated from stored order records; cancelled orders are excluded.
           </p>
         </section>
+
+        <div className="admin-card--wide">
+          <CustomerCrm
+            email={customer.email}
+            initialNotes={notesResult.rows}
+            orders={crmOrders}
+            segments={segments}
+            currency={currency}
+          />
+        </div>
 
         <section className="admin-card admin-card--wide">
           <div className="admin-card-header">

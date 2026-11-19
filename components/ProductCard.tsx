@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
-import { formatPrice, imageUrl, type Product } from "@/lib/products";
+import { imageUrl, type Product } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function ProductCard({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare } = useShop();
+  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, money } = useShop();
   const wished = inWishlist(product.slug);
   const compared = inCompare(product.slug);
 
@@ -47,8 +47,8 @@ export default function ProductCard({ product }: { product: Product }) {
           ★★★★★ <small>({product.reviews})</small>
         </div>
         <div className="price-line">
-          {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
-          <strong>{formatPrice(product.price)}</strong>
+          {product.oldPrice && <del>{money(product.oldPrice)}</del>}
+          <strong>{money(product.price)}</strong>
         </div>
       </div>
     </article>

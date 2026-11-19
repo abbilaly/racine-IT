@@ -22,6 +22,10 @@ export type Product = {
   short: string;
   description: string[];
   specs: [string, string][];
+  /** ISO timestamp from products.created_at, when the catalogue exposes it. */
+  createdAt?: string;
+  /** products.is_featured: the owner's own featured selection. */
+  featured?: boolean;
 };
 
 export type CategoryOption = { key: string; label: string };
@@ -29,10 +33,12 @@ export type CategoryOption = { key: string; label: string };
 /** Shipping and checkout settings, sourced from public.store_settings when Supabase is connected. */
 export type StoreSettings = {
   storeName: string;
+  /** ISO currency code the stored prices are denominated in. Display only:
+   *  amounts are never converted. */
   currency: string;
-  /** Express delivery fee in dollars. */
+  /** Express delivery fee in the store currency. */
   expressShipping: number;
-  /** Standard delivery fee in dollars. */
+  /** Standard delivery fee in the store currency. */
   standardShipping: number;
   checkoutEnabled: boolean;
 };
@@ -488,8 +494,30 @@ export function labelFor(categories: readonly CategoryOption[], key: string): st
   return humanised ? humanised.charAt(0).toUpperCase() + humanised.slice(1) : "All Products";
 }
 
-export function formatPrice(value: number): string {
-  return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+/**
+ * Formats an amount in the currency it is stored in. No conversion happens
+ * here: the catalogue stores amounts in store_settings.currency, and the
+ * formatter only changes how that same number is presented.
+ */
+const CURRENCY_LOCALES: Record<string, string> = {
+  MAD: "fr-MA",
+  USD: "en-US",
+  EUR: "fr-FR",
+  GBP: "en-GB"
+};
+
+export function formatPrice(value: number, currency = "USD"): string {
+  const code = (currency || "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat(CURRENCY_LOCALES[code] ?? "en-US", {
+      style: "currency",
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  } catch {
+    return `${code} ${value.toFixed(2)}`;
+  }
 }
 
 export function imageUrl(file: string): string {
