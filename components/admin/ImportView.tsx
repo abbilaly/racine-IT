@@ -14,6 +14,7 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components/admin/ui/button";
+import { formatMoney } from "@/lib/currency";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
 import { TableCard, TableScroll, Table, THead, TBody, Th, Tr, Td } from "@/components/admin/tables/table";
 
@@ -99,7 +100,7 @@ function SummaryTile({
   );
 }
 
-export function ImportView() {
+export function ImportView({ currency }: { currency: string }) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
@@ -379,7 +380,7 @@ export function ImportView() {
                         <Td className="font-mono text-[12px] text-muted-foreground">{row.slug || "—"}</Td>
                         <Td className="max-w-[260px] truncate font-medium text-foreground">{row.title || "—"}</Td>
                         <Td className="hidden text-muted-foreground md:table-cell">{row.category || "—"}</Td>
-                        <Td className="text-right tabular-nums">${Number(row.price || 0).toFixed(2)}</Td>
+                        <Td className="text-right tabular-nums">{formatMoney(Number(row.price || 0), currency)}</Td>
                         <Td className="text-right tabular-nums">{row.stock}</Td>
                         <Td className="text-right">
                           <RowChip row={row} />

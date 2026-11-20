@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { categoryIcon } from "@/lib/category-icons";
 import { useShop } from "@/lib/shop-store";
-import { formatPrice, imageUrl } from "@/lib/products";
+import { imageUrl } from "@/lib/products";
 
 /**
  * Product Categories sidebar.
@@ -24,7 +24,7 @@ import { formatPrice, imageUrl } from "@/lib/products";
 const MAX_LINKS = 6;
 
 export default function CategoryPanel() {
-  const { categories, products } = useShop();
+  const { categories, products, money } = useShop();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const hoverOpenedAt = useRef(0);
@@ -150,7 +150,7 @@ export default function CategoryPanel() {
                           <span className="gz-cats__promo-eyebrow">AB Tech</span>
                           <strong className="gz-cats__promo-title">{item.promo.title}</strong>
                           <span className="gz-cats__promo-price">
-                            Just from: <b>{formatPrice(item.promo.price)}</b>
+                            Just from: <b>{money(item.promo.price)}</b>
                           </span>
                           <span className="gz-cats__promo-btn">Shop Now</span>
                           <img

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { OrderError, getOrder } from "@/lib/server/orders";
 import { formatCents, normaliseRef } from "@/lib/orders";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function OrderPage({ params }: Params) {
   const { ref } = await params;
+  const currency = await getStoreCurrency();
 
   let order;
   try {
@@ -65,7 +67,7 @@ export default async function OrderPage({ params }: Params) {
           <h2>Order received</h2>
           <p>
             Saved to our order system with {order.itemCount} item{order.itemCount === 1 ? "" : "s"}{" "}
-            totalling <strong>{formatCents(order.total)}</strong>. We'll contact you at{" "}
+            totalling <strong>{formatCents(order.total, currency)}</strong>. We'll contact you at{" "}
             {order.customer.email} to confirm payment and delivery.
           </p>
           <p className="muted-note">
@@ -82,9 +84,9 @@ export default async function OrderPage({ params }: Params) {
               <li key={item.slug}>
                 <Link href={`/product/${item.slug}`}>{item.title}</Link>
                 <span>
-                  {formatCents(item.unitPrice)} × {item.qty}
+                  {formatCents(item.unitPrice, currency)} × {item.qty}
                 </span>
-                <strong>{formatCents(item.lineTotal)}</strong>
+                <strong>{formatCents(item.lineTotal, currency)}</strong>
               </li>
             ))}
           </ul>
@@ -113,11 +115,11 @@ export default async function OrderPage({ params }: Params) {
           <dl>
             <div>
               <dt>Items ({order.itemCount})</dt>
-              <dd>{formatCents(order.subtotal)}</dd>
+              <dd>{formatCents(order.subtotal, currency)}</dd>
             </div>
             <div>
               <dt>Shipping · {order.delivery === "express" ? "Express" : "Standard"}</dt>
-              <dd>{order.shipping === 0 ? <span className="free">FREE</span> : formatCents(order.shipping)}</dd>
+              <dd>{order.shipping === 0 ? <span className="free">FREE</span> : formatCents(order.shipping, currency)}</dd>
             </div>
             <div>
               <dt>Payment</dt>
@@ -126,7 +128,7 @@ export default async function OrderPage({ params }: Params) {
           </dl>
           <div className="cart-total-row">
             <span>Total</span>
-            <strong>{formatCents(order.total)}</strong>
+            <strong>{formatCents(order.total, currency)}</strong>
           </div>
           {order.note && <p className="order-note">“{order.note}”</p>}
           <Link href="/shop" className="btn-dark cart-checkout">Continue shopping</Link>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Package, Pencil, Plus } from "lucide-react";
 import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
 import { formatCents, listBrands, listCategories, listProducts } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { Button } from "@/components/admin/ui/button";
 import { ColumnToggle } from "@/components/admin/tables/column-toggle";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
@@ -44,6 +45,7 @@ export default async function AdminProductsPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const params = await searchParams;
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
@@ -216,11 +218,11 @@ export default async function AdminProductsPage({
                     </Td>
                     <Td className="text-right">
                       <span className="font-medium tabular-nums text-foreground">
-                        {formatCents(product.price_cents)}
+                        {formatCents(product.price_cents, currency)}
                       </span>
                       {product.compare_at_price_cents != null && (
                         <span className="ml-1 text-[11px] tabular-nums text-muted-foreground line-through">
-                          {formatCents(product.compare_at_price_cents)}
+                          {formatCents(product.compare_at_price_cents, currency)}
                         </span>
                       )}
                     </Td>

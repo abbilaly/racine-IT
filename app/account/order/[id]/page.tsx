@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/server/customer-auth";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import OrderDetailClient from "../../../account/orders/OrderClient";
 
 export const metadata = {
@@ -14,5 +15,6 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   }
 
   const { id } = await params;
-  return <OrderDetailClient orderId={id} />;
+  const currency = await getStoreCurrency();
+  return <OrderDetailClient orderId={id} currency={currency} />;
 }

@@ -4,6 +4,7 @@ import { getOrderDetail } from "@/lib/server/admin-data";
 import { createEmailLog, markEmailSent, markEmailFailed } from "@/lib/server/email-center";
 import { sendEmail } from "@/lib/server/email";
 import { renderOrderConfirmationEmail } from "@/lib/server/email-send-templates";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 /**
  * POST { email?, subject?, message? } — sends the customer an order email
@@ -43,6 +44,7 @@ export async function POST(
 
   const rendered = renderOrderConfirmationEmail(order, {
     origin: new URL(request.url).origin,
+    currency: await getStoreCurrency(),
   });
   if (!rendered.ok) {
     return NextResponse.json(

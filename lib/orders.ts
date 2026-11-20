@@ -55,13 +55,13 @@ export type StoredOrder = CreateOrderResponse & {
   items: StoredOrderItem[];
 };
 
-/** Prices are handled as integer cents everywhere on the server. */
-export function formatCents(cents: number): string {
-  return `$${(cents / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`;
-}
+/**
+ * Prices are handled as integer cents everywhere on the server. Formatting is
+ * delegated to the shared currency formatter, which labels the amount with the
+ * store's own currency (MAD on the live store, USD when configured) instead of
+ * assuming dollars.
+ */
+export { formatCents, formatMoney } from "@/lib/currency";
 
 export function toCents(dollars: number): number {
   return Math.round(dollars * 100);

@@ -8,6 +8,7 @@ import {
   renderOrderConfirmationEmail,
 } from "@/lib/server/email-send-templates";
 import { EmailPreviewPanel } from "@/components/admin/EmailPreviewPanel";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Aperçu de l'email de commande" };
@@ -34,7 +35,10 @@ export default async function OrderEmailPreviewPage({
   if (!order) notFound();
 
   const origin = originFromHeaders(await headers());
-  const rendered = renderOrderConfirmationEmail(order, { origin });
+  const rendered = renderOrderConfirmationEmail(order, {
+    origin,
+    currency: await getStoreCurrency(),
+  });
   const device = requestedDevice === "mobile" ? "mobile" : "desktop";
 
   return (

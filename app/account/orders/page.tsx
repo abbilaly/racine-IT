@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import OrdersContent from "./OrdersContent";
 
 export const metadata = {
@@ -6,7 +7,9 @@ export const metadata = {
   description: "View your AB Tech order history.",
 };
 
-export default function OrdersPage() {
+export default async function OrdersPage() {
+  const currency = await getStoreCurrency();
+
   return (
     <main className="site-shell page account-form-page">
       <nav className="breadcrumbs" aria-label="Breadcrumb">
@@ -22,7 +25,7 @@ export default function OrdersPage() {
       </div>
 
       <Suspense fallback={<div className="account-loading"><div className="account-spinner" aria-hidden="true" /><p>Loading your orders…</p></div>}>
-        <OrdersContent />
+        <OrdersContent currency={currency} />
       </Suspense>
     </main>
   );

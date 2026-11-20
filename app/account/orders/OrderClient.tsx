@@ -27,7 +27,7 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
-export default function OrderDetailClient({ orderId }: { orderId: string }) {
+export default function OrderDetailClient({ orderId, currency }: { orderId: string; currency: string }) {
   const router = useRouter();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -155,8 +155,8 @@ export default function OrderDetailClient({ orderId }: { orderId: string }) {
                         {item.variantName && <p className="muted-note">{item.variantName}</p>}
                       </div>
                       <div className="order-item-right">
-                        <div className="order-item-qty">{item.qty} × {formatPrice(item.unitPrice)}</div>
-                        <div className="order-item-total">{formatPrice(item.lineTotal)}</div>
+                        <div className="order-item-qty">{item.qty} × {formatPrice(item.unitPrice, currency)}</div>
+                        <div className="order-item-total">{formatPrice(item.lineTotal, currency)}</div>
                       </div>
                     </div>
                   </li>
@@ -239,17 +239,17 @@ export default function OrderDetailClient({ orderId }: { orderId: string }) {
           <dl className="order-totals">
             <div>
               <dt>Subtotal</dt>
-              <dd>{formatPrice(order.subtotal)}</dd>
+              <dd>{formatPrice(order.subtotal, currency)}</dd>
             </div>
             {order.shipping > 0 && (
               <div>
                 <dt>Shipping</dt>
-                <dd>{formatPrice(order.shipping)}</dd>
+                <dd>{formatPrice(order.shipping, currency)}</dd>
               </div>
             )}
             <div className="order-total-final">
               <dt>Total</dt>
-              <dd>{formatPrice(order.total)}</dd>
+              <dd>{formatPrice(order.total, currency)}</dd>
             </div>
           </dl>
         </div>

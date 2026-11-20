@@ -24,6 +24,8 @@ interface ProductFormProps {
   };
   categories: Array<{ id: string; slug: string; label: string; parent_id?: string | null }>;
   brands: Array<{ id: string; name: string; slug: string }>;
+  /** ISO currency code shown beside the price fields. */
+  currency: string;
 }
 
 /**
@@ -50,7 +52,7 @@ function orderedCategories<T extends { id: string; label: string; parent_id?: st
   return out;
 }
 
-export function ProductForm({ productId, initial, categories, brands }: ProductFormProps) {
+export function ProductForm({ productId, initial, categories, brands, currency }: ProductFormProps) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
   const [saving, setSaving] = useState(false);
@@ -279,7 +281,7 @@ export function ProductForm({ productId, initial, categories, brands }: ProductF
             Price <span className="admin-label-required">*</span>
           </label>
           <div className="admin-input-wrap admin-input-wrap--currency">
-            <span className="admin-input-prefix">$</span>
+            <span className="admin-input-prefix">{currency}</span>
             <input
               id="product-price"
               type="number"
@@ -300,7 +302,7 @@ export function ProductForm({ productId, initial, categories, brands }: ProductF
             Compare-at price
           </label>
           <div className="admin-input-wrap admin-input-wrap--currency">
-            <span className="admin-input-prefix">$</span>
+            <span className="admin-input-prefix">{currency}</span>
             <input
               id="product-compare-at-price"
               type="number"

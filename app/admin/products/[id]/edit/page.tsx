@@ -1,5 +1,6 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getProductDetail, listCategories, listBrands } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { notFound } from "next/navigation";
 import { AdminSpinner, AdminEmptyState, AdminError, AdminBadgeStatus, AdminTable, AdminPagination, AdminSearchInput } from "@/lib/server/admin-ui";
 import { StockAdjustmentForm } from "./StockAdjustmentForm";
@@ -14,6 +15,7 @@ export default async function AdminProductEditPage({ params }: { params: Promise
   const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
 
   const product = await getProductDetail(db, id);
   if (!product) notFound();
@@ -69,6 +71,7 @@ export default async function AdminProductEditPage({ params }: { params: Promise
             }}
             categories={categories}
             brands={brands.rows}
+            currency={currency}
           />
         </section>
 

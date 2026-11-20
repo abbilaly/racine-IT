@@ -15,6 +15,8 @@
  * from a variable so the administrator supplies it.
  */
 
+import { DEFAULT_CURRENCY } from "@/lib/currency";
+
 /* ------------------------------------------------------------------ types */
 
 export const STUDIO_CATEGORIES = [
@@ -71,7 +73,7 @@ export const STUDIO_VARIABLE_HINTS: Record<string, string> = {
   invoice_date: "Date d'émission de la facture",
   due_date: "Date d'échéance de paiement",
   amount: "Montant, sans symbole (ex. 1 240,00)",
-  currency: "Devise affichée (ex. EUR)",
+  currency: "Devise affichée (ex. MAD)",
   quote_number: "Numéro de devis",
   quote_valid_until: "Date de fin de validité du devis",
   order_number: "Numéro de commande",
@@ -90,7 +92,7 @@ const SAMPLE: Record<string, string> = {
   invoice_date: "12/03/2026",
   due_date: "11/04/2026",
   amount: "1 240,00",
-  currency: "EUR",
+  currency: DEFAULT_CURRENCY,
   quote_number: "DEV-2026-0087",
   quote_valid_until: "30/04/2026",
   order_number: "CMD-2026-0311",

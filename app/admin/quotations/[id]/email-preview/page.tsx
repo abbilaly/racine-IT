@@ -4,6 +4,7 @@ import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getQuotationDetail } from "@/lib/server/admin-data";
 import { renderQuotationEmail } from "@/lib/server/email-send-templates";
 import { EmailPreviewPanel } from "@/components/admin/EmailPreviewPanel";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Aperçu de l'email de devis" };
@@ -29,7 +30,7 @@ export default async function QuotationEmailPreviewPage({
   const quotation = await getQuotationDetail(db, id);
   if (!quotation) notFound();
 
-  const rendered = renderQuotationEmail(quotation);
+  const rendered = renderQuotationEmail(quotation, { currency: await getStoreCurrency() });
   const device = requestedDevice === "mobile" ? "mobile" : "desktop";
 
   return (

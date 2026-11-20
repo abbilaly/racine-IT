@@ -1,6 +1,7 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { isUuid } from "@/lib/utils";
 import { getOrderDetail, listAdminNotes, formatCents } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
@@ -17,6 +18,7 @@ export default async function AdminOrderStatusPage({ params }: { params: Promise
   if (!isUuid(id)) notFound();
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
 
   const order = await getOrderDetail(db, id);
   if (!order) notFound();
@@ -67,7 +69,7 @@ export default async function AdminOrderStatusPage({ params }: { params: Promise
             </div>
             <div className="admin-definition-row">
               <dt>Total</dt>
-              <dd><strong>{formatCents(order.total)}</strong></dd>
+              <dd><strong>{formatCents(order.total, currency)}</strong></dd>
             </div>
             <div className="admin-definition-row">
               <dt>Status</dt>
@@ -85,7 +87,7 @@ export default async function AdminOrderStatusPage({ params }: { params: Promise
             <h2>Items</h2>
             <RefreshCw size={14} className="admin-muted" aria-hidden="true" />
           </div>
-          <OrderItems items={order.order_items} />
+          <OrderItems items={order.order_items} currency={currency} />
         </section>
 
         <section className="admin-card admin-card--wide">

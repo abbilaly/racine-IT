@@ -14,6 +14,8 @@ export type QuotationPdfLine = {
   discountPercent?: number;
 };
 
+import { normaliseCurrency } from "@/lib/currency";
+
 export type QuotationPdfData = {
   storeName: string;
   ref: string;
@@ -65,10 +67,6 @@ function textWidth(text: string, size: number): number {
     else units += 0.5;
   }
   return units * size;
-}
-
-function money(cents: number): string {
-  return (cents / 100).toFixed(2);
 }
 
 export function renderQuotationPdf(data: QuotationPdfData): Uint8Array {
@@ -152,11 +150,11 @@ export function renderQuotationPdf(data: QuotationPdfData): Uint8Array {
 
   // ---- totals -----------------------------------------------------------
   ops.push({ kind: "text", x: MARGIN_X + 340, y, size: BODY_SIZE, text: "Subtotal" });
-  rightWrite(line_money(data.subtotal));
+  rightWrite(line_money(data.subtotal, data.currency));
   ops.push({ kind: "text", x: MARGIN_X + 340, y, size: BODY_SIZE, text: "Tax" });
-  rightWrite(line_money(data.tax));
+  rightWrite(line_money(data.tax, data.currency));
   ops.push({ kind: "text", x: MARGIN_X + 340, y, size: BODY_SIZE, text: "Total", bold: true });
-  rightWrite(line_money(data.total), BODY_SIZE, true);
+  rightWrite(line_money(data.total, data.currency), BODY_SIZE, true);
   y -= 8;
   rule();
 
@@ -176,8 +174,13 @@ export function renderQuotationPdf(data: QuotationPdfData): Uint8Array {
   return buildPdf(ops);
 }
 
-function line_money(value: string): string {
-  return value;
+/**
+ * Totals are pre-formatted by the shared currency formatter. A value that
+ * still lacks a currency label gets the store's ISO code appended, so a plain
+ * "2,499.00" is never mistaken for dollars in a MAD store.
+ */
+function line_money(value: string, currency?: string): string {
+  return /[A-Za-z$€£]/.test(value) ? value : `${value} ${normaliseCurrency(currency)}`;
 }
 
 function wrap(text: string, width: number): string[] {

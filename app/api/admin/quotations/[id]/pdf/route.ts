@@ -19,6 +19,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 
     const settings = await getStoreSettings(db).catch(() => null);
     const storeName = settings?.store_name ?? process.env.STORE_NAME ?? "AB Tech";
+    const currency = quotation.currency || settings?.currency || undefined;
 
     const bytes = renderQuotationPdf({
       storeName,
@@ -30,18 +31,18 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       lines: quotation.quotation_lines.map((line) => ({
         title: line.title,
         qty: line.qty,
-        unitPrice: formatCents(line.unit_price_cents),
-        lineTotal: formatCents(line.line_total_cents),
+        unitPrice: formatCents(line.unit_price_cents, currency),
+        lineTotal: formatCents(line.line_total_cents, currency),
         discountPercent: line.discount_percent ? Number(line.discount_percent) : undefined
       })),
-      subtotal: formatCents(quotation.subtotal_cents),
-      tax: formatCents(quotation.tax_cents),
-      total: formatCents(quotation.total_cents),
+      subtotal: formatCents(quotation.subtotal_cents, currency),
+      tax: formatCents(quotation.tax_cents, currency),
+      total: formatCents(quotation.total_cents, currency),
       validFrom: new Date(quotation.valid_from).toLocaleDateString(),
       validUntil: new Date(quotation.valid_until).toLocaleDateString(),
       notes: quotation.notes,
       terms: quotation.terms,
-      currency: quotation.currency
+      currency
     });
 
     return new Response(new Uint8Array(bytes), {

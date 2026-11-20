@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FileText } from "lucide-react";
 import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
 import { formatCents, listQuotations } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { QuotationCreateForm } from "@/components/admin/QuotationCreateForm";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
 import { TablePagination } from "@/components/admin/tables/pagination";
@@ -47,6 +48,7 @@ export default async function AdminQuotationsPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const params = await searchParams;
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
@@ -137,7 +139,7 @@ export default async function AdminQuotationsPage({
                       <StatusBadge status={quotation.status} />
                     </Td>
                     <Td className="text-right font-medium tabular-nums">
-                      {formatCents(quotation.total_cents)}
+                      {formatCents(quotation.total_cents, currency)}
                     </Td>
                     <Td className="hidden whitespace-nowrap text-[12px] tabular-nums md:table-cell">
                       <TdMuted>{shortDate(quotation.valid_until)}</TdMuted>

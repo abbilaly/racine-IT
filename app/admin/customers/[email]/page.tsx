@@ -119,7 +119,7 @@ export default async function AdminCustomerDetailPage({
             </div>
             <div className="admin-stat">
               <span>Total spent</span>
-              <strong>{formatCents(customer.total_spent_cents)}</strong>
+              <strong>{formatCents(customer.total_spent_cents, currency)}</strong>
             </div>
           </div>
           <p className="admin-assistive-text">
@@ -167,7 +167,7 @@ export default async function AdminCustomerDetailPage({
                         </Link>
                       </td>
                       <td>{String(order.item_count)}</td>
-                      <td>{formatCents(Number(order.total))}</td>
+                      <td>{formatCents(Number(order.total), currency)}</td>
                       <td>
                         <AdminBadgeStatus status={String(order.status)} />
                       </td>

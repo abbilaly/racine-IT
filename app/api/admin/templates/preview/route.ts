@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminApiSession, getAdminClient } from "@/lib/server/admin-auth";
 import { EMAIL_KINDS } from "@/lib/server/email-center";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 function fail(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
@@ -53,6 +54,10 @@ export async function POST(request: Request) {
 
   if (kind === "order_confirmation") {
     const params = {
+      currency:
+        typeof previewParams.currency === "string"
+          ? previewParams.currency
+          : await getStoreCurrency(),
       storeName:
         typeof previewParams.storeName === "string"
           ? previewParams.storeName
@@ -113,6 +118,10 @@ export async function POST(request: Request) {
     }
   } else if (kind === "quotation") {
     const params = {
+      currency:
+        typeof previewParams.currency === "string"
+          ? previewParams.currency
+          : await getStoreCurrency(),
       storeName:
         typeof previewParams.storeName === "string"
           ? previewParams.storeName

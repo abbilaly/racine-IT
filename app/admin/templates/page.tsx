@@ -9,6 +9,7 @@ import {
   renderStudioTemplate,
 } from "@/lib/server/email-template-studio";
 import { AdminBreadcrumbs } from "@/components/admin/nav";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Studio des modèles" };
@@ -28,7 +29,8 @@ export default async function TemplateStudioPage({
   const params = await searchParams;
   const selected = getStudioTemplate(params.template) ?? STUDIO_TEMPLATES[0];
   const device = params.device === "mobile" ? "mobile" : "desktop";
-  const rendered = renderStudioTemplate(selected.id);
+  // The amount placeholder must read in the store's own currency.
+  const rendered = renderStudioTemplate(selected.id, { currency: await getStoreCurrency() });
 
   if (!rendered) {
     return (

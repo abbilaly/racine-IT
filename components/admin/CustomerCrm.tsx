@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MessageSquarePlus, ShoppingBag, StickyNote } from "lucide-react";
+import { formatCents } from "@/lib/currency";
 
 export type CrmOrder = {
   id: string;
@@ -55,12 +56,7 @@ export function CustomerCrm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const money = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency || "USD",
-      maximumFractionDigits: 2
-    }).format(value / 100);
+  const money = (cents: number) => formatCents(cents, currency);
 
   const timeline = useMemo<TimelineEntry[]>(() => {
     const entries: TimelineEntry[] = [

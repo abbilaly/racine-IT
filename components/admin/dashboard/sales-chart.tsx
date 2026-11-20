@@ -10,28 +10,19 @@ import {
   XAxis,
   YAxis
 } from "recharts";
+import { formatMoney, formatMoneyCompact } from "@/lib/currency";
 import type { DashboardSeriesPoint } from "@/lib/server/admin-data";
-
-const money = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0
-});
-
-function compactMoney(cents: number): string {
-  const dollars = cents / 100;
-  if (Math.abs(dollars) >= 1000) return `$${(dollars / 1000).toFixed(dollars >= 10000 ? 0 : 1)}k`;
-  return `$${Math.round(dollars)}`;
-}
 
 function ChartTooltip({
   active,
   payload,
-  label
+  label,
+  currency
 }: {
   active?: boolean;
   payload?: Array<{ payload: DashboardSeriesPoint }>;
   label?: string;
+  currency: string;
 }) {
   if (!active || !payload?.length) return null;
   const point = payload[0].payload;
@@ -41,7 +32,7 @@ function ChartTooltip({
       <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </p>
-      <p className="text-sm font-semibold tabular-nums">{money.format(point.revenue_cents / 100)}</p>
+      <p className="text-sm font-semibold tabular-nums">{formatMoney(point.revenue_cents / 100, currency)}</p>
       <p className="text-[11px] text-muted-foreground">
         {point.orders} order{point.orders === 1 ? "" : "s"}
       </p>
@@ -55,10 +46,12 @@ function ChartTooltip({
  */
 export function SalesChart({
   points,
-  granularity
+  granularity,
+  currency
 }: {
   points: DashboardSeriesPoint[];
   granularity: "day" | "month";
+  currency: string;
 }) {
   const [animate, setAnimate] = useState(true);
 
@@ -102,10 +95,10 @@ export function SalesChart({
             axisLine={false}
             width={54}
             tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-            tickFormatter={(value: number) => compactMoney(value)}
+            tickFormatter={(value: number) => formatMoneyCompact(value / 100, currency)}
           />
           <Tooltip
-            content={<ChartTooltip />}
+            content={<ChartTooltip currency={currency} />}
             cursor={{ stroke: "var(--border)", strokeWidth: 1 }}
           />
           <Area

@@ -238,7 +238,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       <ShopControls state={{ ...state, sort }} total={paged.total} />
 
       <div className="shop-layout">
-        <ShopFacets state={state} facets={facets} categories={categories} total={paged.total} />
+        <ShopFacets
+          state={state}
+          facets={facets}
+          categories={categories}
+          total={paged.total}
+          currency={catalog.settings.currency}
+        />
 
         <div className="shop-results">
           {paged.items.length === 0 ? (

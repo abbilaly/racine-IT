@@ -1,5 +1,6 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { listActiveCategories, listBrands } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { AdminSpinner, AdminEmptyState, AdminError } from "@/lib/server/admin-ui";
 import { ProductForm } from "../[id]/edit/ProductForm";
 import Link from "next/link";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminNewProductPage() {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
 
   // New products may only be filed onto an active category.
   const categories = await listActiveCategories(db);
@@ -53,6 +55,7 @@ export default async function AdminNewProductPage() {
             }}
             categories={categories}
             brands={brands.rows}
+            currency={currency}
           />
         </section>
       </div>

@@ -1,6 +1,7 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { isUuid } from "@/lib/utils";
 import { getQuotationDetail, formatCents } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, Building2, Calendar } from "lucide-react";
@@ -16,6 +17,7 @@ export default async function AdminQuotationDetailPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const { id } = await params;
   // A malformed id must be a 404, not a database error screen.
   if (!isUuid(id)) notFound();
@@ -77,9 +79,9 @@ export default async function AdminQuotationDetailPage({
                     <tr key={line.id}>
                       <td>{line.title}</td>
                       <td>{line.qty}</td>
-                      <td>{formatCents(line.unit_price_cents)}</td>
+                      <td>{formatCents(line.unit_price_cents, currency)}</td>
                       <td>{line.discount_percent ? `${Number(line.discount_percent)}%` : "—"}</td>
-                      <td>{formatCents(line.line_total_cents)}</td>
+                      <td>{formatCents(line.line_total_cents, currency)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -89,16 +91,16 @@ export default async function AdminQuotationDetailPage({
           <dl className="admin-definition-list admin-definition-list--inline">
             <div className="admin-definition-row">
               <dt>Subtotal</dt>
-              <dd>{formatCents(quotation.subtotal_cents)}</dd>
+              <dd>{formatCents(quotation.subtotal_cents, currency)}</dd>
             </div>
             <div className="admin-definition-row">
               <dt>Tax</dt>
-              <dd>{formatCents(quotation.tax_cents)}</dd>
+              <dd>{formatCents(quotation.tax_cents, currency)}</dd>
             </div>
             <div className="admin-definition-row admin-definition-row--total">
               <dt>Total</dt>
               <dd>
-                <strong>{formatCents(quotation.total_cents)}</strong>
+                <strong>{formatCents(quotation.total_cents, currency)}</strong>
               </dd>
             </div>
           </dl>

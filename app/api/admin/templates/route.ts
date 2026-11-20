@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminApiSession, getAdminClient } from "@/lib/server/admin-auth";
 import { orderConfirmationTemplate, quotationTemplate } from "@/lib/server/email-templates";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { EMAIL_KINDS } from "@/lib/server/email-center";
 import type { OrderTemplateParams } from "@/lib/server/email-templates";
 import type { QuotationTemplateParams } from "@/lib/server/email-templates";
@@ -114,6 +115,7 @@ export async function POST(request: Request) {
           typeof previewParams.postal === "string" ? previewParams.postal : undefined,
       },
     };
+    params.currency = await getStoreCurrency();
     html = orderConfirmationTemplate(params);
     subjectTemplate = `Order confirmed — ${params.ref}`;
   } else if (kind === "quotation") {
@@ -164,6 +166,7 @@ export async function POST(request: Request) {
       terms:
         typeof previewParams.terms === "string" ? previewParams.terms : undefined,
     };
+    params.currency = await getStoreCurrency();
     html = quotationTemplate(params);
     subjectTemplate = `Quotation ${params.ref} from AB Tech`;
   }

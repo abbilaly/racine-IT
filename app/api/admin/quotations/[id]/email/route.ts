@@ -4,6 +4,7 @@ import { getQuotationDetail } from "@/lib/server/admin-data";
 import { renderQuotationEmail } from "@/lib/server/email-send-templates";
 import { sendEmail } from "@/lib/server/email";
 import { createEmailLog, markEmailSent, markEmailFailed } from "@/lib/server/email-center";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 /**
  * POST — emails the quotation to the business customer through Resend.
@@ -34,7 +35,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       return NextResponse.json({ error: "A valid recipient email is required." }, { status: 400 });
     }
 
-    const rendered = renderQuotationEmail(quotation);
+    const rendered = renderQuotationEmail(quotation, { currency: await getStoreCurrency() });
     if (!rendered.ok) {
       return NextResponse.json(
         {

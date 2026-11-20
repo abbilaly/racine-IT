@@ -1,3 +1,5 @@
+import { DEFAULT_CURRENCY, formatMoney } from "@/lib/currency";
+
 export const ASSET = "/images";
 export const PAYMENTS = "/images/payment.webp";
 
@@ -498,26 +500,15 @@ export function labelFor(categories: readonly CategoryOption[], key: string): st
  * Formats an amount in the currency it is stored in. No conversion happens
  * here: the catalogue stores amounts in store_settings.currency, and the
  * formatter only changes how that same number is presented.
+ *
+ * Formatting is delegated to the shared `lib/currency` formatter, so the
+ * storefront, admin, emails and PDFs all label amounts the same way
+ * ("2,499 MAD" in a MAD store, "$2,499.00" in a USD one). The en-US locale is
+ * used so thousands separators are always commas and decimal separators are
+ * always periods, regardless of the viewer's browser locale.
  */
-const CURRENCY_LOCALES: Record<string, string> = {
-  MAD: "fr-MA",
-  USD: "en-US",
-  EUR: "fr-FR",
-  GBP: "en-GB"
-};
-
-export function formatPrice(value: number, currency = "USD"): string {
-  const code = (currency || "USD").toUpperCase();
-  try {
-    return new Intl.NumberFormat(CURRENCY_LOCALES[code] ?? "en-US", {
-      style: "currency",
-      currency: code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
-  } catch {
-    return `${code} ${value.toFixed(2)}`;
-  }
+export function formatPrice(value: number, currency = DEFAULT_CURRENCY): string {
+  return formatMoney(value, currency);
 }
 
 export function imageUrl(file: string): string {

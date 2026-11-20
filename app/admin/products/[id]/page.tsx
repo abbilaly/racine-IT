@@ -1,5 +1,6 @@
 import { requireAdmin, adminClient } from "@/lib/server/admin-auth";
 import { getProductDetail, listStockAdjustments, formatCents } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { AdminSpinner, AdminEmptyState, AdminBadgeStatus, AdminTable, AdminPagination, AdminSearchInput } from "@/lib/server/admin-ui";
@@ -12,6 +13,7 @@ export default async function AdminProductDetailPage({ params }: { params: Promi
   const { id } = await params;
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
 
   const product = await getProductDetail(db, id);
   if (!product) notFound();
@@ -70,12 +72,12 @@ export default async function AdminProductDetailPage({ params }: { params: Promi
           <dl className="admin-definition-list">
             <div className="admin-definition-row">
               <dt>Selling price</dt>
-              <dd>${formatCents(product.price_cents)}</dd>
+              <dd>{formatCents(product.price_cents, currency)}</dd>
             </div>
             {product.compare_at_price_cents != null && (
               <div className="admin-definition-row">
                 <dt>Compare-at price</dt>
-                <dd>${formatCents(product.compare_at_price_cents)}</dd>
+                <dd>{formatCents(product.compare_at_price_cents, currency)}</dd>
               </div>
             )}
             {product.badge && (

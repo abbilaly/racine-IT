@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Users } from "lucide-react";
 import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
 import { formatCents, listCustomers } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
 import { TablePagination } from "@/components/admin/tables/pagination";
 import { SortHeader } from "@/components/admin/tables/sort-header";
@@ -38,6 +39,7 @@ export default async function AdminCustomersPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const params = await searchParams;
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
@@ -107,7 +109,7 @@ export default async function AdminCustomersPage({
                     </Td>
                     <Td className="text-right tabular-nums">{customer.order_count}</Td>
                     <Td className="text-right font-medium tabular-nums">
-                      {formatCents(customer.total_spent_cents)}
+                      {formatCents(customer.total_spent_cents, currency)}
                     </Td>
                     <Td className="hidden whitespace-nowrap text-[12px] tabular-nums sm:table-cell">
                       <TdMuted>{shortDate(customer.last_order_at)}</TdMuted>

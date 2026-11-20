@@ -31,6 +31,7 @@ import { RecentOrders } from "@/components/admin/dashboard/recent-orders";
 import { SalesChart } from "@/components/admin/dashboard/sales-chart";
 import { StatusBreakdown } from "@/components/admin/dashboard/status-breakdown";
 import { TopProducts } from "@/components/admin/dashboard/top-products";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 
@@ -79,8 +80,9 @@ export default async function AdminOverviewPage({
   const key = parseDashboardRange(params.range);
   const window = dashboardWindow(key);
 
-  const [totals, previous, series, statuses, topProducts, recentOrders, lowStock] =
+  const [currency, totals, previous, series, statuses, topProducts, recentOrders, lowStock] =
     await Promise.all([
+      getStoreCurrency(),
       dashboardTotals(db, window.fromISO, window.toISO),
       dashboardTotals(db, window.previous.fromISO, window.previous.toISO),
       salesSeriesInRange(db, window.fromISO, window.toISO, window.granularity),
@@ -112,21 +114,21 @@ export default async function AdminOverviewPage({
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <KpiCard
           label="Gross order value"
-          value={formatCents(totals.gross_cents)}
+          value={formatCents(totals.gross_cents, currency)}
           hint="All orders placed"
           icon={Receipt}
           delta={comparable ? comparison(totals.gross_cents, previous.gross_cents) : undefined}
         />
         <KpiCard
           label="Confirmed revenue"
-          value={formatCents(totals.confirmed_cents)}
+          value={formatCents(totals.confirmed_cents, currency)}
           hint="Excludes cancelled"
           icon={DollarSign}
           delta={comparable ? comparison(totals.confirmed_cents, previous.confirmed_cents) : undefined}
         />
         <KpiCard
           label="Realized revenue"
-          value={formatCents(totals.realized_cents)}
+          value={formatCents(totals.realized_cents, currency)}
           hint="Delivered orders only"
           icon={Wallet}
           delta={comparable ? comparison(totals.realized_cents, previous.realized_cents) : undefined}
@@ -140,7 +142,7 @@ export default async function AdminOverviewPage({
         />
         <KpiCard
           label="Average order value"
-          value={formatCents(totals.aov_cents)}
+          value={formatCents(totals.aov_cents, currency)}
           hint="Confirmed orders"
           icon={TrendingUp}
           delta={comparable ? comparison(totals.aov_cents, previous.aov_cents) : undefined}
@@ -171,7 +173,7 @@ export default async function AdminOverviewPage({
             </div>
             <div className="text-right">
               <p className="m-0 text-[15px] font-semibold tabular-nums text-foreground">
-                {formatCents(totals.confirmed_cents)}
+                {formatCents(totals.confirmed_cents, currency)}
               </p>
               <p className="m-0 text-[11px] text-muted-foreground">{window.label}</p>
             </div>
@@ -183,7 +185,7 @@ export default async function AdminOverviewPage({
               </p>
             </div>
           ) : (
-            <SalesChart points={series} granularity={window.granularity} />
+            <SalesChart points={series} granularity={window.granularity} currency={currency} />
           )}
         </Card>
 
@@ -205,7 +207,7 @@ export default async function AdminOverviewPage({
             </div>
             <BarChart3 size={15} className="mt-0.5 text-muted-foreground" aria-hidden="true" />
           </div>
-          <TopProducts rows={topProducts} />
+          <TopProducts rows={topProducts} currency={currency} />
         </Card>
 
         <Card className="gap-0 p-4 xl:col-span-2">
@@ -221,7 +223,7 @@ export default async function AdminOverviewPage({
               View all
             </Link>
           </div>
-          <RecentOrders rows={recentOrders} />
+          <RecentOrders rows={recentOrders} currency={currency} />
         </Card>
       </div>
 

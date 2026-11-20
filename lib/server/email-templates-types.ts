@@ -1,5 +1,7 @@
 export type OrderTemplateParams = {
   storeName: string;
+  /** ISO currency code the amounts are denominated in (defaults to USD). */
+  currency?: string;
   ref: string;
   customerName: string;
   items: Array<{
@@ -22,6 +24,8 @@ export type OrderTemplateParams = {
 
 export type QuotationTemplateParams = {
   storeName: string;
+  /** ISO currency code the amounts are denominated in (defaults to USD). */
+  currency?: string;
   ref: string;
   customerName: string;
   company?: string;

@@ -9,6 +9,7 @@ import {
   type FacetGroup,
   type ShopFacets as Facets
 } from "@/lib/products";
+import { formatMoney } from "@/lib/currency";
 import {
   activeFilterCount,
   isSelected,
@@ -24,9 +25,12 @@ type Props = {
   facets: Facets;
   categories: CategoryCount[];
   total: number;
+  /** ISO currency code the catalogue is priced in. */
+  currency: string;
 };
 
-const money = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
+const money = (value: number, currency: string) =>
+  formatMoney(value, currency, { fractionDigits: 0 });
 
 function humanise(key: string): string {
   const text = key.replace(/[-_]+/g, " ").trim();
@@ -41,7 +45,7 @@ function humanise(key: string): string {
  * On phones and tablets the same panel opens as a drawer instead of squeezing
  * the desktop sidebar onto the screen.
  */
-export default function ShopFacets({ state, facets, categories, total }: Props) {
+export default function ShopFacets({ state, facets, categories, total, currency }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -94,6 +98,7 @@ export default function ShopFacets({ state, facets, categories, total }: Props) 
       facets={facets}
       categories={categories}
       total={total}
+      currency={currency}
       active={active}
       apply={apply}
       clearAll={clearAll}
@@ -160,6 +165,7 @@ function FacetSections({
   facets,
   categories,
   total,
+  currency,
   active,
   apply,
   clearAll
@@ -167,6 +173,7 @@ function FacetSections({
   state: ShopState;
   facets: Facets;
   categories: CategoryCount[];
+  currency: string;
   total: number;
   active: number;
   apply: (next: Partial<ShopState>) => void;
@@ -194,10 +201,10 @@ function FacetSections({
   if (state.min || state.max) {
     const label =
       state.min && state.max
-        ? `${money(Number(state.min))} – ${money(Number(state.max))}`
+        ? `${money(Number(state.min), currency)} – ${money(Number(state.max), currency)}`
         : state.min
-          ? `From ${money(Number(state.min))}`
-          : `Up to ${money(Number(state.max))}`;
+          ? `From ${money(Number(state.min), currency)}`
+          : `Up to ${money(Number(state.max), currency)}`;
     chips.push({ key: "price", label, clear: () => apply({ min: "", max: "" }) });
   }
   if (state.rating) {
@@ -344,7 +351,7 @@ function FacetSections({
       </Section>
 
       <Section title="Price">
-        <PriceSection state={state} bounds={facets.price} apply={apply} />
+        <PriceSection state={state} bounds={facets.price} apply={apply} currency={currency} />
       </Section>
 
       <Section title="Color">
@@ -478,11 +485,13 @@ function Chips({
 function PriceSection({
   state,
   bounds,
-  apply
+  apply,
+  currency
 }: {
   state: ShopState;
   bounds: { min: number; max: number };
   apply: (next: Partial<ShopState>) => void;
+  currency: string;
 }) {
   const clamp = (value: number) =>
     Math.min(bounds.max, Math.max(bounds.min, Number.isFinite(value) ? value : bounds.min));
@@ -619,7 +628,7 @@ function PriceSection({
       </div>
 
       <p className="price-readout">
-        Price: <b>{money(min)}</b> — <b>{money(max)}</b>
+        Price: <b>{money(min, currency)}</b> — <b>{money(max, currency)}</b>
       </p>
     </>
   );

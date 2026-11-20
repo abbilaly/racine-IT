@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENCY, formatAmount as formatMoneyAmount, normaliseCurrency } from "@/lib/currency";
 import type { OrderDetailRow, QuotationDetailRow } from "@/lib/server/admin-data";
 import {
   renderStudioTemplateForSend,
@@ -42,16 +43,15 @@ export function originFromHeaders(headers: {
   return `${proto}://${host}`;
 }
 
-/** French amount without currency symbol; the template prints {{currency}} itself. */
-function formatAmount(cents: number | null | undefined): string {
+/**
+ * Amount without currency label, in the store currency; the template prints
+ * {{currency}} itself, so the two always agree.
+ */
+function formatAmount(cents: number | null | undefined, currency?: string | null): string {
   // An absent amount returns "" so the strict renderer fails instead of
-  // emailing a customer a fabricated 0,00.
+  // emailing a customer a fabricated 0.
   if (typeof cents !== "number" || !Number.isFinite(cents)) return "";
-  const value = cents / 100;
-  return new Intl.NumberFormat("fr-FR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
+  return formatMoneyAmount(cents / 100, currency);
 }
 
 function formatDate(value: string | Date | null | undefined): string {
@@ -87,7 +87,7 @@ function readOptional(row: unknown, key: string): string {
 
 export function renderOrderConfirmationEmail(
   order: OrderDetailRow,
-  options: { origin?: string } = {}
+  options: { origin?: string; currency?: string } = {}
 ): StudioSendRender {
   const customerName =
     `${order.first_name ?? ""} ${order.last_name ?? ""}`.trim() || order.email;
@@ -95,6 +95,7 @@ export function renderOrderConfirmationEmail(
     order.order_items.map(item => ({ qty: item.qty, title: item.title }))
   );
 
+  const currency = normaliseCurrency(readOptional(order, "currency") || options.currency);
   const origin = (options.origin ?? "").replace(/\/+$/, "");
   const actionUrl = origin ? `${origin}/order/${encodeURIComponent(order.ref)}` : "";
 
@@ -106,8 +107,8 @@ export function renderOrderConfirmationEmail(
       order_number: order.ref,
       product_name: name || "Commande AB Tech",
       product_summary: summary,
-      amount: formatAmount(order.total),
-      currency: readOptional(order, "currency") || "EUR",
+      amount: formatAmount(order.total, currency),
+      currency,
       action_url: actionUrl,
       contact_email: contactEmail(),
     },
@@ -117,7 +118,11 @@ export function renderOrderConfirmationEmail(
 
 /* -------------------------------------------------------------- quotation */
 
-export function renderQuotationEmail(quotation: QuotationDetailRow): StudioSendRender {
+export function renderQuotationEmail(
+  quotation: QuotationDetailRow,
+  options: { currency?: string } = {}
+): StudioSendRender {
+  const currency = normaliseCurrency(readOptional(quotation, "currency") || options.currency);
   const { name, summary } = summariseItems(
     quotation.quotation_lines.map(line => ({ qty: line.qty, title: line.title }))
   );
@@ -131,8 +136,8 @@ export function renderQuotationEmail(quotation: QuotationDetailRow): StudioSendR
       quote_valid_until: formatDate(quotation.valid_until),
       product_name: name || "Prestation AB Tech",
       product_summary: summary,
-      amount: formatAmount(quotation.total_cents),
-      currency: readOptional(quotation, "currency") || "EUR",
+      amount: formatAmount(quotation.total_cents, currency),
+      currency,
       // There is no public quotation page, so no CTA is rendered.
       action_url: "",
       contact_email: contactEmail(),
@@ -169,8 +174,8 @@ export function renderInvoiceEmail(input: InvoiceEmailInput): StudioSendRender {
       invoice_number: input.invoiceNumber,
       invoice_date: formatDate(input.invoiceDate),
       due_date: formatDate(input.dueDate),
-      amount: formatAmount(input.amountCents),
-      currency: input.currency ?? "EUR",
+      amount: formatAmount(input.amountCents, input.currency),
+      currency: normaliseCurrency(input.currency),
       action_url: input.invoiceUrl ?? "",
       contact_email: contactEmail(),
     },

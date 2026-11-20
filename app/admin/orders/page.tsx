@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Eye, Package, Pencil } from "lucide-react";
 import { adminClient, requireAdmin } from "@/lib/server/admin-auth";
 import { formatCents, listOrders } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 import { Button } from "@/components/admin/ui/button";
 import { ColumnToggle } from "@/components/admin/tables/column-toggle";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
@@ -62,6 +63,7 @@ export default async function AdminOrdersPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const params = await searchParams;
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
@@ -174,7 +176,7 @@ export default async function AdminOrdersPage({
                     <Td col="items" className="hidden tabular-nums sm:table-cell">
                       {order.item_count}
                     </Td>
-                    <Td className="text-right font-medium tabular-nums">{formatCents(order.total)}</Td>
+                    <Td className="text-right font-medium tabular-nums">{formatCents(order.total, currency)}</Td>
                     <Td>
                       <StatusBadge status={order.status} />
                     </Td>

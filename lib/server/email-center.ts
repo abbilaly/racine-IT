@@ -1,3 +1,4 @@
+import { formatCents } from "@/lib/currency";
 import type { AdminClient } from "@/lib/server/admin-client";
 import { emailConfigured, sendEmail, SendEmailResult } from "@/lib/server/email";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -645,6 +646,8 @@ export function buildOrderConfirmationHtml(params: {
   storeName: string;
   ref: string;
   customerName: string;
+  /** ISO currency code the amounts are denominated in (defaults to USD). */
+  currency?: string;
   items: Array<{ title: string; qty: number; price: number; total: number }>;
   shipping: number;
   total: number;
@@ -657,21 +660,22 @@ export function buildOrderConfirmationHtml(params: {
     postal?: string;
   };
 }): string {
+  const fmt = (cents: number) => formatCents(cents, params.currency);
   const itemRows = params.items
     .map(
       (item) => `
       <tr>
         <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:left;font-size:14px;color:#111827;">${item.title}</td>
         <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:center;font-size:14px;color:#111827;">${item.qty}</td>
-        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(item.price)}</td>
-        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(item.total)}</td>
+        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(item.price)}</td>
+        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(item.total)}</td>
       </tr>`
     )
     .join("");
 
   const shippingRow =
     params.shipping > 0
-      ? `<tr><td colspan="3" style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">Livraison</td><td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(params.shipping)}</td></tr>`
+      ? `<tr><td colspan="3" style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">Livraison</td><td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(params.shipping)}</td></tr>`
       : "";
 
   return `
@@ -715,7 +719,7 @@ export function buildOrderConfirmationHtml(params: {
                   ${shippingRow}
                   <tr>
                     <td colspan="3" style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:600;color:#111827;">Total</td>
-                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${formatMoney(params.total)}</td>
+                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${fmt(params.total)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -752,6 +756,8 @@ export function buildQuotationEmailHtml(params: {
   ref: string;
   customerName: string;
   company?: string;
+  /** ISO currency code the amounts are denominated in (defaults to USD). */
+  currency?: string;
   items: Array<{ title: string; qty: number; price: number; total: number }>;
   subtotal: number;
   tax: number;
@@ -761,14 +767,15 @@ export function buildQuotationEmailHtml(params: {
   notes?: string;
   terms?: string;
 }): string {
+  const fmt = (cents: number) => formatCents(cents, params.currency);
   const itemRows = params.items
     .map(
       (item) => `
       <tr>
         <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:left;font-size:14px;color:#111827;">${escapeHtml(item.title)}</td>
         <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:center;font-size:14px;color:#111827;">${item.qty}</td>
-        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(item.price)}</td>
-        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(item.total)}</td>
+        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(item.price)}</td>
+        <td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(item.total)}</td>
       </tr>`
     )
     .join("");
@@ -820,15 +827,15 @@ export function buildQuotationEmailHtml(params: {
                   ${validityRow}
                   <tr>
                     <td colspan="3" style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:600;color:#111827;">Total HT</td>
-                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${formatMoney(params.subtotal)}</td>
+                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${fmt(params.subtotal)}</td>
                   </tr>
                   <tr>
                     <td colspan="3" style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">TVA</td>
-                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${formatMoney(params.tax)}</td>
+                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;color:#111827;">${fmt(params.tax)}</td>
                   </tr>
                   <tr>
                     <td colspan="3" style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">Total TTC</td>
-                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${formatMoney(params.total)}</td>
+                    <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:right;font-size:14px;font-weight:700;color:#0b2e4f;">${fmt(params.total)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -861,14 +868,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function formatMoney(cents: number): string {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-  }).format(cents / 100);
 }
 
 function formatDateRange(from?: string, until?: string): string {

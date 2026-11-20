@@ -19,6 +19,7 @@ import { SalesChart } from "@/components/admin/dashboard/sales-chart";
 import { StatusBreakdown } from "@/components/admin/dashboard/status-breakdown";
 import { TablePageHeader } from "@/components/admin/tables/page-header";
 import { TableCard, TableScroll, Table, THead, TBody, Th, Tr, Td } from "@/components/admin/tables/table";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,7 @@ export default async function AdminReportsPage({
 }) {
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
   const params = await searchParams;
 
   const today = new Date().toISOString().slice(0, 10);
@@ -127,7 +129,7 @@ export default async function AdminReportsPage({
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="Revenue in range"
-          value={formatCents(totalRevenue)}
+          value={formatCents(totalRevenue, currency)}
           hint="Cancelled orders excluded"
           icon={DollarSign}
         />
@@ -139,7 +141,7 @@ export default async function AdminReportsPage({
         />
         <KpiCard
           label="Average order value"
-          value={formatCents(averageOrder)}
+          value={formatCents(averageOrder, currency)}
           hint="Confirmed orders"
           icon={TrendingUp}
         />
@@ -162,7 +164,7 @@ export default async function AdminReportsPage({
             </div>
             <div className="text-right">
               <p className="m-0 text-[15px] font-semibold tabular-nums text-foreground">
-                {formatCents(totalRevenue)}
+                {formatCents(totalRevenue, currency)}
               </p>
               <p className="m-0 text-[11px] text-muted-foreground">{totalOrders} orders</p>
             </div>
@@ -176,7 +178,7 @@ export default async function AdminReportsPage({
               </div>
             </div>
           ) : (
-            <SalesChart points={series} granularity="day" />
+            <SalesChart points={series} granularity="day" currency={currency} />
           )}
         </Card>
 
@@ -217,7 +219,7 @@ export default async function AdminReportsPage({
                       <Td className="tabular-nums text-muted-foreground">{index + 1}</Td>
                       <Td className="max-w-[320px] truncate font-medium text-foreground" >{row.title}</Td>
                       <Td className="text-right tabular-nums">{row.units_sold}</Td>
-                      <Td className="text-right tabular-nums font-medium">{formatCents(row.revenue_cents)}</Td>
+                      <Td className="text-right tabular-nums font-medium">{formatCents(row.revenue_cents, currency)}</Td>
                     </Tr>
                   ))}
                 </TBody>

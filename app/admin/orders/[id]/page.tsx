@@ -10,6 +10,7 @@ import { OrderNotes } from "./OrderNotes";
 import { OrderItems } from "./OrderItems";
 import { deliveryLabel, paymentLabel } from "@/lib/server/orders";
 import { formatCents } from "@/lib/server/admin-data";
+import { getStoreCurrency } from "@/lib/server/store-currency";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   if (!isUuid(id)) notFound();
   const session = await requireAdmin();
   const db = adminClient(session);
+  const currency = await getStoreCurrency();
 
   const order = await getOrderDetail(db, id);
   if (!order) notFound();
@@ -80,15 +82,15 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             </div>
             <div className="admin-definition-row">
               <dt>Subtotal</dt>
-              <dd>{order.subtotal ? formatCents(order.subtotal) : "—"}</dd>
+              <dd>{order.subtotal ? formatCents(order.subtotal, currency) : "—"}</dd>
             </div>
             <div className="admin-definition-row">
               <dt>Shipping</dt>
-              <dd>{order.shipping ? formatCents(order.shipping) : "—"}</dd>
+              <dd>{order.shipping ? formatCents(order.shipping, currency) : "—"}</dd>
             </div>
             <div className="admin-definition-row admin-definition-row--total">
               <dt>Total</dt>
-              <dd><strong>{formatCents(order.total)}</strong></dd>
+              <dd><strong>{formatCents(order.total, currency)}</strong></dd>
             </div>
           </dl>
         </section>
@@ -97,7 +99,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           <div className="admin-card-header">
             <h2>Items</h2>
           </div>
-          <OrderItems items={order.order_items} />
+          <OrderItems items={order.order_items} currency={currency} />
         </section>
 
         <section className="admin-card">

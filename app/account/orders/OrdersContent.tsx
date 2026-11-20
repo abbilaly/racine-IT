@@ -25,7 +25,7 @@ const STATUS_ORDER: Record<string, number> = {
   delivered: 4,
 };
 
-export default function OrdersContent() {
+export default function OrdersContent({ currency }: { currency: string }) {
   const { session, refresh, loading: sessionLoading } = useCustomerSession();
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
   const [total, setTotal] = useState(0);
@@ -132,17 +132,17 @@ export default function OrdersContent() {
                   <div className="order-totals">
                     <div className="order-total-row">
                       <span>Subtotal</span>
-                      <span>{formatPrice(order.subtotal)}</span>
+                      <span>{formatPrice(order.subtotal, currency)}</span>
                     </div>
                     {order.shipping > 0 && (
                       <div className="order-total-row">
                         <span>Shipping</span>
-                        <span>{formatPrice(order.shipping)}</span>
+                        <span>{formatPrice(order.shipping, currency)}</span>
                       </div>
                     )}
                     <div className="order-total-row order-total-final">
                       <span>Total</span>
-                      <span>{formatPrice(order.total)}</span>
+                      <span>{formatPrice(order.total, currency)}</span>
                     </div>
                   </div>
                   <Link href={`/account/order/${order.id}`} className="btn-outline">

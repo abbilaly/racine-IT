@@ -13,9 +13,11 @@ interface OrderItemsProps {
     line_total: number;
     snapshot: Record<string, unknown> | null;
   }>;
+  /** ISO currency code used to label unit prices and line totals. */
+  currency: string;
 }
 
-export function OrderItems({ items }: OrderItemsProps) {
+export function OrderItems({ items, currency }: OrderItemsProps) {
   if (items.length === 0) {
     return (
       <div className="admin-empty">
@@ -63,8 +65,8 @@ export function OrderItems({ items }: OrderItemsProps) {
                     {item.qty}
                   </span>
                 </td>
-                <td className="admin-table-right">{formatCents(unitPrice)}</td>
-                <td className="admin-table-right">{formatCents(lineTotal)}</td>
+                <td className="admin-table-right">{formatCents(unitPrice, currency)}</td>
+                <td className="admin-table-right">{formatCents(lineTotal, currency)}</td>
                 <td className="admin-table-actions">
                   {isDigital ? (
                     <AdminBadgeStatus status="digital" />

@@ -1,6 +1,6 @@
 import { formatCents, type BestSellerRow } from "@/lib/server/admin-data";
 
-export function TopProducts({ rows }: { rows: BestSellerRow[] }) {
+export function TopProducts({ rows, currency }: { rows: BestSellerRow[]; currency: string }) {
   if (rows.length === 0) {
     return <p className="m-0 py-6 text-center text-[13px] text-muted-foreground">No product sales in this period.</p>;
   }
@@ -20,7 +20,7 @@ export function TopProducts({ rows }: { rows: BestSellerRow[] }) {
               {row.units_sold} sold
             </span>
             <span className="w-16 shrink-0 text-right text-[12px] font-medium tabular-nums text-foreground">
-              {formatCents(row.revenue_cents)}
+              {formatCents(row.revenue_cents, currency)}
             </span>
           </div>
           <div className="ml-6 h-1.5 overflow-hidden rounded-full bg-muted">

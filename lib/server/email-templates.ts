@@ -1,10 +1,11 @@
+import { formatCents, formatMoney } from "@/lib/currency";
 import type { OrderTemplateParams } from "./email-templates-types";
 import type { QuotationTemplateParams } from "./email-templates-types";
 
 export type { OrderTemplateParams, QuotationTemplateParams } from "./email-templates-types";
 
 export function orderConfirmationTemplate(params: OrderTemplateParams): string {
-  const { storeName, ref, customerName, items, shipping, total, customer } = params;
+  const { storeName, ref, customerName, items, shipping, total, customer, currency } = params;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -43,8 +44,8 @@ export function orderConfirmationTemplate(params: OrderTemplateParams): string {
                   <tr>
                     <td style="padding:8px 0;font-size:14px">${escapeHtml(item.title)}</td>
                     <td style="padding:8px 0;font-size:14px;text-align:right">${item.qty}</td>
-                    <td style="padding:8px 0;font-size:14px;text-align:right">$${item.price.toFixed(2)}</td>
-                    <td style="padding:8px 0;font-size:14px;text-align:right">$${item.total.toFixed(2)}</td>
+                    <td style="padding:8px 0;font-size:14px;text-align:right">${formatMoney(item.price, currency)}</td>
+                    <td style="padding:8px 0;font-size:14px;text-align:right">${formatMoney(item.total, currency)}</td>
                   </tr>
                   `
                     )
@@ -54,15 +55,15 @@ export function orderConfirmationTemplate(params: OrderTemplateParams): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;border-collapse:collapse">
                 <tr>
                   <td style="padding:4px 0;font-size:14px">Subtotal</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right">$${((items.reduce((sum, i) => sum + i.total, 0) / 100) * 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right">${formatMoney(items.reduce((sum, i) => sum + i.total, 0), currency)}</td>
                 </tr>
                 <tr>
                   <td style="padding:4px 0;font-size:14px">Shipping</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right">$${(shipping / 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right">${formatCents(shipping, currency)}</td>
                 </tr>
                 <tr>
                   <td style="padding:4px 0;font-size:14px">Total</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right">$${(total / 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right">${formatCents(total, currency)}</td>
                 </tr>
               </table>
               <p style="margin:16px 0 0;font-size:14px;color:#555555">
@@ -100,6 +101,7 @@ export function quotationTemplate(params: QuotationTemplateParams): string {
     validUntil,
     notes,
     terms,
+    currency,
   } = params;
 
   return `<!DOCTYPE html>
@@ -146,8 +148,8 @@ export function quotationTemplate(params: QuotationTemplateParams): string {
                   <tr>
                     <td style="padding:8px 0;font-size:14px">${escapeHtml(item.title)}</td>
                     <td style="padding:8px 0;font-size:14px;text-align:right">${item.qty}</td>
-                    <td style="padding:8px 0;font-size:14px;text-align:right">$${(item.price / 100).toFixed(2)}</td>
-                    <td style="padding:8px 0;font-size:14px;text-align:right">$${(item.total / 100).toFixed(2)}</td>
+                    <td style="padding:8px 0;font-size:14px;text-align:right">${formatCents(item.price, currency)}</td>
+                    <td style="padding:8px 0;font-size:14px;text-align:right">${formatCents(item.total, currency)}</td>
                   </tr>
                   `
                     )
@@ -157,15 +159,15 @@ export function quotationTemplate(params: QuotationTemplateParams): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;border-collapse:collapse">
                 <tr>
                   <td style="padding:4px 0;font-size:14px">Subtotal</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right">$${(subtotal / 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right">${formatCents(subtotal, currency)}</td>
                 </tr>
                 <tr>
                   <td style="padding:4px 0;font-size:14px">Tax</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right">$${(tax / 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right">${formatCents(tax, currency)}</td>
                 </tr>
                 <tr>
                   <td style="padding:4px 0;font-size:14px;font-weight:bold">Total</td>
-                  <td style="padding:4px 0;font-size:14px;text-align:right;font-weight:bold">$${(total / 100).toFixed(2)}</td>
+                  <td style="padding:4px 0;font-size:14px;text-align:right;font-weight:bold">${formatCents(total, currency)}</td>
                 </tr>
               </table>
               ${notes ? `<p style="margin:16px 0 0;font-size:13px;color:#555555">${escapeHtml(notes)}</p>` : ""}
