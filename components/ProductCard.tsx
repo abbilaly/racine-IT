@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
-import { imageUrl, type Product } from "@/lib/products";
+import { imageUrl, isDraftPreview, type Product } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, money } = useShop();
   const wished = inWishlist(product.slug);
   const compared = inCompare(product.slug);
+  // Draft review listings are display-only until the owner approves price and stock.
+  const draft = isDraftPreview(product);
 
   return (
     <article className="product-card">
@@ -36,8 +38,8 @@ export default function ProductCard({ product }: { product: Product }) {
           <img className="product-primary" src={imageUrl(product.image)} alt={product.title} loading="lazy" />
           <img className="product-secondary" src={imageUrl(product.hover)} alt="" loading="lazy" />
         </Link>
-        <button className="quick-add" onClick={() => addToCart(product.slug)}>
-          <ShoppingCart size={13} /> Add to Cart
+        <button className="quick-add" disabled={draft} onClick={() => addToCart(product.slug)}>
+          <ShoppingCart size={13} /> {draft ? "Preview only" : "Add to Cart"}
         </button>
       </div>
       <div className="product-copy">

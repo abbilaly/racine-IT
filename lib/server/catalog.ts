@@ -1,5 +1,6 @@
 import { cache } from "react";
 import {
+  PLACEHOLDER_IMAGE,
   productMap,
   seedCatalog,
   type Catalog,
@@ -109,7 +110,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
       )
       .eq("is_active", true)
       .order("created_at"),
-    supabase.from("product_images").select("product_id,kind,path").in("kind", ["primary", "hover"]),
+    supabase.from("product_images").select("product_id,kind,path,position").in("kind", ["primary", "hover", "gallery"]),
     supabase.from("inventory").select("product_id,variant_id,on_hand"),
     // Real colourways live in the variant options ({"colour": "Pink", ...}),
     // which is what the admin editor writes. One extra query per request; the
@@ -132,11 +133,13 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
     label: row.label
   }));
 
-  const imagesByProduct = new Map<string, { primary?: string; hover?: string }>();
+  type ImageSet = { primary?: string; hover?: string; gallery: string[] };
+  const imagesByProduct = new Map<string, ImageSet>();
   for (const row of (imagesRes.data ?? []) as ImageRow[]) {
-    const entry = imagesByProduct.get(row.product_id) ?? {};
+    const entry: ImageSet = imagesByProduct.get(row.product_id) ?? { gallery: [] };
     if (row.kind === "primary") entry.primary = row.path;
-    else entry.hover = row.path;
+    else if (row.kind === "hover") entry.hover = row.path;
+    else entry.gallery.push(row.path);
     imagesByProduct.set(row.product_id, entry);
   }
 
@@ -165,7 +168,7 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
   }
 
   const products: Product[] = ((productsRes.data ?? []) as ProductRow[]).map(row => {
-    const images = imagesByProduct.get(row.id) ?? {};
+    const images: ImageSet = imagesByProduct.get(row.id) ?? { gallery: [] };
     const fallback = productMap[row.slug];
     const relation = Array.isArray(row.category) ? row.category[0] : row.category;
     const categorySlug = (relation as { slug?: string } | null | undefined)?.slug ?? "";
@@ -182,8 +185,10 @@ async function fetchCatalogFromSupabase(): Promise<Catalog | null> {
       ...(brandName ? { brand: brandName } : {}),
       ...(row.origin ? { origin: row.origin } : {}),
       ...(colours.length > 0 ? { colours } : {}),
-      image: images.primary ?? fallback?.image ?? "",
-      hover: images.hover ?? images.primary ?? fallback?.hover ?? "",
+      // `||` (not `??`) so an empty path also falls through to the placeholder.
+      image: images.primary || fallback?.image || PLACEHOLDER_IMAGE,
+      hover: images.hover || images.primary || fallback?.hover || PLACEHOLDER_IMAGE,
+      ...(images.gallery.length > 0 ? { gallery: images.gallery } : {}),
       price: row.price_cents / 100,
       ...(row.compare_at_price_cents != null ? { oldPrice: row.compare_at_price_cents / 100 } : {}),
       ...(row.badge ? { badge: row.badge } : {}),

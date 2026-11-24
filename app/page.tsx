@@ -1,5 +1,6 @@
 import HomeView, { type HomeSlide } from "@/components/HomeView";
 import { requireCatalog } from "@/lib/server/catalog";
+import { isDraftPreview } from "@/lib/products";
 import { bannerImageUrl, listPublicBanners } from "@/lib/server/banners";
 import { listBestSellers } from "@/lib/server/best-sellers";
 
@@ -37,7 +38,7 @@ export default async function HomePage() {
 
   // Newest rows, by the timestamp the catalogue records.
   const newArrivalSlugs = catalog.products
-    .filter(product => product.createdAt)
+    .filter(product => product.createdAt && !isDraftPreview(product))
     .slice()
     .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
     .slice(0, 5)

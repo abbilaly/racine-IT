@@ -50,7 +50,10 @@ export default function ProductDetail({ product }: { product: Product }) {
   const wished = inWishlist(product.slug);
   const compared = inCompare(product.slug);
   const compareFull = !compared && compare.length >= MAX_COMPARE;
-  const gallery = [product.image, product.hover];
+  // Draft products share one fallback image, so do not show a duplicate thumbnail.
+  const gallery = [product.image, product.hover, ...(product.gallery ?? [])].filter(
+    (file, index, all) => Boolean(file) && all.indexOf(file) === index
+  );
   const saving = product.oldPrice ? product.oldPrice - product.price : 0;
 
   return (
@@ -58,18 +61,20 @@ export default function ProductDetail({ product }: { product: Product }) {
       <div className="pd-gallery">
         {product.badge && <span className="sale-badge">{product.badge}</span>}
         <img src={imageUrl(main)} alt={product.title} />
-        <div className="pd-thumbs">
-          {gallery.map(file => (
-            <button
-              key={file}
-              className={main === file ? "is-on" : ""}
-              onClick={() => setMain(file)}
-              aria-label="Show image"
-            >
-              <img src={imageUrl(file)} alt="" />
-            </button>
-          ))}
-        </div>
+        {gallery.length > 1 && (
+          <div className="pd-thumbs">
+            {gallery.map(file => (
+              <button
+                key={file}
+                className={main === file ? "is-on" : ""}
+                onClick={() => setMain(file)}
+                aria-label="Show image"
+              >
+                <img src={imageUrl(file)} alt="" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="pd-info">

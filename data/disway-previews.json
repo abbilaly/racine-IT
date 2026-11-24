@@ -1,0 +1,4101 @@
+{
+ "supplier": "Disway",
+ "note": "Draft review listings. Experimental MAD prices; not supplier quotes. No stock created.",
+ "products": [
+  {
+   "slug": "disway-preview-desktops-06190034-6190034n-gp",
+   "title": "HUAWEI DESKTOP SLIM 1 Intel i7-12700 16 Go 512 Go SSD W11P Wifi Bluetooth Gris 12M OPS",
+   "category": "desktops",
+   "image": "/images/disway/disway-preview-desktops-06190034-6190034n-gp-1.webp",
+   "hover": "/images/disway/disway-preview-desktops-06190034-6190034n-gp-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-desktops-06190034-6190034n-gp-3.webp"
+   ],
+   "price": 4200,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Compact Huawei desktop with a 12-core Intel Core i7-12700, 16 GB DDR4 and a 512 GB NVMe SSD.",
+   "description": [
+    "Compact Huawei desktop with a 12-core Intel Core i7-12700, 16 GB DDR4 and a 512 GB NVMe SSD.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "06190034 (6190034N-GP)"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ i7-12700 (12ᵉ génération, jusqu'à 4,9 GHz, 12 cœurs, 20 threads, 25 Mo de cache L3)"
+    ],
+    [
+     "Chipset",
+     "Intel® H610"
+    ],
+    [
+     "Carte graphique",
+     "Intel® UHD Graphics 770 intégrée (jusqu'à 1,5 GHz, sortie HDMI 4096 x 2160 @ 60 Hz)"
+    ],
+    [
+     "Mémoire vive (RAM)",
+     "16 Go DDR4 (2 x 8 Go), double canal"
+    ],
+    [
+     "Slots mémoire",
+     "2 DIMM DDR4"
+    ],
+    [
+     "Stockage",
+     "512 Go SSD M.2 NVMe"
+    ],
+    [
+     "Slot stockage",
+     "1x M.2 2230"
+    ],
+    [
+     "Alimentation",
+     "Adaptateur externe 19 V / 4,74 A, 90 W (via connecteur DC_IN ou broches JAE 80)"
+    ],
+    [
+     "Logiciels inclus",
+     "Client IdeaShare Server pré-installé (lien de téléchargement fourni par HUAWEI)"
+    ],
+    [
+     "Wi-Fi & Bluetooth",
+     "Wi-Fi 6 (802.11 a/b/g/n/ac/ax) et Bluetooth 5.2"
+    ],
+    [
+     "Ports",
+     "3x USB 3.0 3x USB 2.0 1x HDMI 1.4 (sortie vidéo autonome) 1x sortie audio (Line Out) 1x entrée microphone (Mic In) 1x bouton d'alimentation 1x bouton de restauration"
+    ],
+    [
+     "Docking",
+     "Connecteur arrière standard JAE 80 broches (spécification OPS-C) : alimentation + vidéo HDMI 2.0 transmises à l'écran hôte"
+    ],
+    [
+     "Expansion",
+     "1x M.2 2230 dédié au module Wi-Fi/Bluetooth"
+    ],
+    [
+     "Dimensions (l x p x h)",
+     "195 x 180 x 30 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "06190034 (6190034N-GP)",
+    "url": "https://www.disway.com/huawei-desktop-slim-1-intel-i7-12700-16-go-512-go-06190034",
+    "catalogueTitle": "HUAWEI DESKTOP SLIM 1 Intel i7-12700 16 Go 512 Go SSD W11P Wifi Bluetooth Gris 12M OPS"
+   },
+   "images": [
+    "/images/disway/disway-preview-desktops-06190034-6190034n-gp-1.webp",
+    "/images/disway/disway-preview-desktops-06190034-6190034n-gp-2.webp",
+    "/images/disway/disway-preview-desktops-06190034-6190034n-gp-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-servers-p65395-421",
+   "title": "HPE DL20G11 4SFF E-2434 3.4G 4c 16GB RAID-SATA-VROC 4p-1GbE-BCM5719 800wT 36M",
+   "category": "servers",
+   "image": "/images/disway/disway-preview-servers-p65395-421-1.webp",
+   "hover": "/images/disway/disway-preview-servers-p65395-421-1.webp",
+   "gallery": [],
+   "price": 14540,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "1U rack server with an Intel E-2434 4-core processor, 16 GB RAM and HPE RAID/VROC storage control.",
+   "description": [
+    "1U rack server with an Intel E-2434 4-core processor, 16 GB RAM and HPE RAID/VROC storage control.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "P65395-421"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ],
+    [
+     "RAM",
+     "16 Go"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Format Serveur",
+     "Rackable"
+    ],
+    [
+     "Rack Units",
+     "1U"
+    ],
+    [
+     "CPU Sockets",
+     "1"
+    ],
+    [
+     "Processeur Serveur",
+     "Intel"
+    ],
+    [
+     "Nombre de cœurs",
+     "4"
+    ],
+    [
+     "Fréquence processeur",
+     "3.4 GHZ GHz"
+    ],
+    [
+     "Type Raid",
+     "Software"
+    ],
+    [
+     "HDD Form Factor",
+     "SFF"
+    ],
+    [
+     "Drive Bays",
+     "4"
+    ],
+    [
+     "Connectivité LAN",
+     "1 Gb Ethernet"
+    ],
+    [
+     "Connectivité SAN",
+     "NA"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "P65395-421",
+    "url": "https://www.disway.com/hpe-dl20g11-4sff-e-2434-3-4g-4c-16gb-raid-sata-vro-p65395--421",
+    "catalogueTitle": "HPE DL20G11 4SFF E-2434 3.4G 4c 16GB RAID-SATA-VROC 4p-1GbE-BCM5719 800wT 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-servers-p65395-421-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-networking-98012196",
+   "title": "HUAWEI S110-24T2SR (24*10/100/1000BASE-T ports, 2*GE SFP ports, AC power)",
+   "category": "networking",
+   "image": "/images/disway/disway-preview-networking-98012196-1.webp",
+   "hover": "/images/disway/disway-preview-networking-98012196-1.webp",
+   "gallery": [],
+   "price": 1980,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Unmanaged 24-port Gigabit switch with two GE SFP uplinks and built-in AC power.",
+   "description": [
+    "Unmanaged 24-port Gigabit switch with two GE SFP uplinks and built-in AC power.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "98012196"
+    ],
+    [
+     "Marque",
+     "HUAWEI"
+    ],
+    [
+     "Garantie",
+     "24 Mois"
+    ],
+    [
+     "Type de Switch",
+     "SMB"
+    ],
+    [
+     "POE",
+     "Non"
+    ],
+    [
+     "Downlink Port Speed",
+     "1 Gb"
+    ],
+    [
+     "Uplink Port Speed",
+     "1 Gb"
+    ],
+    [
+     "Stackable",
+     "Non"
+    ],
+    [
+     "Nombre de ports Uplink",
+     "2"
+    ],
+    [
+     "Type de ports Uplink",
+     "SFP"
+    ],
+    [
+     "Managed",
+     "Unmanaged"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "98012196",
+    "url": "https://www.disway.com/huawei-s110-24t2sr-24-12-10-3-100-3-1000base-t-por-98012196",
+    "catalogueTitle": "HUAWEI S110-24T2SR (24*10/100/1000BASE-T ports, 2*GE SFP ports, AC power)"
+   },
+   "images": [
+    "/images/disway/disway-preview-networking-98012196-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-components-ad4s320016g22-sgn",
+   "title": "ADATA 16GB Single DDR4 3200Mhz CL22 PC4-25600 260-Pin SODIMM Memory RAM Single 12M",
+   "category": "components",
+   "image": "/images/disway/disway-preview-components-ad4s320016g22-sgn-1.webp",
+   "hover": "/images/disway/disway-preview-components-ad4s320016g22-sgn-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-components-ad4s320016g22-sgn-3.webp"
+   ],
+   "price": 970,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "16 GB DDR4-3200 SO-DIMM memory module (CL22) for laptops and compact systems.",
+   "description": [
+    "16 GB DDR4-3200 SO-DIMM memory module (CL22) for laptops and compact systems.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "AD4S320016G22-SGN"
+    ],
+    [
+     "Capacité",
+     "16 Go (1 x 16 Go)"
+    ],
+    [
+     "Type",
+     "DDR4 SDRAM"
+    ],
+    [
+     "Format",
+     "SO-DIMM"
+    ],
+    [
+     "Nombre de broches",
+     "260 broches"
+    ],
+    [
+     "Fréquence",
+     "3200 MHz (PC4-25600)"
+    ],
+    [
+     "Latence",
+     "CL22"
+    ],
+    [
+     "Bande passante",
+     "Jusqu'à 25,6 Go/s"
+    ],
+    [
+     "Tension",
+     "1,2 V (VDD/VDDQ)"
+    ],
+    [
+     "Standard",
+     "JEDEC"
+    ],
+    [
+     "Usage",
+     "Ordinateurs portables et mini pc"
+    ],
+    [
+     "Plateformes",
+     "Intel Core 8e/9e/10e génération, AMD Ryzen ZEN 2e/3e génération"
+    ],
+    [
+     "Température de fonctionnement",
+     "0 °C à 85 °C"
+    ],
+    [
+     "Normes",
+     "JEDEC, RoHS"
+    ],
+    [
+     "Garantie",
+     "12 mois"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "AD4S320016G22-SGN",
+    "url": "https://www.disway.com/adata-16gb-single-ddr4-3200mhz-cl22-pc4-25600-260-ad4s320016g22--sgn",
+    "catalogueTitle": "ADATA 16GB Single DDR4 3200Mhz CL22 PC4-25600 260-Pin SODIMM Memory RAM Single 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-components-ad4s320016g22-sgn-1.webp",
+    "/images/disway/disway-preview-components-ad4s320016g22-sgn-2.webp",
+    "/images/disway/disway-preview-components-ad4s320016g22-sgn-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-gaming-83l3003jfe",
+   "title": "LENOVO Legion Go S 8ARP1 RYZEN-Z2 10FHD 32Go 1To SSD W11H Black casse 12M",
+   "category": "gaming",
+   "image": "/images/disway/disway-preview-gaming-83l3003jfe-1.webp",
+   "hover": "/images/disway/disway-preview-gaming-83l3003jfe-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-gaming-83l3003jfe-3.webp"
+   ],
+   "price": 2560,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Handheld gaming PC with an AMD Ryzen Z2 processor, 32 GB LPDDR5X and a 1 TB NVMe SSD.",
+   "description": [
+    "Handheld gaming PC with an AMD Ryzen Z2 processor, 32 GB LPDDR5X and a 1 TB NVMe SSD.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "83L3003JFE"
+    ],
+    [
+     "Processeur",
+     "AMD Ryzen™ Z2 — 4 cœurs / 8 threads, 3,0 GHz base / 4,3 GHz boost, 2 Mo L2 + 8 Mo L3"
+    ],
+    [
+     "Architecture CPU",
+     "AMD Zen 3"
+    ],
+    [
+     "Graphique intégré",
+     "AMD Radeon™ Graphics (RDNA 3.5), mémoire partagée"
+    ],
+    [
+     "Chipset",
+     "AMD SoC (System on Chip)"
+    ],
+    [
+     "Mémoire vive (RAM)",
+     "32 Go LPDDR5X-6400, soudée (non évolutive)"
+    ],
+    [
+     "Stockage",
+     "1 To SSD M.2 2242 PCIe® NVMe® Gen 4×4"
+    ],
+    [
+     "Lecteur de carte",
+     "microSD"
+    ],
+    [
+     "Écran",
+     "8\" IPS WUXGA (1920×1200), 16:10, tactile multi-touch 10 points"
+    ],
+    [
+     "Luminosité",
+     "500 nits"
+    ],
+    [
+     "Taux de rafraîchissement",
+     "48–120 Hz VRR adaptatif"
+    ],
+    [
+     "Contraste",
+     "1200:1"
+    ],
+    [
+     "Gamut couleur",
+     "100 % sRGB"
+    ],
+    [
+     "Protection",
+     "Verre Panda King, anti-empreintes, TÜV Rheinland® Low Blue Light"
+    ],
+    [
+     "Ratio écran/façade",
+     "83 % AAR"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "83L3003JFE",
+    "url": "https://www.disway.com/lenovo-legion-go-s-8arp1-ryzen-z2-10fhd-32go-1to-s-83l3003jfe",
+    "catalogueTitle": "LENOVO Legion Go S 8ARP1 RYZEN-Z2 10FHD 32Go 1To SSD W11H Black casse 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-gaming-83l3003jfe-1.webp",
+    "/images/disway/disway-preview-gaming-83l3003jfe-2.webp",
+    "/images/disway/disway-preview-gaming-83l3003jfe-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-printers-3pz15a",
+   "title": "HP LaserJet M406dn — mono A4 laser printer, 38 ppm",
+   "category": "printers",
+   "image": "/images/placeholder-product.svg",
+   "hover": "/images/placeholder-product.svg",
+   "gallery": [],
+   "price": 2300,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Mono A4 laser printer, up to 38 ppm, with automatic duplex printing up to 31 ipm.",
+   "description": [
+    "Mono A4 laser printer, up to 38 ppm, with automatic duplex printing up to 31 ipm.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "3PZ15A"
+    ],
+    [
+     "Technologie d'impression",
+     "Laser"
+    ],
+    [
+     "Vitesse d'impression (noir, A4)",
+     "Jusqu'à 38 ppm (40 ppm en mode haute vitesse)"
+    ],
+    [
+     "Vitesse d'impression (noir, Lettre)",
+     "Jusqu'à 40 ppm (42 ppm en mode haute vitesse)"
+    ],
+    [
+     "Vitesse recto verso (A4)",
+     "Jusqu'à 31 ipm"
+    ],
+    [
+     "Première page imprimée",
+     "Dès 6,3 s"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "3PZ15A",
+    "url": "https://www.disway.com/hp-laser-m406dn-sfp-non-mono-a4-non-38-b-1-wppm-38-3pz15a",
+    "catalogueTitle": "HP LaserJet M406dn — mono A4 laser printer, 38 ppm"
+   },
+   "images": [
+    "/images/placeholder-product.svg"
+   ]
+  },
+  {
+   "slug": "disway-preview-monitors-90lm02w0-b01171",
+   "title": "ASUS Moniteur VA249HG 24-inch'' 12Mois (23.8-inch viewable) IPS Full HD 99% sRGB Frameless 120Hz A",
+   "category": "monitors",
+   "image": "/images/disway/disway-preview-monitors-90lm02w0-b01171-1.webp",
+   "hover": "/images/disway/disway-preview-monitors-90lm02w0-b01171-2.webp",
+   "gallery": [],
+   "price": 1740,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "23.8-inch Full HD IPS monitor with a 120 Hz refresh rate and 1 ms MPRT response.",
+   "description": [
+    "23.8-inch Full HD IPS monitor with a 120 Hz refresh rate and 1 ms MPRT response.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "90LM02W0-B01171"
+    ],
+    [
+     "Taille",
+     "23,8 pouces (viewable)"
+    ],
+    [
+     "Résolution",
+     "1920 x 1080 (FHD) — 16:9"
+    ],
+    [
+     "Type de dalle",
+     "IPS, sans bords, rétroéclairage LED"
+    ],
+    [
+     "Luminosité",
+     "300 cd/m²"
+    ],
+    [
+     "Contraste",
+     "1500:1 (typique) / 3000:1 (max)"
+    ],
+    [
+     "Taux de rafraîchissement",
+     "120 Hz"
+    ],
+    [
+     "Temps de réponse",
+     "1 ms MPRT"
+    ],
+    [
+     "Angle de vision",
+     "178° H / 178° V"
+    ],
+    [
+     "Couverture colorimétrique",
+     "99% sRGB — 16,7 millions de couleurs"
+    ],
+    [
+     "Pas de pixel",
+     "0,2745 mm"
+    ],
+    [
+     "Surface d'écran",
+     "Anti-reflet"
+    ],
+    [
+     "Adaptive-Sync",
+     "Oui (VRR)"
+    ],
+    [
+     "Technologie Eye Care",
+     "Low Blue Light / Flicker-free (TÜV Rheinland certifié)"
+    ],
+    [
+     "Logiciel",
+     "ASUS DisplayWidget Center"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "90LM02W0-B01171",
+    "url": "https://www.disway.com/asus-moniteur-va249hg-24-inch-12mois-23-8-inch-vie-90lm02w0--b01171",
+    "catalogueTitle": "ASUS Moniteur VA249HG 24-inch'' 12Mois (23.8-inch viewable) IPS Full HD 99% sRGB Frameless 120Hz A"
+   },
+   "images": [
+    "/images/disway/disway-preview-monitors-90lm02w0-b01171-1.webp",
+    "/images/disway/disway-preview-monitors-90lm02w0-b01171-2.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-peripherals-1y4d0ut",
+   "title": "HP 235 Wireless Mouse and Keyboard Combo",
+   "category": "peripherals",
+   "image": "/images/placeholder-product.svg",
+   "hover": "/images/placeholder-product.svg",
+   "gallery": [],
+   "price": 550,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Wireless keyboard and mouse combo with a full-size chiclet layout and a 1600 dpi optical sensor.",
+   "description": [
+    "Wireless keyboard and mouse combo with a full-size chiclet layout and a 1600 dpi optical sensor.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "1Y4D0UT"
+    ],
+    [
+     "Type",
+     "Pleine taille, disposition 3 zones, style chiclet"
+    ],
+    [
+     "Structure des touches",
+     "Piston, course basse de 2,5 mm"
+    ],
+    [
+     "Touches de fonction",
+     "12 touches activables en un clic"
+    ],
+    [
+     "Voyants",
+     "Verr. Maj, Verr. Num, Arrêt défil."
+    ],
+    [
+     "Caractéristiques",
+     "Pieds d'inclinaison"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "1Y4D0UT",
+    "url": "https://www.disway.com/hp-235-wireless-mouse-and-keyboard-combo-12m-1y4d0ut",
+    "catalogueTitle": "HP 235 Wireless Mouse and Keyboard Combo"
+   },
+   "images": [
+    "/images/placeholder-product.svg"
+   ]
+  },
+  {
+   "slug": "disway-preview-software-ep2-06659",
+   "title": "Microsoft Office Home and Business 2024 French Africa Only",
+   "category": "software",
+   "image": "/images/disway/disway-preview-software-ep2-06659-1.webp",
+   "hover": "/images/disway/disway-preview-software-ep2-06659-1.webp",
+   "gallery": [],
+   "price": 1940,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Microsoft Office Home & Business 2024, French language, Africa edition.",
+   "description": [
+    "Microsoft Office Home & Business 2024, French language, Africa edition.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "EP2-06659"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "EP2-06659",
+    "url": "https://www.disway.com/microsoft-office-home-and-business-2024-french-afr-ep2--06659",
+    "catalogueTitle": "Microsoft Office Home and Business 2024 French Africa Only"
+   },
+   "images": [
+    "/images/disway/disway-preview-software-ep2-06659-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-power-be850g2-fr",
+   "title": "APC Back-UPS 850VA — 230V, USB Type-C/A",
+   "category": "power",
+   "image": "/images/placeholder-product.svg",
+   "hover": "/images/placeholder-product.svg",
+   "gallery": [],
+   "price": 1130,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "850 VA offline UPS with 230 V output and USB Type-C / USB-A charging ports.",
+   "description": [
+    "850 VA offline UPS with 230 V output and USB Type-C / USB-A charging ports.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "BE850G2-FR"
+    ],
+    [
+     "Marque",
+     "APC"
+    ],
+    [
+     "Garantie",
+     "12 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Offline"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "BE850G2-FR",
+    "url": "https://www.disway.com/onduleur/onduleur__standby/apc-back-ups-850va-230v-usb-type-c-and-a-charginng-be850g2--fr",
+    "catalogueTitle": "APC Back-UPS 850VA — 230V, USB Type-C/A"
+   },
+   "images": [
+    "/images/placeholder-product.svg"
+   ]
+  },
+  {
+   "slug": "disway-preview-computers-21nu00k6fe",
+   "title": "LENOVO Thinkpad X1 2-in-1 G10 LNL 14 touch'' Intel u7-258V 32Go 1 To SSD W11P Noir 36M Yoga Pen",
+   "category": "computers",
+   "image": "/images/disway/disway-preview-computers-21nu00k6fe-1.webp",
+   "hover": "/images/disway/disway-preview-computers-21nu00k6fe-1.webp",
+   "gallery": [],
+   "price": 7020,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO Thinkpad X1 2-in-1 G10 LNL 14 touch'' Intel u7-258V 32Go 1 To SSD W11P Noir 36M Yoga Pen — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO Thinkpad X1 2-in-1 G10 LNL 14 touch'' Intel u7-258V 32Go 1 To SSD W11P Noir 36M Yoga Pen — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "21NU00K6FE"
+    ],
+    [
+     "Processeur",
+     "Intel Core™ Ultra 7 258V, 8C (4P + 4LPE) / 8T, Max Turbo up to 4.8GHz"
+    ],
+    [
+     "Catégorie AI PC",
+     "Copilot+ PC"
+    ],
+    [
+     "NPU",
+     "Intel® AI Boost jusqu'à 47 TOPS"
+    ],
+    [
+     "Carte graphique",
+     "Intel® Arc™ Graphics 140V"
+    ],
+    [
+     "Chipset",
+     "Intel® SoC Platform"
+    ],
+    [
+     "Mémoire",
+     "32GB LPDDR5x-8533 soudée"
+    ],
+    [
+     "Slots mémoire",
+     "Aucun (dual-channel)"
+    ],
+    [
+     "Mémoire max",
+     "32GB non extensible"
+    ],
+    [
+     "Stockage",
+     "1TB SSD M.2 PCIe® 4.0 NVMe®"
+    ],
+    [
+     "Slot stockage",
+     "1x M.2 2280 PCIe® 5.0"
+    ],
+    [
+     "Stockage max",
+     "Jusqu'à 2TB SSD"
+    ],
+    [
+     "Lecteur carte",
+     "Non"
+    ],
+    [
+     "Audio (chip)",
+     "Realtek® ALC713"
+    ],
+    [
+     "Haut-parleurs",
+     "Stereo 2W x2, Dolby Atmos®"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "21NU00K6FE",
+    "url": "https://www.disway.com/lenovo-thinkpad-x1-2-in-1-g10-lnl-14-touch-intel-u-21nu00k6fe",
+    "catalogueTitle": "LENOVO Thinkpad X1 2-in-1 G10 LNL 14 touch'' Intel u7-258V 32Go 1 To SSD W11P Noir 36M Yoga Pen"
+   },
+   "images": [
+    "/images/disway/disway-preview-computers-21nu00k6fe-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-computers-21q6001ffe",
+   "title": "LENOVO LAPTOP Thinkpad X9-15 15,3'' Touch Ultra7-258V 32Go 1To SSD Windows 11 Pro Gris 36 Mois",
+   "category": "computers",
+   "image": "/images/disway/disway-preview-computers-21q6001ffe-1.webp",
+   "hover": "/images/disway/disway-preview-computers-21q6001ffe-1.webp",
+   "gallery": [],
+   "price": 7060,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO LAPTOP Thinkpad X9-15 15,3'' Touch Ultra7-258V 32Go 1To SSD Windows 11 Pro Gris 36 Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO LAPTOP Thinkpad X9-15 15,3'' Touch Ultra7-258V 32Go 1To SSD Windows 11 Pro Gris 36 Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "21Q6001FFE"
+    ],
+    [
+     "Processeur",
+     "Intel Core™ Ultra 7 258V, 8C / 8T, jusqu'à 4.8GHz"
+    ],
+    [
+     "Catégorie AI PC",
+     "Copilot+ PC"
+    ],
+    [
+     "NPU",
+     "Intel® AI Boost jusqu'à 47 TOPS"
+    ],
+    [
+     "Carte graphique",
+     "Intel® Arc™ Graphics 140V"
+    ],
+    [
+     "Chipset",
+     "Intel® SoC Platform"
+    ],
+    [
+     "Mémoire",
+     "32GB LPDDR5X-8533 soudée"
+    ],
+    [
+     "Slots mémoire",
+     "Aucun (dual-channel)"
+    ],
+    [
+     "Mémoire max",
+     "32GB non extensible"
+    ],
+    [
+     "Stockage",
+     "1TB SSD M.2 PCIe® 4.0 NVMe®"
+    ],
+    [
+     "Slot stockage",
+     "1x M.2 2242 PCIe® 4.0"
+    ],
+    [
+     "Stockage max",
+     "Jusqu'à 2TB SSD"
+    ],
+    [
+     "Lecteur carte",
+     "Non"
+    ],
+    [
+     "Audio",
+     "Cirrus Logic® CS42L43, Dolby Atmos®"
+    ],
+    [
+     "Haut-parleurs",
+     "2W x2 woofers + 2W x2 tweeters"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "21Q6001FFE",
+    "url": "https://www.disway.com/lenovo-laptop-thinkpad-x9-15-15-3-touch-ultra7-258-21q6001ffe",
+    "catalogueTitle": "LENOVO LAPTOP Thinkpad X9-15 15,3'' Touch Ultra7-258V 32Go 1To SSD Windows 11 Pro Gris 36 Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-computers-21q6001ffe-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-computers-21y6002kfe",
+   "title": "LENOVO Thinkpad E14 14'' Ultra 5-325 16Go 512Go SSD Freedos Noir 24 Mois Topload Case",
+   "category": "computers",
+   "image": "/images/disway/disway-preview-computers-21y6002kfe-1.webp",
+   "hover": "/images/disway/disway-preview-computers-21y6002kfe-2.webp",
+   "gallery": [],
+   "price": 7100,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO Thinkpad E14 14'' Ultra 5-325 16Go 512Go SSD Freedos Noir 24 Mois Topload Case — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO Thinkpad E14 14'' Ultra 5-325 16Go 512Go SSD Freedos Noir 24 Mois Topload Case — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "21Y6002KFE"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ Ultra 5 325 (Panther Lake), 8 cœurs / 8 threads, 2,1 GHz P-core base, jusqu'à 4,5 GHz Boost, 12 Mo cache, NPU jusqu'à 47 TOPS"
+    ],
+    [
+     "Graphique",
+     "Intel® Graphics (intégré), jusqu'à 40 TOPS"
+    ],
+    [
+     "Mémoire vive",
+     "16 Go DDR5-5600 (2 slots SODIMM) — extensible jusqu'à 64 Go"
+    ],
+    [
+     "Stockage",
+     "512 Go M.2 2242 NVMe™ PCIe® 4.0 SSD (Opal 2.0)"
+    ],
+    [
+     "Écran",
+     "14 pouces WUXGA (1920×1200) 16:10, IPS anti-reflet, 400 nits, 45% NTSC, 60 Hz"
+    ],
+    [
+     "Clavier",
+     "6 rangées, touche Copilot, course 1,5mm, résistant aux éclaboussures"
+    ],
+    [
+     "Navigation",
+     "TrackPoint® + Touchpad 3 boutons Mylar® 60×115 mm"
+    ],
+    [
+     "Dimensions (l × p × h)",
+     "31,3 × 22,03 × 10,1/15,25 mm (max 19,7 mm)"
+    ],
+    [
+     "Poids",
+     "À partir de 1,34 kg"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Système d'exploitation",
+     "FreeDOS"
+    ],
+    [
+     "Wi-Fi & Bluetooth",
+     "Wi-Fi 7 (802.11be) 2×2 + Bluetooth® 5.4"
+    ],
+    [
+     "Ethernet",
+     "1× RJ-45 Gigabit"
+    ],
+    [
+     "Ports",
+     "2× Thunderbolt™ 4 (USB PD, DP 2.1) 1× USB-A 10 Gbps Always On 1× USB-A 5 Gbps 1× HDMI 2.1 1× RJ-45 1× Jack audio combo 3,5 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "21Y6002KFE",
+    "url": "https://www.disway.com/lenovo-thinkpad-e14-14-ultra-5-325-16go-512go-ssd-21y6002kfe",
+    "catalogueTitle": "LENOVO Thinkpad E14 14'' Ultra 5-325 16Go 512Go SSD Freedos Noir 24 Mois Topload Case"
+   },
+   "images": [
+    "/images/disway/disway-preview-computers-21y6002kfe-1.webp",
+    "/images/disway/disway-preview-computers-21y6002kfe-2.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-desktops-12ud009xfm",
+   "title": "LENOVO ThinkCentre Neo 50t TWR i7-14700 8Go 512Go SSD Freedos 24M",
+   "category": "desktops",
+   "image": "/images/disway/disway-preview-desktops-12ud009xfm-1.webp",
+   "hover": "/images/disway/disway-preview-desktops-12ud009xfm-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-desktops-12ud009xfm-3.webp"
+   ],
+   "price": 4440,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO ThinkCentre Neo 50t TWR i7-14700 8Go 512Go SSD Freedos 24M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO ThinkCentre Neo 50t TWR i7-14700 8Go 512Go SSD Freedos 24M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "12UD009XFM"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ i7-14700 (33 Mo cache, 20 cœurs, 28 threads, jusqu'à 5,4 GHz Turbo, 65W) - Intel UHD Graphics 770"
+    ],
+    [
+     "Carte graphique",
+     "Intel® UHD Graphics (intégrée) - GPU discret optionnel (Intel® Arc™ A310 LP 4GB)"
+    ],
+    [
+     "Chipset",
+     "Intel® B760"
+    ],
+    [
+     "Mémoire vive (RAM)",
+     "8 Go DDR5-5600 DIMM (2 slots, extensible jusqu'à 64 Go)"
+    ],
+    [
+     "Slots mémoire",
+     "2x DIMM DDR5"
+    ],
+    [
+     "Stockage",
+     "512 Go SSD M.2 2280 PCIe Gen 4 NVMe"
+    ],
+    [
+     "Stockage max",
+     "1x 3,5'' HDD jusqu'à 2 To + 1x M.2 SSD jusqu'à 1 To"
+    ],
+    [
+     "Audio",
+     "HD Audio Realtek ALC623-CG, haut-parleur 2W intégré (optionnel)"
+    ],
+    [
+     "Alimentation",
+     "180W / 260W / 310W / 380W selon config (100-240V, 50-60Hz)"
+    ],
+    [
+     "Format",
+     "Tower (13,6 litres)"
+    ],
+    [
+     "Dimensions (L x P x H)",
+     "145 x 294 x 340 mm"
+    ],
+    [
+     "Poids",
+     "~5,6 kg"
+    ],
+    [
+     "Couleur produit",
+     "Luna Grey (face) / Raven Black (châssis)"
+    ],
+    [
+     "Matériaux",
+     "85% PCC ABS recyclé (châssis)"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "12UD009XFM",
+    "url": "https://www.disway.com/lenovo-thinkcentre-neo-50t-twr-i7-14700-8go-512go-12ud009xfm",
+    "catalogueTitle": "LENOVO ThinkCentre Neo 50t TWR i7-14700 8Go 512Go SSD Freedos 24M"
+   },
+   "images": [
+    "/images/disway/disway-preview-desktops-12ud009xfm-1.webp",
+    "/images/disway/disway-preview-desktops-12ud009xfm-2.webp",
+    "/images/disway/disway-preview-desktops-12ud009xfm-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-desktops-13b9004sfm",
+   "title": "LENOVO DESKTOP TINY Thinkcenter Neo 50q Intel Core 5-210H 8 Go 512 Go SSD Freedos Noir 36M",
+   "category": "desktops",
+   "image": "/images/disway/disway-preview-desktops-13b9004sfm-1.webp",
+   "hover": "/images/disway/disway-preview-desktops-13b9004sfm-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-desktops-13b9004sfm-3.webp"
+   ],
+   "price": 4200,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO DESKTOP TINY Thinkcenter Neo 50q Intel Core 5-210H 8 Go 512 Go SSD Freedos Noir 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO DESKTOP TINY Thinkcenter Neo 50q Intel Core 5-210H 8 Go 512 Go SSD Freedos Noir 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "13B9004SFM"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ 5 210H (Arrow Lake-H, 8 cœurs 4P+4E, 2,2 GHz à 4,8 GHz P-core, 12 Mo cache, NPU 13 TOPS)"
+    ],
+    [
+     "Carte graphique",
+     "Intel® Graphics (intégrée)"
+    ],
+    [
+     "Mémoire vive (RAM)",
+     "8 Go DDR5-5600 SO-DIMM (2 slots, extensible jusqu'à 64 Go)"
+    ],
+    [
+     "Slots mémoire",
+     "2x SO-DIMM DDR5"
+    ],
+    [
+     "Stockage",
+     "512 Go SSD M.2 2280 PCIe Gen 4 NVMe (Opal 2.0)"
+    ],
+    [
+     "Audio",
+     "Combo audio jack 3,5 mm en façade"
+    ],
+    [
+     "Alimentation",
+     "Adaptateur externe 90W (100-240V)"
+    ],
+    [
+     "Format",
+     "Tiny (1 litre)"
+    ],
+    [
+     "Dimensions",
+     "~182 x 71 x 36 mm"
+    ],
+    [
+     "Poids",
+     "~1,13 kg (environ)"
+    ],
+    [
+     "Couleur produit",
+     "Noir (Raven Black)"
+    ],
+    [
+     "Montage",
+     "Compatible VESA 100x100mm (derrière moniteur)"
+    ],
+    [
+     "Système d'exploitation",
+     "FreeDOS"
+    ],
+    [
+     "Wi-Fi & Bluetooth",
+     "Wi-Fi 6 (Intel AX203, 802.11ax) + Bluetooth 5.2 ou Wi-Fi 7 (optionnel)"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "13B9004SFM",
+    "url": "https://www.disway.com/lenovo-desktop-tiny-thinkcenter-neo-50q-intel-core-13b9004sfm",
+    "catalogueTitle": "LENOVO DESKTOP TINY Thinkcenter Neo 50q Intel Core 5-210H 8 Go 512 Go SSD Freedos Noir 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-desktops-13b9004sfm-1.webp",
+    "/images/disway/disway-preview-desktops-13b9004sfm-2.webp",
+    "/images/disway/disway-preview-desktops-13b9004sfm-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-desktops-13bd002kfm",
+   "title": "LENOVO DESKTOP TWR Thinkcenter Neo 50t Ultra 7-265 8 Go 512 Go SSD Freedos Noir 36M",
+   "category": "desktops",
+   "image": "/images/disway/disway-preview-desktops-13bd002kfm-1.webp",
+   "hover": "/images/disway/disway-preview-desktops-13bd002kfm-2.webp",
+   "gallery": [],
+   "price": 4240,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO DESKTOP TWR Thinkcenter Neo 50t Ultra 7-265 8 Go 512 Go SSD Freedos Noir 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO DESKTOP TWR Thinkcenter Neo 50t Ultra 7-265 8 Go 512 Go SSD Freedos Noir 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "13BD002KFM"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ Ultra 7 265 (36 Mo L2 + 30 Mo L3 cache, 20 cœurs, 20 threads, 2,4 GHz à 5,3 GHz, 65W) - Intel Graphics"
+    ],
+    [
+     "NPU",
+     "Intel® AI Boost - jusqu'à 13 TOPS (AI PC)"
+    ],
+    [
+     "Carte graphique",
+     "Intel® Graphics (intégrée) - GPU discret optionnel (Arc A310 LP / RTX 3050 / RTX 5050)"
+    ],
+    [
+     "Chipset",
+     "Intel® Q870"
+    ],
+    [
+     "Mémoire vive (RAM)",
+     "8 Go DDR5-5600 UDIMM (2 slots, extensible jusqu'à 64 Go)"
+    ],
+    [
+     "Slots mémoire",
+     "2x UDIMM DDR5 dual-channel"
+    ],
+    [
+     "Stockage",
+     "512 Go SSD M.2 2280 PCIe Gen 4 NVMe"
+    ],
+    [
+     "Stockage max",
+     "1x 3,5'' HDD jusqu'à 2 To + 1x M.2 SSD jusqu'à 1 To"
+    ],
+    [
+     "Audio",
+     "HD Audio Realtek ALC623-CG"
+    ],
+    [
+     "Alimentation",
+     "200W / 260W / 310W / 400W (90% efficiency)"
+    ],
+    [
+     "Format",
+     "Tower (~13,6 litres)"
+    ],
+    [
+     "Dimensions",
+     "145 x 296 x 346 mm (environ)"
+    ],
+    [
+     "Couleur produit",
+     "Noir"
+    ],
+    [
+     "Accès maintenance",
+     "Toolless"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "13BD002KFM",
+    "url": "https://www.disway.com/lenovo-desktop-twr-thinkcenter-neo-50t-ultra-7-265-13bd002kfm",
+    "catalogueTitle": "LENOVO DESKTOP TWR Thinkcenter Neo 50t Ultra 7-265 8 Go 512 Go SSD Freedos Noir 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-desktops-13bd002kfm-1.webp",
+    "/images/disway/disway-preview-desktops-13bd002kfm-2.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-desktops-13hr0014fm",
+   "title": "LENOVO TINY Thinkcenter Neo 50q U7-256V 16Go 512Go SSD Freedos Wifi Bluetooth Noir 36Mois VESA Mount",
+   "category": "desktops",
+   "image": "/images/disway/disway-preview-desktops-13hr0014fm-1.webp",
+   "hover": "/images/disway/disway-preview-desktops-13hr0014fm-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-desktops-13hr0014fm-3.webp"
+   ],
+   "price": 4280,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO TINY Thinkcenter Neo 50q U7-256V 16Go 512Go SSD Freedos Wifi Bluetooth Noir 36Mois VESA Mount — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO TINY Thinkcenter Neo 50q U7-256V 16Go 512Go SSD Freedos Wifi Bluetooth Noir 36Mois VESA Mount — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "13HR0014FM"
+    ],
+    [
+     "Processeur",
+     "Intel® Core™ Ultra 7 256V (Lunar Lake), 8 cœurs / 8 threads, 2,2 GHz P-core base, jusqu'à 4,8 GHz Boost, 12 Mo cache, NPU AI Boost jusqu'à 47 TOPS — 115 TOPS total plateforme"
+    ],
+    [
+     "Graphique",
+     "Intel® Arc™ Graphics 140V, 64 TOPS, DirectX 12"
+    ],
+    [
+     "Mémoire vive",
+     "16 Go LPDDR5X-8533 (soudée MoP, non évolutive)"
+    ],
+    [
+     "Stockage",
+     "512 Go M.2 2280 NVMe™ PCIe® 4.0 SSD"
+    ],
+    [
+     "Format",
+     "Tiny 1L (Ultra Small Form Factor)"
+    ],
+    [
+     "Dimensions (l × p × h)",
+     "179 × 182,9 × 36,5 mm (avec pieds caoutchouc)"
+    ],
+    [
+     "Poids",
+     "Environ 1,1 kg"
+    ],
+    [
+     "Couleur",
+     "Noir (Raven black)"
+    ],
+    [
+     "Système d'exploitation",
+     "FreeDOS"
+    ],
+    [
+     "Wi-Fi & Bluetooth",
+     "Wi-Fi 7 (802.11be) 2×2 + Bluetooth® 5.4 — ou Wi-Fi 6 selon config"
+    ],
+    [
+     "Ethernet",
+     "Gigabit Ethernet Realtek RTL8111K intégré (1× RJ-45) Optionnel : 2,5 GbE Realtek RTL8125BGS"
+    ],
+    [
+     "Ports avant",
+     "1× USB-C 10 Gbps (données + charge 5V/3A) 1× USB-A 10 Gbps Always On (5V/2,1A) 1× Jack audio combo 3,5 mm"
+    ],
+    [
+     "Ports arrière",
+     "2× USB-A Hi-Speed (dont 1 Smart Power On) 2× USB-A 10 Gbps 1× HDMI 2.1 TMDS 1× DisplayPort 1.4b 1× RJ-45 Gigabit 1× Port optionnel (VGA / HDMI / DP / USB-C DP) 1× Connecteur d'alimentation"
+    ],
+    [
+     "Alimentation",
+     "65W (80+ 89%) ou 90W (89%) ou 135W (89%) autosensing"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "13HR0014FM",
+    "url": "https://www.disway.com/lenovo-tiny-thinkcenter-neo-50q-u7-256v-16go-512go-13hr0014fm",
+    "catalogueTitle": "LENOVO TINY Thinkcenter Neo 50q U7-256V 16Go 512Go SSD Freedos Wifi Bluetooth Noir 36Mois VESA Mount"
+   },
+   "images": [
+    "/images/disway/disway-preview-desktops-13hr0014fm-1.webp",
+    "/images/disway/disway-preview-desktops-13hr0014fm-2.webp",
+    "/images/disway/disway-preview-desktops-13hr0014fm-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-servers-p51932-421",
+   "title": "HPE DL360G11 8SFF NC 5415+ 32GB SATA-RAID 2p-10G-BCM57416-BASET 800W 36M",
+   "category": "servers",
+   "image": "/images/disway/disway-preview-servers-p51932-421-1.webp",
+   "hover": "/images/disway/disway-preview-servers-p51932-421-1.webp",
+   "gallery": [],
+   "price": 14620,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HPE DL360G11 8SFF NC 5415+ 32GB SATA-RAID 2p-10G-BCM57416-BASET 800W 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HPE DL360G11 8SFF NC 5415+ 32GB SATA-RAID 2p-10G-BCM57416-BASET 800W 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "P51932-421"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "P51932-421",
+    "url": "https://www.disway.com/hpe-dl360g11-8sff-nc-5415-15-32gb-sata-raid-2p-10g-p51932--421",
+    "catalogueTitle": "HPE DL360G11 8SFF NC 5415+ 32GB SATA-RAID 2p-10G-BCM57416-BASET 800W 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-servers-p51932-421-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-servers-p52560-421",
+   "title": "HPE DL380G11 8SFF-NC 4410Y 2GHz-12c 32GB MR408i-o 4p-1GbE-BCM5719 1000wT 36M",
+   "category": "servers",
+   "image": "/images/disway/disway-preview-servers-p52560-421-1.webp",
+   "hover": "/images/disway/disway-preview-servers-p52560-421-1.webp",
+   "gallery": [],
+   "price": 14660,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HPE DL380G11 8SFF-NC 4410Y 2GHz-12c 32GB MR408i-o 4p-1GbE-BCM5719 1000wT 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HPE DL380G11 8SFF-NC 4410Y 2GHz-12c 32GB MR408i-o 4p-1GbE-BCM5719 1000wT 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "P52560-421"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ],
+    [
+     "RAM",
+     "32 Go"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Format Serveur",
+     "Rackable"
+    ],
+    [
+     "Rack Units",
+     "2U"
+    ],
+    [
+     "CPU Sockets",
+     "2"
+    ],
+    [
+     "Processeur Serveur",
+     "Intel"
+    ],
+    [
+     "Nombre de cœurs",
+     "12"
+    ],
+    [
+     "Fréquence processeur",
+     "2.0 GHZ GHz"
+    ],
+    [
+     "Type Raid",
+     "Hardware"
+    ],
+    [
+     "HDD Form Factor",
+     "SFF"
+    ],
+    [
+     "Drive Bays",
+     "8"
+    ],
+    [
+     "Connectivité LAN",
+     "1 Gb Ethernet"
+    ],
+    [
+     "Connectivité SAN",
+     "NA"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "P52560-421",
+    "url": "https://www.disway.com/hpe-dl380g11-8sff-nc-4410y-2ghz-12c-32gb-mr408i-o-p52560--421",
+    "catalogueTitle": "HPE DL380G11 8SFF-NC 4410Y 2GHz-12c 32GB MR408i-o 4p-1GbE-BCM5719 1000wT 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-servers-p52560-421-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-servers-p53567-421",
+   "title": "HPE ML350G11 8SFF 4410Y 2GHz-12c 32GB MR408i-o-4G 4p-1GbE-BCM5719-OCP 1000wT TPM 36M",
+   "category": "servers",
+   "image": "/images/disway/disway-preview-servers-p53567-421-1.webp",
+   "hover": "/images/disway/disway-preview-servers-p53567-421-1.webp",
+   "gallery": [],
+   "price": 14700,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HPE ML350G11 8SFF 4410Y 2GHz-12c 32GB MR408i-o-4G 4p-1GbE-BCM5719-OCP 1000wT TPM 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HPE ML350G11 8SFF 4410Y 2GHz-12c 32GB MR408i-o-4G 4p-1GbE-BCM5719-OCP 1000wT TPM 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "P53567-421"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ],
+    [
+     "RAM",
+     "32 Go"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Format Serveur",
+     "TWR"
+    ],
+    [
+     "Rack Units",
+     "NA"
+    ],
+    [
+     "CPU Sockets",
+     "2"
+    ],
+    [
+     "Processeur Serveur",
+     "Intel"
+    ],
+    [
+     "Nombre de cœurs",
+     "12"
+    ],
+    [
+     "Fréquence processeur",
+     "2.0 GHZ GHz"
+    ],
+    [
+     "Type Raid",
+     "Hardware"
+    ],
+    [
+     "HDD Form Factor",
+     "SFF"
+    ],
+    [
+     "Drive Bays",
+     "8"
+    ],
+    [
+     "Connectivité LAN",
+     "1 Gb Ethernet"
+    ],
+    [
+     "Connectivité SAN",
+     "NA"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "P53567-421",
+    "url": "https://www.disway.com/hpe-ml350g11-8sff-4410y-2ghz-12c-32gb-mr408i-o-4g-p53567--421",
+    "catalogueTitle": "HPE ML350G11 8SFF 4410Y 2GHz-12c 32GB MR408i-o-4G 4p-1GbE-BCM5719-OCP 1000wT TPM 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-servers-p53567-421-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-servers-p55245-b21",
+   "title": "HPE DL380G10+ 8SFF NC U.3 4309Y 32G MR416i-p/4G 2p-10G-SFP+BCM57412-OCP3 800w CMA 3-3-3 36M",
+   "category": "servers",
+   "image": "/images/disway/disway-preview-servers-p55245-b21-1.webp",
+   "hover": "/images/disway/disway-preview-servers-p55245-b21-1.webp",
+   "gallery": [],
+   "price": 14740,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HPE DL380G10+ 8SFF NC U.3 4309Y 32G MR416i-p/4G 2p-10G-SFP+BCM57412-OCP3 800w CMA 3-3-3 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HPE DL380G10+ 8SFF NC U.3 4309Y 32G MR416i-p/4G 2p-10G-SFP+BCM57412-OCP3 800w CMA 3-3-3 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "P55245-B21"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ],
+    [
+     "Marque",
+     "HPE"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "P55245-B21",
+    "url": "https://www.disway.com/hpe-dl380g10-15-8sff-nc-u-3-4309y-32g-mr416i-p-3-4-p55245--b21",
+    "catalogueTitle": "HPE DL380G10+ 8SFF NC U.3 4309Y 32G MR416i-p/4G 2p-10G-SFP+BCM57412-OCP3 800w CMA 3-3-3 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-servers-p55245-b21-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-networking-98012177",
+   "title": "HUAWEI S380-L4T1T (1*GE WAN, 4*GE LAN)",
+   "category": "networking",
+   "image": "/images/disway/disway-preview-networking-98012177-1.webp",
+   "hover": "/images/disway/disway-preview-networking-98012177-1.webp",
+   "gallery": [],
+   "price": 1900,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HUAWEI S380-L4T1T (1*GE WAN, 4*GE LAN) — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HUAWEI S380-L4T1T (1*GE WAN, 4*GE LAN) — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "98012177"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "98012177",
+    "url": "https://www.disway.com/huawei-s380-l4t1t-1-12-ge-wan-4-12-ge-lan-98012177",
+    "catalogueTitle": "HUAWEI S380-L4T1T (1*GE WAN, 4*GE LAN)"
+   },
+   "images": [
+    "/images/disway/disway-preview-networking-98012177-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-networking-98012178",
+   "title": "HUAWEI S380-L4P1T (1*GE WAN, 4*GE LAN(PoE+, 50W)",
+   "category": "networking",
+   "image": "/images/disway/disway-preview-networking-98012178-1.webp",
+   "hover": "/images/disway/disway-preview-networking-98012178-1.webp",
+   "gallery": [],
+   "price": 1940,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HUAWEI S380-L4P1T (1*GE WAN, 4*GE LAN(PoE+, 50W) — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HUAWEI S380-L4P1T (1*GE WAN, 4*GE LAN(PoE+, 50W) — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "98012178"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "98012178",
+    "url": "https://www.disway.com/huawei-s380-l4p1t-1-12-ge-wan-4-12-ge-lan-poe-15-5-98012178",
+    "catalogueTitle": "HUAWEI S380-L4P1T (1*GE WAN, 4*GE LAN(PoE+, 50W)"
+   },
+   "images": [
+    "/images/disway/disway-preview-networking-98012178-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-networking-98012179",
+   "title": "HUAWEI S380-S8T2T (2*GE WAN, 8*GE LAN)",
+   "category": "networking",
+   "image": "/images/disway/disway-preview-networking-98012179-1.webp",
+   "hover": "/images/disway/disway-preview-networking-98012179-1.webp",
+   "gallery": [],
+   "price": 1980,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HUAWEI S380-S8T2T (2*GE WAN, 8*GE LAN) — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HUAWEI S380-S8T2T (2*GE WAN, 8*GE LAN) — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "98012179"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "98012179",
+    "url": "https://www.disway.com/huawei-s380-s8t2t-2-12-ge-wan-8-12-ge-lan-98012179",
+    "catalogueTitle": "HUAWEI S380-S8T2T (2*GE WAN, 8*GE LAN)"
+   },
+   "images": [
+    "/images/disway/disway-preview-networking-98012179-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-networking-98012180",
+   "title": "HUAWEI S380-S8P2T (2*GE WAN, 8*GE LAN(PoE+, 124W)",
+   "category": "networking",
+   "image": "/images/disway/disway-preview-networking-98012180-1.webp",
+   "hover": "/images/disway/disway-preview-networking-98012180-1.webp",
+   "gallery": [],
+   "price": 2020,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HUAWEI S380-S8P2T (2*GE WAN, 8*GE LAN(PoE+, 124W) — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HUAWEI S380-S8P2T (2*GE WAN, 8*GE LAN(PoE+, 124W) — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "98012180"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "98012180",
+    "url": "https://www.disway.com/huawei-s380-s8p2t-2-12-ge-wan-8-12-ge-lan-poe-15-1-98012180",
+    "catalogueTitle": "HUAWEI S380-S8P2T (2*GE WAN, 8*GE LAN(PoE+, 124W)"
+   },
+   "images": [
+    "/images/disway/disway-preview-networking-98012180-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-components-d4eu01-8g",
+   "title": "SYNOLOGY BARRETTE MEMOIRE D4EU01-8G 12 Mois",
+   "category": "components",
+   "image": "/images/disway/disway-preview-components-d4eu01-8g-1.webp",
+   "hover": "/images/disway/disway-preview-components-d4eu01-8g-1.webp",
+   "gallery": [],
+   "price": 1010,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "SYNOLOGY BARRETTE MEMOIRE D4EU01-8G 12 Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "SYNOLOGY BARRETTE MEMOIRE D4EU01-8G 12 Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "D4EU01-8G"
+    ],
+    [
+     "Capacité",
+     "8 Go (1 x 8 Go)"
+    ],
+    [
+     "Type",
+     "DDR4 SDRAM"
+    ],
+    [
+     "Format",
+     "UDIMM (Unbuffered DIMM)"
+    ],
+    [
+     "Nombre de broches",
+     "288 broches"
+    ],
+    [
+     "Fréquence",
+     "2666 MHz (PC4-21300)"
+    ],
+    [
+     "Tension",
+     "1,2 V"
+    ],
+    [
+     "Correction d'erreurs",
+     "ECC"
+    ],
+    [
+     "Série FS",
+     "FS2500"
+    ],
+    [
+     "Série 23",
+     "RS2423RP+, RS2423+"
+    ],
+    [
+     "Garantie",
+     "1 an"
+    ],
+    [
+     "Modèle",
+     "Synology D4EU01-8G"
+    ],
+    [
+     "EAN",
+     "4711174724420"
+    ],
+    [
+     "Capacité",
+     "8 Go (1 x 8 Go)"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "D4EU01-8G",
+    "url": "https://www.disway.com/synology-barrette-memoire-d4eu01-8g-12-mois-d4eu01--8g",
+    "catalogueTitle": "SYNOLOGY BARRETTE MEMOIRE D4EU01-8G 12 Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-components-d4eu01-8g-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-components-ld4as008g-b3200gsst",
+   "title": "LEXAR BARRETTE MEMOIRE So 3200 8GB SO-DIMM DDR4 3200 - Blister Package 12 Mois",
+   "category": "components",
+   "image": "/images/disway/disway-preview-components-ld4as008g-b3200gsst-1.webp",
+   "hover": "/images/disway/disway-preview-components-ld4as008g-b3200gsst-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-components-ld4as008g-b3200gsst-3.webp"
+   ],
+   "price": 1050,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LEXAR BARRETTE MEMOIRE So 3200 8GB SO-DIMM DDR4 3200 - Blister Package 12 Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LEXAR BARRETTE MEMOIRE So 3200 8GB SO-DIMM DDR4 3200 - Blister Package 12 Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "LD4AS008G-B3200GSST"
+    ],
+    [
+     "Capacité",
+     "8 Go (1 x 8 Go)"
+    ],
+    [
+     "Type",
+     "DDR4 SDRAM"
+    ],
+    [
+     "Format",
+     "SO-DIMM"
+    ],
+    [
+     "Nombre de broches",
+     "260 broches"
+    ],
+    [
+     "Débit",
+     "3200 MT/s (PC4-25600)"
+    ],
+    [
+     "Latence",
+     "CL22-22-22-52"
+    ],
+    [
+     "Tension",
+     "1,2 V"
+    ],
+    [
+     "Standard",
+     "JEDEC"
+    ],
+    [
+     "Usage",
+     "Ordinateurs portables, NUC et mini PC compatibles DDR4 SO-DIMM"
+    ],
+    [
+     "Dimensions du module",
+     "69,6 x 30 mm"
+    ],
+    [
+     "Température de fonctionnement",
+     "-20 °C à 85 °C (surface)"
+    ],
+    [
+     "Température de stockage",
+     "-55 °C à 100 °C"
+    ],
+    [
+     "Garantie",
+     "12 mois"
+    ],
+    [
+     "Modèle",
+     "Lexar DDR4-3200 SO-DIMM"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "LD4AS008G-B3200GSST",
+    "url": "https://www.disway.com/lexar-barrette-memoire-so-3200-8gb-so-dimm-ddr4-32-ld4as008g--b3200gsst",
+    "catalogueTitle": "LEXAR BARRETTE MEMOIRE So 3200 8GB SO-DIMM DDR4 3200 - Blister Package 12 Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-components-ld4as008g-b3200gsst-1.webp",
+    "/images/disway/disway-preview-components-ld4as008g-b3200gsst-2.webp",
+    "/images/disway/disway-preview-components-ld4as008g-b3200gsst-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-components-301996",
+   "title": "LACIE HDD 3To pour 2 BIG QUADRA USB 3.0",
+   "category": "components",
+   "image": "/images/disway/disway-preview-components-301996-1.webp",
+   "hover": "/images/disway/disway-preview-components-301996-1.webp",
+   "gallery": [],
+   "price": 1090,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LACIE HDD 3To pour 2 BIG QUADRA USB 3.0 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LACIE HDD 3To pour 2 BIG QUADRA USB 3.0 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "301996"
+    ],
+    [
+     "Capacité",
+     "3 To"
+    ],
+    [
+     "Interface",
+     "SATA"
+    ],
+    [
+     "Type",
+     "Disque de rechange avec tiroir (hot-swap)"
+    ],
+    [
+     "Compatible avec",
+     "LaCie 2big Quadra, 2big Triple, 2big Dual"
+    ],
+    [
+     "Marque",
+     "LaCie"
+    ],
+    [
+     "Garantie",
+     "12 mois"
+    ],
+    [
+     "Capacité",
+     "3 To"
+    ],
+    [
+     "Interface",
+     "SATA"
+    ],
+    [
+     "Type",
+     "Disque de rechange avec tiroir (hot-swap)"
+    ],
+    [
+     "Compatible avec",
+     "LaCie 2big Quadra, 2big Triple, 2big Dual"
+    ],
+    [
+     "Marque",
+     "LaCie"
+    ],
+    [
+     "Garantie",
+     "12 mois"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "301996",
+    "url": "https://www.disway.com/lacie-hdd-3to-pour-2-big-quadra-usb-3-0-301996",
+    "catalogueTitle": "LACIE HDD 3To pour 2 BIG QUADRA USB 3.0"
+   },
+   "images": [
+    "/images/disway/disway-preview-components-301996-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-components-aeli-se880-1tcgy",
+   "title": "ADATA SSD SE880 External Solid State Drive 1T USB 3.2 Gen2 x2 2000MB/s 12Mois",
+   "category": "components",
+   "image": "/images/disway/disway-preview-components-aeli-se880-1tcgy-1.webp",
+   "hover": "/images/disway/disway-preview-components-aeli-se880-1tcgy-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-components-aeli-se880-1tcgy-3.webp"
+   ],
+   "price": 850,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "ADATA SSD SE880 External Solid State Drive 1T USB 3.2 Gen2 x2 2000MB/s 12Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "ADATA SSD SE880 External Solid State Drive 1T USB 3.2 Gen2 x2 2000MB/s 12Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "AELI-SE880-1TCGY"
+    ],
+    [
+     "Vitesse de lecture/écriture",
+     "Jusqu'à 2000 Mo/s"
+    ],
+    [
+     "Interface",
+     "USB 3.2 Gen2x2"
+    ],
+    [
+     "Connecteur",
+     "USB Type-C"
+    ],
+    [
+     "Dimensions",
+     "64,8 x 35 x 12,25 mm"
+    ],
+    [
+     "Poids",
+     "31 g"
+    ],
+    [
+     "Matériau",
+     "Aluminium et plastique"
+    ],
+    [
+     "Température de fonctionnement",
+     "5 °C à 50 °C"
+    ],
+    [
+     "Systèmes d'exploitation",
+     "Windows 8/8.1/10/11, macOS 10.6+, Linux kernel 2.6+, Android 5.0+"
+    ],
+    [
+     "Câbles",
+     "1x USB Type-C vers Type-C, 1x USB Type-C vers Type-A"
+    ],
+    [
+     "Documentation",
+     "Guide de démarrage rapide"
+    ],
+    [
+     "Modèle",
+     "SE880"
+    ],
+    [
+     "Marque",
+     "ADATA"
+    ],
+    [
+     "Garantie",
+     "5 ans (limitée)"
+    ],
+    [
+     "Vitesse de lecture/écriture",
+     "Jusqu'à 2000 Mo/s"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "AELI-SE880-1TCGY",
+    "url": "https://www.disway.com/adata-ssd-se880-external-solid-state-drive-1t-usb-aeli--se880--1tcgy",
+    "catalogueTitle": "ADATA SSD SE880 External Solid State Drive 1T USB 3.2 Gen2 x2 2000MB/s 12Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-components-aeli-se880-1tcgy-1.webp",
+    "/images/disway/disway-preview-components-aeli-se880-1tcgy-2.webp",
+    "/images/disway/disway-preview-components-aeli-se880-1tcgy-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-gaming-69050",
+   "title": "Steelseries Stratus XL Wireless Gaming controller for Windows+Android",
+   "category": "gaming",
+   "image": "/images/disway/disway-preview-gaming-69050-1.webp",
+   "hover": "/images/disway/disway-preview-gaming-69050-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-gaming-69050-3.webp"
+   ],
+   "price": 2440,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Steelseries Stratus XL Wireless Gaming controller for Windows+Android — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Steelseries Stratus XL Wireless Gaming controller for Windows+Android — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "69050"
+    ],
+    [
+     "Sticks",
+     "2 sticks analogiques cliquables"
+    ],
+    [
+     "Croix directionnelle",
+     "Oui"
+    ],
+    [
+     "Boutons",
+     "4 boutons d'action, 4 boutons d'épaule, Home et Back"
+    ],
+    [
+     "Gâchettes",
+     "Sensibles à la pression"
+    ],
+    [
+     "Commutateur",
+     "Windows / Android"
+    ],
+    [
+     "Connexion",
+     "Bluetooth 2.1 + EDR"
+    ],
+    [
+     "Modes d'entrée",
+     "XInput et DirectInput"
+    ],
+    [
+     "Logiciel",
+     "SteelSeries Engine 3 (Windows)"
+    ],
+    [
+     "Piles",
+     "2 x AA (incluses)"
+    ],
+    [
+     "Autonomie",
+     "Plus de 40 heures"
+    ],
+    [
+     "Voyants",
+     "4 LED d'état et de connexion"
+    ],
+    [
+     "Systèmes",
+     "Windows 7 ou ultérieur, Android 3.1 ou ultérieur"
+    ],
+    [
+     "Plateformes",
+     "Steam Big Picture"
+    ],
+    [
+     "Contenu",
+     "Manette Stratus XL 2 piles AA Documentation"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "69050",
+    "url": "https://www.disway.com/steelseries-stratus-xl-wireless-gaming-controller-69050",
+    "catalogueTitle": "Steelseries Stratus XL Wireless Gaming controller for Windows+Android"
+   },
+   "images": [
+    "/images/disway/disway-preview-gaming-69050-1.webp",
+    "/images/disway/disway-preview-gaming-69050-2.webp",
+    "/images/disway/disway-preview-gaming-69050-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-gaming-910-005273",
+   "title": "LOGITECH G PRO LIGHTSPEED Wireless Gaming Mouse - BLACK - EWR2",
+   "category": "gaming",
+   "image": "/images/disway/disway-preview-gaming-910-005273-1.webp",
+   "hover": "/images/disway/disway-preview-gaming-910-005273-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-gaming-910-005273-3.webp"
+   ],
+   "price": 2480,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LOGITECH G PRO LIGHTSPEED Wireless Gaming Mouse - BLACK - EWR2 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LOGITECH G PRO LIGHTSPEED Wireless Gaming Mouse - BLACK - EWR2 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "910-005273"
+    ],
+    [
+     "Capteur",
+     "HERO"
+    ],
+    [
+     "Vitesse max.",
+     "Plus de 400 IPS"
+    ],
+    [
+     "Accélération max.",
+     "Plus de 40 G"
+    ],
+    [
+     "Taux de rapport",
+     "1000 Hz (1 ms)"
+    ],
+    [
+     "Boutons",
+     "4 à 8 programmables (boutons latéraux amovibles)"
+    ],
+    [
+     "Durabilité",
+     "50 millions de clics (boutons principaux)"
+    ],
+    [
+     "Mémoire embarquée",
+     "5 profils"
+    ],
+    [
+     "Forme",
+     "Ambidextre"
+    ],
+    [
+     "Rétroéclairage",
+     "LIGHTSYNC RGB, 1 zone"
+    ],
+    [
+     "Connexion",
+     "Sans fil LIGHTSPEED 2,4 GHz (récepteur USB)"
+    ],
+    [
+     "Recharge sans fil",
+     "Compatible POWERPLAY"
+    ],
+    [
+     "Logiciel",
+     "Logitech G HUB"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions (H x L x P)",
+     "125 x 63,5 x 40 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "910-005273",
+    "url": "https://www.disway.com/logitech-g-pro-lightspeed-wireless-gaming-mouse-bl-910--005273",
+    "catalogueTitle": "LOGITECH G PRO LIGHTSPEED Wireless Gaming Mouse - BLACK - EWR2"
+   },
+   "images": [
+    "/images/disway/disway-preview-gaming-910-005273-1.webp",
+    "/images/disway/disway-preview-gaming-910-005273-2.webp",
+    "/images/disway/disway-preview-gaming-910-005273-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-gaming-910-005282",
+   "title": "LOGITECH G305 LIGHTSPEED Wireless Gaming Mouse - BLACK - EER2",
+   "category": "gaming",
+   "image": "/images/disway/disway-preview-gaming-910-005282-1.webp",
+   "hover": "/images/disway/disway-preview-gaming-910-005282-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-gaming-910-005282-3.webp"
+   ],
+   "price": 2520,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LOGITECH G305 LIGHTSPEED Wireless Gaming Mouse - BLACK - EER2 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LOGITECH G305 LIGHTSPEED Wireless Gaming Mouse - BLACK - EER2 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "910-005282"
+    ],
+    [
+     "Capteur",
+     "HERO"
+    ],
+    [
+     "Résolution",
+     "200 à 12 000 PPP"
+    ],
+    [
+     "Vitesse max.",
+     "400 IPS"
+    ],
+    [
+     "Accélération max.",
+     "40 G"
+    ],
+    [
+     "Boutons",
+     "6 programmables"
+    ],
+    [
+     "Mémoire embarquée",
+     "Oui"
+    ],
+    [
+     "Forme",
+     "Ambidextre"
+    ],
+    [
+     "Connexion",
+     "Sans fil LIGHTSPEED 2,4 GHz (nano-récepteur USB)"
+    ],
+    [
+     "Taux de rapport",
+     "1 ms"
+    ],
+    [
+     "Rangement du récepteur",
+     "Dans la souris"
+    ],
+    [
+     "Logiciel",
+     "Logitech G HUB"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions (L x l x H)",
+     "116,6 x 62,15 x 38,2 mm"
+    ],
+    [
+     "Poids",
+     "99 g"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "910-005282",
+    "url": "https://www.disway.com/logitech-g305-lightspeed-wireless-gaming-mouse-bla-910--005282",
+    "catalogueTitle": "LOGITECH G305 LIGHTSPEED Wireless Gaming Mouse - BLACK - EER2"
+   },
+   "images": [
+    "/images/disway/disway-preview-gaming-910-005282-1.webp",
+    "/images/disway/disway-preview-gaming-910-005282-2.webp",
+    "/images/disway/disway-preview-gaming-910-005282-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-gaming-910-005471",
+   "title": "LOGITECH G502 Corded Gaming Mouse - HERO - BLACK - USB - EWR2",
+   "category": "gaming",
+   "image": "/images/disway/disway-preview-gaming-910-005471-1.webp",
+   "hover": "/images/disway/disway-preview-gaming-910-005471-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-gaming-910-005471-3.webp"
+   ],
+   "price": 2560,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LOGITECH G502 Corded Gaming Mouse - HERO - BLACK - USB - EWR2 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LOGITECH G502 Corded Gaming Mouse - HERO - BLACK - USB - EWR2 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "910-005471"
+    ],
+    [
+     "Capteur",
+     "HERO 25K"
+    ],
+    [
+     "Résolution",
+     "100 à 25 600 PPP"
+    ],
+    [
+     "Vitesse max.",
+     "Plus de 400 IPS"
+    ],
+    [
+     "Accélération max.",
+     "Plus de 40 G"
+    ],
+    [
+     "Taux de rapport",
+     "1000 Hz (1 ms)"
+    ],
+    [
+     "Boutons",
+     "11 programmables"
+    ],
+    [
+     "Molette",
+     "Hyper-rapide double mode"
+    ],
+    [
+     "Mémoire embarquée",
+     "Jusqu'à 5 profils"
+    ],
+    [
+     "Forme",
+     "Droitier"
+    ],
+    [
+     "Rétroéclairage",
+     "LIGHTSYNC RGB"
+    ],
+    [
+     "Connexion",
+     "Filaire USB"
+    ],
+    [
+     "Longueur du câble",
+     "2,1 m"
+    ],
+    [
+     "Logiciel",
+     "Logitech G HUB"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "910-005471",
+    "url": "https://www.disway.com/logitech-g502-corded-gaming-mouse-hero-black-usb-e-910--005471",
+    "catalogueTitle": "LOGITECH G502 Corded Gaming Mouse - HERO - BLACK - USB - EWR2"
+   },
+   "images": [
+    "/images/disway/disway-preview-gaming-910-005471-1.webp",
+    "/images/disway/disway-preview-gaming-910-005471-2.webp",
+    "/images/disway/disway-preview-gaming-910-005471-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-printers-1f3y2a",
+   "title": "HP Smart Tank 580 AiO Printer MFP 3en1 Wifi Couleur A4 12 B&WPPM 5PPMCOL 12M",
+   "category": "printers",
+   "image": "/images/disway/disway-preview-printers-1f3y2a-1.webp",
+   "hover": "/images/disway/disway-preview-printers-1f3y2a-1.webp",
+   "gallery": [],
+   "price": 2300,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HP Smart Tank 580 AiO Printer MFP 3en1 Wifi Couleur A4 12 B&WPPM 5PPMCOL 12M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HP Smart Tank 580 AiO Printer MFP 3en1 Wifi Couleur A4 12 B&WPPM 5PPMCOL 12M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "1F3Y2A"
+    ],
+    [
+     "Technologie d'impression",
+     "HP Thermal Inkjet"
+    ],
+    [
+     "Vitesse d'impression (noir, ISO)",
+     "Jusqu'à 12 ppm"
+    ],
+    [
+     "Vitesse d'impression (couleur, ISO)",
+     "Jusqu'à 5 ppm"
+    ],
+    [
+     "Résolution d'impression (noir, optimale)",
+     "Jusqu'à 1200 x 1200 ppp rendus"
+    ],
+    [
+     "Résolution d'impression (couleur, optimale)",
+     "Jusqu'à 4800 x 1200 ppp optimisés"
+    ],
+    [
+     "Cycle d'utilisation mensuel",
+     "Jusqu'à 3 000 pages"
+    ],
+    [
+     "Volume d'impression mensuel recommandé",
+     "400 à 800 pages"
+    ],
+    [
+     "Fonctions",
+     "Impression, copie, numérisation"
+    ],
+    [
+     "Recto verso",
+     "Manuel (pris en charge par le pilote)"
+    ],
+    [
+     "Copies maximum",
+     "Jusqu'à 99 copies"
+    ],
+    [
+     "Numérisation, technologie",
+     "Capteur d'image de contact (CIS)"
+    ],
+    [
+     "Résolution de numérisation optique",
+     "Jusqu'à 1200 ppp"
+    ],
+    [
+     "Dimensions (l x p x h)",
+     "434,66 x 361,53 x 157,26 mm"
+    ],
+    [
+     "Écran",
+     "Écran LCD iCON 33 segments + 1,2 pouce"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "1F3Y2A",
+    "url": "https://www.disway.com/hp-smart-tank-580-aio-printer-mfp-3en1-wifi-couleu-1f3y2a",
+    "catalogueTitle": "HP Smart Tank 580 AiO Printer MFP 3en1 Wifi Couleur A4 12 B&WPPM 5PPMCOL 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-printers-1f3y2a-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-printers-0651c003",
+   "title": "CANON Scanner Image FORMULA DR-C240 12M",
+   "category": "printers",
+   "image": "/images/disway/disway-preview-printers-0651c003-1.webp",
+   "hover": "/images/disway/disway-preview-printers-0651c003-2.webp",
+   "gallery": [],
+   "price": 2340,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "CANON Scanner Image FORMULA DR-C240 12M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "CANON Scanner Image FORMULA DR-C240 12M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "0651C003"
+    ],
+    [
+     "Type de scanner",
+     "À défilement (sheet-fed)"
+    ],
+    [
+     "Vitesse de numérisation (noir/couleur)",
+     "Jusqu'à 45 ppm / 90 ipm (recto verso)"
+    ],
+    [
+     "Résolution optique",
+     "600 x 600 ppp"
+    ],
+    [
+     "Capteur",
+     "CMOS CIS"
+    ],
+    [
+     "Volume quotidien recommandé",
+     "Jusqu'à 4 000 à 6 000 pages"
+    ],
+    [
+     "Capacité du chargeur (ADF)",
+     "60 feuilles"
+    ],
+    [
+     "Formats pris en charge",
+     "Cartes plastiques, cartes de visite, A4, A3 (via folio), documents longs jusqu'à 3 m"
+    ],
+    [
+     "Détection de double alimentation",
+     "Ultrasonique avec fonction de reprise rapide (DFR)"
+    ],
+    [
+     "Interface",
+     "USB 2.0"
+    ],
+    [
+     "Logiciels inclus",
+     "CaptureOnTouch, CapturePerfect, pilote Kofax VRS inclus, eCopy PDF Pro"
+    ],
+    [
+     "Consommation",
+     "19 W (fonctionnement), 1,4 W (veille)"
+    ],
+    [
+     "Garantie",
+     "1 an, échange anticipé"
+    ],
+    [
+     "Certifications",
+     "ENERGY STAR®, EPEAT Silver"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "0651C003",
+    "url": "https://www.disway.com/canon-scanner-image-formula-dr-c240-12m-0651c003",
+    "catalogueTitle": "CANON Scanner Image FORMULA DR-C240 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-printers-0651c003-1.webp",
+    "/images/disway/disway-preview-printers-0651c003-2.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-printers-3881c005aa",
+   "title": "Canon Laser imageRUNNER ADVANCE DX C357i MFP 3en1 Réseau Wifi Couleur A3 R/V 35 B&WPPM 35PPMCOL 35 X",
+   "category": "printers",
+   "image": "/images/disway/disway-preview-printers-3881c005aa-1.webp",
+   "hover": "/images/disway/disway-preview-printers-3881c005aa-1.webp",
+   "gallery": [],
+   "price": 2100,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Canon Laser imageRUNNER ADVANCE DX C357i MFP 3en1 Réseau Wifi Couleur A3 R/V 35 B&WPPM 35PPMCOL 35 X — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Canon Laser imageRUNNER ADVANCE DX C357i MFP 3en1 Réseau Wifi Couleur A3 R/V 35 B&WPPM 35PPMCOL 35 X — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "3881C005AA"
+    ],
+    [
+     "Fonctions",
+     "Impression, Copie, Numérisation (Fax en option)"
+    ],
+    [
+     "Vitesse d'impression (A4)",
+     "35 ppm noir et blanc / 35 ppm couleur"
+    ],
+    [
+     "Vitesse de copie (A4)",
+     "35 ppm noir et blanc / couleur"
+    ],
+    [
+     "Temps de sortie 1ère copie",
+     "Env. 5,1 s (N&B) / 6,9 s (couleur)"
+    ],
+    [
+     "Résolution d'impression",
+     "600 x 600 à 1200 x 1200 ppp (équivalent)"
+    ],
+    [
+     "Langages PDL",
+     "UFR II, PCL6, Adobe PostScript 3"
+    ],
+    [
+     "Vitesse de numérisation",
+     "Jusqu'à 190 ipm (recto verso)"
+    ],
+    [
+     "Destinations d'envoi",
+     "E-mail, i-Fax (SMTP), SMB3.0, FTP, WebDAV, boîte aux lettres"
+    ],
+    [
+     "Écran tactile",
+     "10,1 pouces, couleur, entièrement numérique"
+    ],
+    [
+     "Format",
+     "A3"
+    ],
+    [
+     "Dimensions (L x P x H)",
+     "519 x 658 x 638 mm"
+    ],
+    [
+     "Impression mobile & cloud",
+     "AirPrint, Mopria, Canon PRINT Business, uniFLOW Online Express (installé en série)"
+    ],
+    [
+     "Formats pris en charge",
+     "TIFF, JPEG, PDF, EPS, XPS"
+    ],
+    [
+     "Protection",
+     "Sécurité à 360° : chiffrement des données, authentification utilisateur, McAfee Embedded Control"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "3881C005AA",
+    "url": "https://www.disway.com/canon-laser-imagerunner-advance-dx-c357i-mfp-3en1-3881c005aa",
+    "catalogueTitle": "Canon Laser imageRUNNER ADVANCE DX C357i MFP 3en1 Réseau Wifi Couleur A3 R/V 35 B&WPPM 35PPMCOL 35 X"
+   },
+   "images": [
+    "/images/disway/disway-preview-printers-3881c005aa-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-monitors-63d3gat1eu",
+   "title": "LENOVO Moniteur ThinkVision T32h-30 31,5'' 2K QHD (IPS Panel,60Hz,4ms,HDMI,DP, USB-C 36Mois",
+   "category": "monitors",
+   "image": "/images/disway/disway-preview-monitors-63d3gat1eu-1.webp",
+   "hover": "/images/disway/disway-preview-monitors-63d3gat1eu-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-monitors-63d3gat1eu-3.webp"
+   ],
+   "price": 1540,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO Moniteur ThinkVision T32h-30 31,5'' 2K QHD (IPS Panel,60Hz,4ms,HDMI,DP, USB-C 36Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO Moniteur ThinkVision T32h-30 31,5'' 2K QHD (IPS Panel,60Hz,4ms,HDMI,DP, USB-C 36Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "63D3GAT1EU"
+    ],
+    [
+     "Taille",
+     "31,5 pouces"
+    ],
+    [
+     "Résolution",
+     "2560 x 1440 (QHD) — 16:9"
+    ],
+    [
+     "Type de dalle",
+     "IPS, NearEdgeless 3 côtés, rétroéclairage WLED"
+    ],
+    [
+     "Luminosité",
+     "350 cd/m²"
+    ],
+    [
+     "Contraste",
+     "1000:1 (statique) / 3 000 000:1 (dynamique)"
+    ],
+    [
+     "Taux de rafraîchissement",
+     "60 Hz"
+    ],
+    [
+     "Temps de réponse",
+     "4 ms (mode Extrême) / 6 ms (mode Normal)"
+    ],
+    [
+     "Angle de vision",
+     "178° H / 178° V"
+    ],
+    [
+     "Couverture colorimétrique",
+     "99% sRGB — 1,07 milliard de couleurs"
+    ],
+    [
+     "Profondeur de couleur",
+     "10 bits (8 bits + FRC)"
+    ],
+    [
+     "Surface d'écran",
+     "Anti-reflet"
+    ],
+    [
+     "Ports",
+     "1x USB-C 3.2 Gen 1 (DP 1.4 Alt Mode, jusqu'à 90W PD) — amont 4x USB-A 3.2 Gen 1 (1x BC 1.2) — aval 1x HDMI 2.1 TMDS (2560x1440@60Hz) 1x DisplayPort 1.4 (HBR2) 1x Ethernet (RJ-45) 1x Audio jack 3,5 mm"
+    ],
+    [
+     "Réglages du pied",
+     "Inclinaison -5° à +23,5° / Pivotement ±45° / Rotation 90° / Hauteur ±155 mm"
+    ],
+    [
+     "Fixation VESA",
+     "100 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "63D3GAT1EU",
+    "url": "https://www.disway.com/lenovo-moniteur-thinkvision-t32h-30-31-5-2k-qhd-ip-63d3gat1eu",
+    "catalogueTitle": "LENOVO Moniteur ThinkVision T32h-30 31,5'' 2K QHD (IPS Panel,60Hz,4ms,HDMI,DP, USB-C 36Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-monitors-63d3gat1eu-1.webp",
+    "/images/disway/disway-preview-monitors-63d3gat1eu-2.webp",
+    "/images/disway/disway-preview-monitors-63d3gat1eu-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-monitors-63dekat3eu",
+   "title": "LENOVO S24i-30-20 23.8\" Monitor, IPS panel ,1920 x 1080, Input connectors-VGA+HDMI 1.4 ,Cables",
+   "category": "monitors",
+   "image": "/images/disway/disway-preview-monitors-63dekat3eu-1.webp",
+   "hover": "/images/disway/disway-preview-monitors-63dekat3eu-1.webp",
+   "gallery": [],
+   "price": 1580,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO S24i-30-20 23.8\" Monitor, IPS panel ,1920 x 1080, Input connectors-VGA+HDMI 1.4 ,Cables — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO S24i-30-20 23.8\" Monitor, IPS panel ,1920 x 1080, Input connectors-VGA+HDMI 1.4 ,Cables — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "63DEKAT3EU"
+    ],
+    [
+     "Marque",
+     "LENOVO"
+    ],
+    [
+     "Taille d'écran",
+     "23,8 Pouces"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Smart",
+     "Non"
+    ],
+    [
+     "Marque",
+     "LENOVO"
+    ],
+    [
+     "Taille d'écran",
+     "23,8 Pouces"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Smart",
+     "Non"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "63DEKAT3EU",
+    "url": "https://www.disway.com/lenovo-s24i-30-20-23-8-7-monitor-ips-panel-1920-x-63dekat3eu",
+    "catalogueTitle": "LENOVO S24i-30-20 23.8\" Monitor, IPS panel ,1920 x 1080, Input connectors-VGA+HDMI 1.4 ,Cables"
+   },
+   "images": [
+    "/images/disway/disway-preview-monitors-63dekat3eu-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-monitors-63dfkat4eu",
+   "title": "LENOVO S27i-30 27.0'' Monitor, IPS panel , 1920 x 1080, VGA HDMI 1.4 ,Cables included - HDMI 36M",
+   "category": "monitors",
+   "image": "/images/disway/disway-preview-monitors-63dfkat4eu-1.webp",
+   "hover": "/images/disway/disway-preview-monitors-63dfkat4eu-1.webp",
+   "gallery": [],
+   "price": 1620,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO S27i-30 27.0'' Monitor, IPS panel , 1920 x 1080, VGA HDMI 1.4 ,Cables included - HDMI 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO S27i-30 27.0'' Monitor, IPS panel , 1920 x 1080, VGA HDMI 1.4 ,Cables included - HDMI 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "63DFKAT4EU"
+    ],
+    [
+     "Taille",
+     "27 pouces"
+    ],
+    [
+     "Résolution",
+     "1920 x 1080 (FHD) — 16:9"
+    ],
+    [
+     "Type de dalle",
+     "IPS, rétroéclairage WLED"
+    ],
+    [
+     "Luminosité",
+     "300 cd/m² (typique)"
+    ],
+    [
+     "Contraste",
+     "1300:1"
+    ],
+    [
+     "Taux de rafraîchissement",
+     "100 Hz"
+    ],
+    [
+     "Temps de réponse",
+     "4 ms (mode Extrême) / 6 ms (mode Normal)"
+    ],
+    [
+     "Angle de vision",
+     "178° H / 178° V"
+    ],
+    [
+     "Couverture colorimétrique",
+     "99% sRGB — 16,7 millions de couleurs"
+    ],
+    [
+     "Profondeur de couleur",
+     "8 bits (6 bits + FRC)"
+    ],
+    [
+     "Surface d'écran",
+     "Anti-reflet"
+    ],
+    [
+     "Ports",
+     "2x HDMI 1.4 (1920x1080@100Hz) 1x VGA 1x Audio jack 3,5 mm"
+    ],
+    [
+     "Réglages du pied",
+     "Inclinaison -5° à +22°"
+    ],
+    [
+     "Fixation VESA",
+     "100 x 100 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "63DFKAT4EU",
+    "url": "https://www.disway.com/lenovo-s27i-30-27-0-monitor-ips-panel-1920-x-1080-63dfkat4eu",
+    "catalogueTitle": "LENOVO S27i-30 27.0'' Monitor, IPS panel , 1920 x 1080, VGA HDMI 1.4 ,Cables included - HDMI 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-monitors-63dfkat4eu-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-monitors-64cbkat6eu",
+   "title": "LENOVO Moniteur S22-4e 21,5'' 36M",
+   "category": "monitors",
+   "image": "/images/disway/disway-preview-monitors-64cbkat6eu-1.webp",
+   "hover": "/images/disway/disway-preview-monitors-64cbkat6eu-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-monitors-64cbkat6eu-3.webp"
+   ],
+   "price": 1660,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "LENOVO Moniteur S22-4e 21,5'' 36M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "LENOVO Moniteur S22-4e 21,5'' 36M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "64CBKAT6EU"
+    ],
+    [
+     "Taille",
+     "21,5 pouces"
+    ],
+    [
+     "Résolution",
+     "1920 x 1080 (FHD) — 16:9"
+    ],
+    [
+     "Type de dalle",
+     "IPS, NearEdgeless 3 côtés, rétroéclairage WLED"
+    ],
+    [
+     "Luminosité",
+     "250 cd/m²"
+    ],
+    [
+     "Contraste",
+     "1300:1 (typique) / 3 000 000:1 (dynamique)"
+    ],
+    [
+     "Taux de rafraîchissement",
+     "100 Hz"
+    ],
+    [
+     "Temps de réponse",
+     "4 ms GtG (Extrême) / 6 ms GtG (Normal)"
+    ],
+    [
+     "Angle de vision",
+     "178° H / 178° V"
+    ],
+    [
+     "Couverture colorimétrique",
+     "99% sRGB — 16,7 millions de couleurs"
+    ],
+    [
+     "Ports",
+     "1x HDMI 1.4b (1920x1080@100Hz) 1x VGA"
+    ],
+    [
+     "Réglages du pied",
+     "Inclinaison -5° à +22°"
+    ],
+    [
+     "Fixation VESA",
+     "100 x 100 mm"
+    ],
+    [
+     "Couleur",
+     "Noir Raven"
+    ],
+    [
+     "Dimensions (avec pied)",
+     "489,3 x 174,0 x 379,4 mm"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "64CBKAT6EU",
+    "url": "https://www.disway.com/lenovo-moniteur-s22-4e-21-5-36m-64cbkat6eu",
+    "catalogueTitle": "LENOVO Moniteur S22-4e 21,5'' 36M"
+   },
+   "images": [
+    "/images/disway/disway-preview-monitors-64cbkat6eu-1.webp",
+    "/images/disway/disway-preview-monitors-64cbkat6eu-2.webp",
+    "/images/disway/disway-preview-monitors-64cbkat6eu-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-multimedia-51138",
+   "title": "Siberia Gaming Micro-casque 200 Proton Yellow",
+   "category": "multimedia",
+   "image": "/images/disway/disway-preview-multimedia-51138-1.webp",
+   "hover": "/images/disway/disway-preview-multimedia-51138-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-multimedia-51138-3.webp"
+   ],
+   "price": 1050,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Siberia Gaming Micro-casque 200 Proton Yellow — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Siberia Gaming Micro-casque 200 Proton Yellow — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "51138"
+    ],
+    [
+     "Haut-parleurs",
+     "50 mm, néodyme"
+    ],
+    [
+     "Réponse en fréquence",
+     "10 Hz - 28 kHz"
+    ],
+    [
+     "Sensibilité",
+     "112 dB"
+    ],
+    [
+     "Type",
+     "Circum-aural, fermé"
+    ],
+    [
+     "Type",
+     "Rétractable, unidirectionnel"
+    ],
+    [
+     "Réponse en fréquence",
+     "50 Hz - 16 kHz"
+    ],
+    [
+     "Sensibilité",
+     "-38 dB"
+    ],
+    [
+     "Impédance",
+     "2200 ohms"
+    ],
+    [
+     "Sur le câble",
+     "Molette de volume, coupure du micro"
+    ],
+    [
+     "Connecteurs",
+     "2 jacks 3,5 mm 3 pôles"
+    ],
+    [
+     "Adaptateur",
+     "Jack 3,5 mm 4 pôles (mobiles, consoles)"
+    ],
+    [
+     "Longueur du câble",
+     "1,8 m"
+    ],
+    [
+     "Couleur",
+     "Proton Yellow (noir et jaune)"
+    ],
+    [
+     "Arceau",
+     "Suspension"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "51138",
+    "url": "https://www.disway.com/siberia-gaming-micro-casque-200-proton-yellow-51138",
+    "catalogueTitle": "Siberia Gaming Micro-casque 200 Proton Yellow"
+   },
+   "images": [
+    "/images/disway/disway-preview-multimedia-51138-1.webp",
+    "/images/disway/disway-preview-multimedia-51138-2.webp",
+    "/images/disway/disway-preview-multimedia-51138-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-multimedia-77p35aa",
+   "title": "Poly Sync 40 USB-A Speakerphone",
+   "category": "multimedia",
+   "image": "/images/disway/disway-preview-multimedia-77p35aa-1.webp",
+   "hover": "/images/disway/disway-preview-multimedia-77p35aa-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-multimedia-77p35aa-3.webp"
+   ],
+   "price": 1090,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Poly Sync 40 USB-A Speakerphone — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Poly Sync 40 USB-A Speakerphone — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "77P35AA"
+    ],
+    [
+     "Micros",
+     "3, réseau orientable"
+    ],
+    [
+     "Haut-parleur",
+     "50 mm, bass-reflex à 2 radiateurs passifs"
+    ],
+    [
+     "Bande passante haut-parleur",
+     "75 Hz - 20 kHz"
+    ],
+    [
+     "Portée de captation",
+     "Jusqu'à 2,5 m"
+    ],
+    [
+     "Taille de salle conseillée",
+     "Jusqu'à 5 x 5 m"
+    ],
+    [
+     "Fonctions",
+     "Full-duplex, réduction du bruit et de l'écho"
+    ],
+    [
+     "Connexion",
+     "USB-A avec adaptateur USB-C + Bluetooth 5.1"
+    ],
+    [
+     "Profils Bluetooth",
+     "A2DP, AVRCP, HFP, HSP, BLE"
+    ],
+    [
+     "Chaînage",
+     "Liaison sans fil de 2 Sync 40"
+    ],
+    [
+     "Port de recharge",
+     "1 x USB-A pour smartphone"
+    ],
+    [
+     "Longueur du câble",
+     "1,05 m"
+    ],
+    [
+     "Tactiles",
+     "Décrocher/raccrocher, muet, volume +/-, bouton programmable, appairage Bluetooth, Microsoft Teams"
+    ],
+    [
+     "Boutons",
+     "Marche/arrêt, chaînage sans fil"
+    ],
+    [
+     "Type",
+     "Lithium-ion 5000 mAh"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "77P35AA",
+    "url": "https://www.disway.com/poly-sync-40-usb-a-speakerphone-77p35aa",
+    "catalogueTitle": "Poly Sync 40 USB-A Speakerphone"
+   },
+   "images": [
+    "/images/disway/disway-preview-multimedia-77p35aa-1.webp",
+    "/images/disway/disway-preview-multimedia-77p35aa-2.webp",
+    "/images/disway/disway-preview-multimedia-77p35aa-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-peripherals-240j7aa",
+   "title": "HP 150 Wired Mouse and Keyboard 12M",
+   "category": "peripherals",
+   "image": "/images/disway/disway-preview-peripherals-240j7aa-1.webp",
+   "hover": "/images/disway/disway-preview-peripherals-240j7aa-1.webp",
+   "gallery": [],
+   "price": 550,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HP 150 Wired Mouse and Keyboard 12M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HP 150 Wired Mouse and Keyboard 12M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "240J7AA"
+    ],
+    [
+     "Type",
+     "Pleine taille, disposition 2,5 zones"
+    ],
+    [
+     "Structure des touches",
+     "Piston, course basse de 2,5 mm"
+    ],
+    [
+     "Voyants",
+     "Verr. Maj, Verr. Num, Arrêt défil."
+    ],
+    [
+     "Capteur",
+     "Suivi optique rouge"
+    ],
+    [
+     "Boutons",
+     "3"
+    ],
+    [
+     "Connexion",
+     "Filaire USB Type-A"
+    ],
+    [
+     "Longueur du câble",
+     "100 cm"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions clavier (l x p x h)",
+     "42,59 x 14,61 x 2,68 cm"
+    ],
+    [
+     "Poids clavier",
+     "0,44 kg"
+    ],
+    [
+     "Dimensions souris (l x p x h)",
+     "10,34 x 6,11 x 3,42 cm"
+    ],
+    [
+     "Poids souris",
+     "0,06 kg"
+    ],
+    [
+     "Systèmes compatibles",
+     "Windows 11, Windows 10"
+    ],
+    [
+     "Configuration requise",
+     "Port USB-A disponible"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "240J7AA",
+    "url": "https://www.disway.com/hp-150-wired-mouse-and-keyboard-12m-240j7aa",
+    "catalogueTitle": "HP 150 Wired Mouse and Keyboard 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-peripherals-240j7aa-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-peripherals-265a9ut",
+   "title": "HP 125 Wired Mouse",
+   "category": "peripherals",
+   "image": "/images/disway/disway-preview-peripherals-265a9ut-1.webp",
+   "hover": "/images/disway/disway-preview-peripherals-265a9ut-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-peripherals-265a9ut-3.webp"
+   ],
+   "price": 590,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HP 125 Wired Mouse — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HP 125 Wired Mouse — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "265A9UT"
+    ],
+    [
+     "Capteur",
+     "Suivi optique rouge"
+    ],
+    [
+     "Résolution",
+     "Jusqu'à 1200 PPP"
+    ],
+    [
+     "Boutons",
+     "3"
+    ],
+    [
+     "Molette",
+     "Molette de défilement standard"
+    ],
+    [
+     "Forme",
+     "Ambidextre"
+    ],
+    [
+     "Connexion",
+     "Filaire USB Type-A"
+    ],
+    [
+     "Longueur du câble",
+     "1,8 m"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions (l x p x h)",
+     "11,2 x 6,3 x 3,6 cm"
+    ],
+    [
+     "Poids",
+     "80 g"
+    ],
+    [
+     "Systèmes compatibles",
+     "Windows 11, 10, 8, 7"
+    ],
+    [
+     "Configuration requise",
+     "Port USB disponible"
+    ],
+    [
+     "Contenu",
+     "Souris Guide de démarrage rapide Carte de garantie Notice produit"
+    ],
+    [
+     "Garantie",
+     "1 an (garantie limitée)"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "265A9UT",
+    "url": "https://www.disway.com/hp-125-wired-mouse-265a9ut",
+    "catalogueTitle": "HP 125 Wired Mouse"
+   },
+   "images": [
+    "/images/disway/disway-preview-peripherals-265a9ut-1.webp",
+    "/images/disway/disway-preview-peripherals-265a9ut-2.webp",
+    "/images/disway/disway-preview-peripherals-265a9ut-3.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-peripherals-2v9e6aa",
+   "title": "HP 330 Wireless Mouse & Keyboard Combo FR",
+   "category": "peripherals",
+   "image": "/images/disway/disway-preview-peripherals-2v9e6aa-1.webp",
+   "hover": "/images/disway/disway-preview-peripherals-2v9e6aa-1.webp",
+   "gallery": [],
+   "price": 630,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HP 330 Wireless Mouse & Keyboard Combo FR — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HP 330 Wireless Mouse & Keyboard Combo FR — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "2V9E6AA"
+    ],
+    [
+     "Type",
+     "Pleine taille, disposition 2,5 zones, avec pavé numérique"
+    ],
+    [
+     "Structure des touches",
+     "Piston, course basse de 2,5 mm"
+    ],
+    [
+     "Raccourcis",
+     "12 combinaisons avec la touche Fn"
+    ],
+    [
+     "Voyants",
+     "Verr. Num, Verr. Maj, Arrêt défil."
+    ],
+    [
+     "Capteur",
+     "Optique"
+    ],
+    [
+     "Résolution",
+     "1600 PPP"
+    ],
+    [
+     "Boutons",
+     "Gauche, droit, molette"
+    ],
+    [
+     "Connexion",
+     "Sans fil 2,4 GHz (dongle USB-A)"
+    ],
+    [
+     "Portée",
+     "Jusqu'à 10 m en espace dégagé"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions clavier (l x p x h)",
+     "42,58 x 14,61 x 2,68 cm"
+    ],
+    [
+     "Poids clavier",
+     "0,42 kg"
+    ],
+    [
+     "Dimensions souris (l x p x h)",
+     "10,3 x 6,11 x 3,4 cm"
+    ],
+    [
+     "Poids souris",
+     "0,05 kg"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "2V9E6AA",
+    "url": "https://www.disway.com/hp-330-wireless-mouse-1-keyboard-combo-fr-2v9e6aa",
+    "catalogueTitle": "HP 330 Wireless Mouse & Keyboard Combo FR"
+   },
+   "images": [
+    "/images/disway/disway-preview-peripherals-2v9e6aa-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-peripherals-4qm14aa",
+   "title": "HP Wired Mouse 1000",
+   "category": "peripherals",
+   "image": "/images/disway/disway-preview-peripherals-4qm14aa-1.webp",
+   "hover": "/images/disway/disway-preview-peripherals-4qm14aa-1.webp",
+   "gallery": [],
+   "price": 670,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "HP Wired Mouse 1000 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "HP Wired Mouse 1000 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "4QM14AA"
+    ],
+    [
+     "Capteur",
+     "Suivi optique rouge"
+    ],
+    [
+     "Résolution",
+     "Jusqu'à 1200 PPP"
+    ],
+    [
+     "Boutons",
+     "3"
+    ],
+    [
+     "Molette",
+     "Molette de défilement standard"
+    ],
+    [
+     "Forme",
+     "Ambidextre"
+    ],
+    [
+     "Connexion",
+     "Filaire USB Type-A"
+    ],
+    [
+     "Longueur du câble",
+     "1,5 m"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions (l x p x h)",
+     "10 x 5,85 x 3,95 cm"
+    ],
+    [
+     "Poids",
+     "0,07 kg"
+    ],
+    [
+     "Systèmes compatibles",
+     "Windows 11, 10, 8, 7"
+    ],
+    [
+     "Configuration requise",
+     "Port USB disponible"
+    ],
+    [
+     "Contenu",
+     "Souris HP Wired Mouse 1000 Notice produit Carte de garantie Guide de démarrage rapide"
+    ],
+    [
+     "Garantie",
+     "2 ans (garantie limitée)"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "4QM14AA",
+    "url": "https://www.disway.com/hp-wired-mouse-1000-4qm14aa",
+    "catalogueTitle": "HP Wired Mouse 1000"
+   },
+   "images": [
+    "/images/disway/disway-preview-peripherals-4qm14aa-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-software-6gq-01921",
+   "title": "Microsoft M365 Family French Subscr 1YR Africa Only Medialess Emerging Market P10",
+   "category": "software",
+   "image": "/images/disway/disway-preview-software-6gq-01921-1.webp",
+   "hover": "/images/disway/disway-preview-software-6gq-01921-1.webp",
+   "gallery": [],
+   "price": 2060,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Microsoft M365 Family French Subscr 1YR Africa Only Medialess Emerging Market P10 — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Microsoft M365 Family French Subscr 1YR Africa Only Medialess Emerging Market P10 — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "6GQ-01921"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "6GQ-01921",
+    "url": "https://www.disway.com/microsoft-m365-family-french-subscr-1yr-africa-onl-6gq--01921",
+    "catalogueTitle": "Microsoft M365 Family French Subscr 1YR Africa Only Medialess Emerging Market P10"
+   },
+   "images": [
+    "/images/disway/disway-preview-software-6gq-01921-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-software-79g-05401",
+   "title": "MS Office Home and Student 2021 French Africa Only Medialess",
+   "category": "software",
+   "image": "/images/disway/disway-preview-software-79g-05401-1.webp",
+   "hover": "/images/disway/disway-preview-software-79g-05401-1.webp",
+   "gallery": [],
+   "price": 2100,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "MS Office Home and Student 2021 French Africa Only Medialess — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "MS Office Home and Student 2021 French Africa Only Medialess — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "79G-05401"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "79G-05401",
+    "url": "https://www.disway.com/ms-office-home-and-student-2021-french-africa-only-79g--05401",
+    "catalogueTitle": "MS Office Home and Student 2021 French Africa Only Medialess"
+   },
+   "images": [
+    "/images/disway/disway-preview-software-79g-05401-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-software-cfq7ttc0lh18-001k",
+   "title": "MICROSOFT Microsoft 365 Business Basic and Microsoft 365 Copilot Business",
+   "category": "software",
+   "image": "/images/disway/disway-preview-software-cfq7ttc0lh18-001k-1.webp",
+   "hover": "/images/disway/disway-preview-software-cfq7ttc0lh18-001k-1.webp",
+   "gallery": [],
+   "price": 2140,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "MICROSOFT Microsoft 365 Business Basic and Microsoft 365 Copilot Business — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "MICROSOFT Microsoft 365 Business Basic and Microsoft 365 Copilot Business — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "CFQ7TTC0LH18-001K"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "CFQ7TTC0LH18-001K",
+    "url": "https://www.disway.com/microsoft-microsoft-365-business-basic-and-microso-cfq7ttc0lh18--001k",
+    "catalogueTitle": "MICROSOFT Microsoft 365 Business Basic and Microsoft 365 Copilot Business"
+   },
+   "images": [
+    "/images/disway/disway-preview-software-cfq7ttc0lh18-001k-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-software-hav-00123",
+   "title": "microsoft Win Pro FPP 10 P2 32-bit/64-bit French USB",
+   "category": "software",
+   "image": "/images/disway/disway-preview-software-hav-00123-1.webp",
+   "hover": "/images/disway/disway-preview-software-hav-00123-1.webp",
+   "gallery": [],
+   "price": 1900,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "microsoft Win Pro FPP 10 P2 32-bit/64-bit French USB — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "microsoft Win Pro FPP 10 P2 32-bit/64-bit French USB — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "HAV-00123"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ],
+    [
+     "Marque",
+     "MICROSOFT"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "HAV-00123",
+    "url": "https://www.disway.com/microsoft-win-pro-fpp-10-p2-32-bit-3-64-bit-french-hav--00123",
+    "catalogueTitle": "microsoft Win Pro FPP 10 P2 32-bit/64-bit French USB"
+   },
+   "images": [
+    "/images/disway/disway-preview-software-hav-00123-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-power-3p700f",
+   "title": "Eaton 3P Ellipse UPS FR,700 VA,420 W,Input: C14,Outputs:(3)French,(1)French surge only,Tower 24 Mois",
+   "category": "power",
+   "image": "/images/disway/disway-preview-power-3p700f-1.webp",
+   "hover": "/images/disway/disway-preview-power-3p700f-1.webp",
+   "gallery": [],
+   "price": 1090,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Eaton 3P Ellipse UPS FR,700 VA,420 W,Input: C14,Outputs:(3)French,(1)French surge only,Tower 24 Mois — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Eaton 3P Ellipse UPS FR,700 VA,420 W,Input: C14,Outputs:(3)French,(1)French surge only,Tower 24 Mois — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "3P700F"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Offline"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "36 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Offline"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "3P700F",
+    "url": "https://www.disway.com/eaton-3p-ellipse-ups-fr-700-va-420-w-input-5-c14-o-3p700f",
+    "catalogueTitle": "Eaton 3P Ellipse UPS FR,700 VA,420 W,Input: C14,Outputs:(3)French,(1)French surge only,Tower 24 Mois"
+   },
+   "images": [
+    "/images/disway/disway-preview-power-3p700f-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-power-3sm36",
+   "title": "Eaton 3S Mini 36W 12M",
+   "category": "power",
+   "image": "/images/disway/disway-preview-power-3sm36-1.webp",
+   "hover": "/images/disway/disway-preview-power-3sm36-1.webp",
+   "gallery": [],
+   "price": 1130,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Eaton 3S Mini 36W 12M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Eaton 3S Mini 36W 12M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "3SM36"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "3SM36",
+    "url": "https://www.disway.com/eaton-3s-mini-36w-12m-3sm36",
+    "catalogueTitle": "Eaton 3S Mini 36W 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-power-3sm36-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-power-5e1200ui",
+   "title": "Eaton 5E 1200 USB IEC G2 24M",
+   "category": "power",
+   "image": "/images/disway/disway-preview-power-5e1200ui-1.webp",
+   "hover": "/images/disway/disway-preview-power-5e1200ui-1.webp",
+   "gallery": [],
+   "price": 1170,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Eaton 5E 1200 USB IEC G2 24M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Eaton 5E 1200 USB IEC G2 24M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "5E1200UI"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "24 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Line Interactive"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "24 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Line Interactive"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "5E1200UI",
+    "url": "https://www.disway.com/eaton-5e-1200-usb-iec-g2-24m-5e1200ui",
+    "catalogueTitle": "Eaton 5E 1200 USB IEC G2 24M"
+   },
+   "images": [
+    "/images/disway/disway-preview-power-5e1200ui-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-power-5e1600ui",
+   "title": "Eaton 5E 1600 USB IEC G2 24M",
+   "category": "power",
+   "image": "/images/disway/disway-preview-power-5e1600ui-1.webp",
+   "hover": "/images/disway/disway-preview-power-5e1600ui-1.webp",
+   "gallery": [],
+   "price": 1210,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "Eaton 5E 1600 USB IEC G2 24M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "Eaton 5E 1600 USB IEC G2 24M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "5E1600UI"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "24 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Line Interactive"
+    ],
+    [
+     "Marque",
+     "EATON"
+    ],
+    [
+     "Garantie",
+     "24 Mois"
+    ],
+    [
+     "Type d'onduleur",
+     "Line Interactive"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "5E1600UI",
+    "url": "https://www.disway.com/eaton-5e-1600-usb-iec-g2-24m-5e1600ui",
+    "catalogueTitle": "Eaton 5E 1600 USB IEC G2 24M"
+   },
+   "images": [
+    "/images/disway/disway-preview-power-5e1600ui-1.webp"
+   ]
+  },
+  {
+   "slug": "disway-preview-printers-brother-ql-600",
+   "title": "BROTHER IMPRIMANTE Thermique QL-600 noir SFP 62mm R/V interfc USB 71mm/S PPM Noir . PPM Couleur 12M",
+   "category": "printers",
+   "image": "/images/disway/disway-preview-printers-brother-ql-600-1.webp",
+   "hover": "/images/disway/disway-preview-printers-brother-ql-600-2.webp",
+   "gallery": [
+    "/images/disway/disway-preview-printers-brother-ql-600-3.webp"
+   ],
+   "price": 2100,
+   "badge": "Draft",
+   "rating": 0,
+   "reviews": 0,
+   "stock": 0,
+   "short": "BROTHER IMPRIMANTE Thermique QL-600 noir SFP 62mm R/V interfc USB 71mm/S PPM Noir . PPM Couleur 12M — fiche importée du catalogue distributeur Disway.",
+   "description": [
+    "BROTHER IMPRIMANTE Thermique QL-600 noir SFP 62mm R/V interfc USB 71mm/S PPM Noir . PPM Couleur 12M — fiche importée du catalogue distributeur Disway.",
+    "Draft review listing built from the Disway catalogue. The MAD price is an experimental placeholder, not a supplier quote, and there is no stock or availability information."
+   ],
+   "specs": [
+    [
+     "Référence",
+     "QL-600B"
+    ],
+    [
+     "Technologie",
+     "Thermique directe"
+    ],
+    [
+     "Couleur d'impression",
+     "Noir"
+    ],
+    [
+     "Résolution",
+     "Jusqu'à 300 x 600 dpi"
+    ],
+    [
+     "Vitesse",
+     "Jusqu'à 44 étiquettes/min"
+    ],
+    [
+     "Longueur max.",
+     "Environ 1 m (3 pieds)"
+    ],
+    [
+     "Consommables",
+     "Rouleaux DK (étiquettes prédécoupées et rubans continus)"
+    ],
+    [
+     "Largeur max.",
+     "62 mm"
+    ],
+    [
+     "Coupe",
+     "Coupe-étiquette automatique"
+    ],
+    [
+     "Interface",
+     "USB"
+    ],
+    [
+     "Création d'étiquettes",
+     "Brother P-touch Editor"
+    ],
+    [
+     "Couleur",
+     "Noir"
+    ],
+    [
+     "Dimensions (L x P x H)",
+     "5,1 x 8,8 x 6,1 pouces (environ 13 x 22,4 x 15,5 cm)"
+    ],
+    [
+     "Poids",
+     "2,5 lb (environ 1,1 kg)"
+    ],
+    [
+     "Garantie",
+     "12 mois"
+    ]
+   ],
+   "source": {
+    "supplier": "Disway",
+    "reference": "QL-600B",
+    "url": "https://www.disway.com/brother-imprimante-thermique-ql-600-noir-sfp-62mm-ql--600b",
+    "catalogueTitle": "BROTHER IMPRIMANTE Thermique QL-600 noir SFP 62mm R/V interfc USB 71mm/S PPM Noir . PPM Couleur 12M"
+   },
+   "images": [
+    "/images/disway/disway-preview-printers-brother-ql-600-1.webp",
+    "/images/disway/disway-preview-printers-brother-ql-600-2.webp",
+    "/images/disway/disway-preview-printers-brother-ql-600-3.webp"
+   ]
+  }
+ ]
+}

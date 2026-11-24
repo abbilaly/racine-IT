@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import { imageUrl } from "@/lib/products";
+import { imageUrl, isDraftPreview } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
 export default function CompareTable() {
@@ -85,8 +85,12 @@ export default function CompareTable() {
                     <img src={imageUrl(p!.image)} alt={p!.title} />
                     <span>{p!.title}</span>
                   </Link>
-                  <button className="btn-dark compare-add" onClick={() => addToCart(p!.slug)}>
-                    Add to Cart
+                  <button
+                    className="btn-dark compare-add"
+                    disabled={isDraftPreview(p!)}
+                    onClick={() => addToCart(p!.slug)}
+                  >
+                    {isDraftPreview(p!) ? "Preview only" : "Add to Cart"}
                   </button>
                 </th>
               ))}

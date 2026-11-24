@@ -1,7 +1,18 @@
 import { DEFAULT_CURRENCY, formatMoney } from "@/lib/currency";
+import diswayPreviews from "@/data/disway-previews.json";
 
 export const ASSET = "/images";
 export const PAYMENTS = "/images/payment.webp";
+
+/** Neutral fallback shown when a product has no photo (and for draft previews). */
+export const PLACEHOLDER_IMAGE = "/images/placeholder-product.svg";
+
+/** Draft preview listings are not real offers; they are excluded from promotions. */
+export const DRAFT_PREVIEW_SLUG_PREFIX = "disway-preview-";
+
+export function isDraftPreview(product: { slug: string }): boolean {
+  return product.slug.startsWith(DRAFT_PREVIEW_SLUG_PREFIX);
+}
 
 export type Product = {
   slug: string;
@@ -15,6 +26,8 @@ export type Product = {
   origin?: string;
   image: string;
   hover: string;
+  /** Extra gallery photos, when the catalogue stores more than primary + hover. */
+  gallery?: string[];
   price: number;
   oldPrice?: number;
   badge?: string;
@@ -118,6 +131,9 @@ export const CATEGORY_SUBKEYS: Record<string, string[]> = {
   software: ["operating-systems", "productivity", "security", "creative", "b2b-licenses"],
   power: ["ups", "surge-protectors", "inverters", "battery-backups"],
 };
+
+/** Draft preview listings prepared for the empty categories (data/disway-previews.json). */
+const DISWAY_PREVIEW_PRODUCTS = diswayPreviews.products as unknown as Product[];
 
 export const products: Product[] = [
   {
@@ -426,6 +442,7 @@ export const products: Product[] = [
       ["Warranty", "12 months"],
     ],
   },
+  ...DISWAY_PREVIEW_PRODUCTS,
 ];
 
 export const productMap: Record<string, Product> = Object.fromEntries(
@@ -512,7 +529,8 @@ export function formatPrice(value: number, currency = DEFAULT_CURRENCY): string 
 }
 
 export function imageUrl(file: string): string {
-  if (!file) return "";
+  // One shared fallback for every surface that renders a product image.
+  if (!file) return PLACEHOLDER_IMAGE;
   if (/^(https?:)?\/\//.test(file) || file.startsWith("/")) return file;
   return `${ASSET}/${file}`;
 }
