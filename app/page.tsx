@@ -1,8 +1,7 @@
 import HomeView, { type HomeSlide } from "@/components/HomeView";
 import { requireCatalog } from "@/lib/server/catalog";
-import { isDraftPreview } from "@/lib/products";
+import { selectHomepageProducts } from "@/lib/homepage-products";
 import { bannerImageUrl, listPublicBanners } from "@/lib/server/banners";
-import { listBestSellers } from "@/lib/server/best-sellers";
 
 /**
  * Storefront home page.
@@ -18,7 +17,7 @@ import { listBestSellers } from "@/lib/server/best-sellers";
 export default async function HomePage() {
   const catalog = await requireCatalog();
 
-  const [{ rows }, bestSellers] = await Promise.all([listPublicBanners(), listBestSellers(5)]);
+  const { rows } = await listPublicBanners();
   const slides: HomeSlide[] = rows
     .filter(banner => banner.image_path)
     .map(banner => ({
@@ -36,20 +35,21 @@ export default async function HomePage() {
   // Owner-curated featured products (products.is_featured).
   const featuredSlugs = catalog.products.filter(product => product.featured).map(product => product.slug);
 
-  // Newest rows, by the timestamp the catalogue records.
-  const newArrivalSlugs = catalog.products
-    .filter(product => product.createdAt && !isDraftPreview(product))
-    .slice()
-    .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
-    .slice(0, 5)
-    .map(product => product.slug);
+  // Round-robin across categories, with no hardcoded product positions. The
+  // first row is curated when possible; otherwise it is a diverse in-stock
+  // selection. The second row covers the wider approved catalogue without
+  // repeating a product from the first. Draft previews stay off the homepage.
+  const selection = selectHomepageProducts(catalog.products, featuredSlugs, {
+    categoryOrder: catalog.categories.map(category => category.key),
+    featuredLimit: 5,
+    discoveryLimit: 10
+  });
 
   return (
     <HomeView
       slides={slides}
-      featuredSlugs={featuredSlugs}
-      newArrivalSlugs={newArrivalSlugs}
-      bestSellers={bestSellers}
+      featuredSlugs={selection.featured.map(product => product.slug)}
+      discoverySlugs={selection.discovery.map(product => product.slug)}
     />
   );
 }

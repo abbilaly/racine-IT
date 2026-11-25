@@ -46,7 +46,7 @@ html{scroll-behavior:smooth}
 .account-area span{font-size:11px;text-align:left;line-height:1.1}
 .account-area small{font-size:10px}
 .account-area i{position:absolute;top:-9px;right:-8px;background:#ec5865;border-radius:50%;width:16px;height:16px;display:grid;place-items:center;font-size:9px;font-style:normal}
-.cart-button i{left:18px;right:auto}
+.cart-button i{left:16px;right:auto}
 .mobile-menu-button{display:none;background:none;border:0;color:white}
 
 .main-nav{border-bottom:1px solid var(--line);background:#fff}
@@ -92,6 +92,35 @@ html{scroll-behavior:smooth}
 .category-item h3 span{font-weight:400;color:#888}
 .category-item>b{display:none}
 
+/* Homepage category shortcuts: all active categories, compact icon tiles. */
+.category-shortcuts{padding:26px 0 6px}
+.shortcut-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:15px}
+.shortcut-heading h2{margin:0;font-size:17px;line-height:1.2;letter-spacing:-.4px}
+.shortcut-heading a{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;white-space:nowrap}
+.shortcut-rail{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;max-width:100%}
+.shortcut{display:flex;align-items:center;gap:9px;min-width:0;min-height:56px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.shortcut:hover{border-color:#cfc7e2;box-shadow:0 6px 18px rgba(16,0,36,.06);transform:translateY(-1px)}
+.shortcut-icon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:#f3efff;color:#5a2ca0}
+/* Tiles with restored artwork keep the same box; the illustration gets the
+   taller slot the icon padding frees up. */
+.shortcut.has-art{padding-top:6px;padding-bottom:6px}
+.shortcut-art{display:block;width:42px;height:42px;flex:0 0 42px}
+.shortcut-art img{display:block;width:100%;height:100%;object-fit:contain}
+.shortcut-label{min-width:0;font-size:11px;line-height:1.25;font-weight:600;color:#1d1826;overflow-wrap:anywhere}
+@media (max-width:1050px){.shortcut-rail{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:760px){
+  .category-shortcuts{padding:22px 0 2px}
+  .shortcut-heading{margin-bottom:12px}
+  .shortcut-heading h2{font-size:15px}
+  .shortcut-heading a{font-size:10px}
+  .shortcut-rail{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:9px;padding:1px 0 6px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .shortcut-rail::-webkit-scrollbar{display:none}
+  .shortcut{flex:0 0 124px;min-height:76px;flex-direction:column;justify-content:center;gap:6px;padding:9px 8px;text-align:center;scroll-snap-align:start}
+  .shortcut-icon{width:30px;height:30px;flex:0 0 30px}
+  .shortcut-art{width:40px;height:40px;flex:0 0 40px}
+  .shortcut-label{font-size:10px;line-height:1.2}
+}
+
 .section{padding:8px 0 52px}
 .deals-heading,.title-line{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .deals-heading h2,.title-line h2{font-size:27px;letter-spacing:-1px;margin:0}
@@ -117,6 +146,8 @@ html{scroll-behavior:smooth}
 .product-brand{display:block;font-size:9px;line-height:1.3;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b8b8b;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .product-copy>a{font-size:11px;line-height:1.45;font-weight:600;display:block;min-height:47px}
 .rating,.mini-rating{color:#e9b83c;font-size:9px;letter-spacing:1px;margin-top:6px}
+.rating-empty{color:#a0a0aa;font-size:9px;letter-spacing:0}
+.product-category{display:block;font-size:9px;line-height:1.3;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#a0a0aa;margin:-2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .price-line{display:flex;gap:6px;margin-top:6px;align-items:center}
 .price-line del,.mini-product del{font-size:10px;color:#999}
 .price-line strong{font-size:12px}
@@ -1315,13 +1346,13 @@ body:has(.compare-tray) .footer{padding-bottom:78px}
 /* ---- AB Tech completion: responsive hero focal points & category hub ---- */
 .hero-slide picture{display:block;width:100%;height:100%}
 .hero-slide img{object-position:var(--focus-desktop,center)}
-@media (max-width:767px){.hero-slide img{object-position:var(--focus-mobile,center)}}
+@media (max-width:760px){.hero-slide img{object-position:var(--focus-mobile,center)}}
 .pd-perks li{align-items:flex-start;line-height:1.55}
 .pd-perks li a{color:#100024;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .pd-perks-sep{color:#c9c9d3;margin:0 2px}
 .categories-page{padding-bottom:16px}
 .section-note{margin:10px 0 0;font-size:11px;color:#8a8a95}
-@media (max-width:767px){
+@media (max-width:760px){
   .hero-slide::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(16,0,36,.86) 0%,rgba(16,0,36,.62) 48%,rgba(16,0,36,0) 82%)}
   .hero-text{width:74%}
 }

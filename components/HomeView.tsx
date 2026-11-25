@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ChevronLeft, ChevronRight, Headphones, RotateCcw, Truck } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import MiniProduct from "@/components/MiniProduct";
 import { ASSET } from "@/lib/products";
+import { categoryArt } from "@/lib/category-art";
+import { categoryIcon } from "@/lib/category-icons";
 import { useShop } from "@/lib/shop-store";
 import CategoryPanel from "@/components/CategoryPanel";
 
@@ -77,16 +78,13 @@ const fallbackSlides: Slide[] = [
 export default function HomeView({
   slides: managedSlides = [],
   featuredSlugs = [],
-  newArrivalSlugs = [],
-  bestSellers = []
+  discoverySlugs = []
 }: {
   slides?: HomeSlide[];
-  /** products.is_featured, chosen by the owner in the admin. */
+  /** Curated products or the server's diverse fallback selection. */
   featuredSlugs?: string[];
-  /** Newest catalogue rows, by products.created_at. */
-  newArrivalSlugs?: string[];
-  /** Real units sold, counted from non-cancelled orders. */
-  bestSellers?: { slug: string; units: number }[];
+  /** Wider category-diverse selection, disjoint from featuredSlugs. */
+  discoverySlugs?: string[];
 }) {
   const { products, categories: catalogCategories } = useShop();
 
@@ -122,45 +120,13 @@ export default function HomeView({
     return match ? `/shop?category=${match.key}` : "/shop";
   };
 
-  const categoryImages = [
-    "h-electro-pulse-cat-2.webp",
-    "h-electro-pulse-cat-3.webp",
-    "h-electro-pulse-cat-5.webp",
-    "h-electro-pulse-cat-6.webp"
-  ];
-  const categoryTiles = [
-    { key: "all", name: "All Products", image: "h-electro-pulse-cat-1.webp", href: "/shop" },
-    ...catalogCategories.slice(0, 4).map((category, index) => ({
-      key: category.key,
-      name: category.label,
-      image: categoryImages[index % categoryImages.length],
-      href: `/shop?category=${category.key}`
-    }))
-  ];
-  // The catalogue can change at runtime, so pick by index defensively.
-  const pick = (indexes: number[]) =>
-    indexes
-      .map(i => products[i])
-      .filter((p): p is NonNullable<typeof p> => Boolean(p));
-  const popularPicks = pick([5, 6, 7, 8]);
-  const highlightPicks = pick([11, 9, 6]);
-
-  // Homepage rows follow real catalogue flags, timestamps and sales.
+  // Resolve only the slugs selected on the server; no array-position picks.
   const productsBySlug = (slugs: string[]) =>
     slugs
       .map(slug => products.find(p => p.slug === slug))
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
   const featuredProducts = productsBySlug(featuredSlugs);
-  // With no product flagged as featured, the first catalogue rows keep the
-  // section populated rather than leaving an empty block.
-  const featuredRow = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 5);
-  const newArrivalProducts = productsBySlug(newArrivalSlugs);
-  const bestSellerProducts = bestSellers
-    .map(entry => ({ product: products.find(p => p.slug === entry.slug), units: entry.units }))
-    .filter(
-      (entry): entry is { product: NonNullable<(typeof products)[number]>; units: number } =>
-        Boolean(entry.product)
-    );
+  const discoveryProducts = productsBySlug(discoverySlugs);
 
   /** Applies each slide's focal point as CSS custom properties. */
   const focusStyle = (s: Slide): CSSProperties =>
@@ -204,11 +170,11 @@ export default function HomeView({
           {slides.map((s, i) => (
             <div
               className={`hero-slide ${i === slide ? "active" : ""}`}
-              key={s.title}
+              key={`${s.title}-${i}`}
               style={focusStyle(s)}
             >
               <picture>
-                {s.mobileImage && <source media="(max-width: 767px)" srcSet={s.mobileImage} />}
+                {s.mobileImage && <source media="(max-width: 760px)" srcSet={s.mobileImage} />}
                 <img src={s.image} alt="" />
               </picture>
               <div className="hero-text">
@@ -270,88 +236,76 @@ export default function HomeView({
         </div>
       </section>
 
-      <section className="category-row site-shell" aria-label="Product categories">
-        {categoryTiles.map(tile => (
-          <Link className="category-item" key={tile.key} href={tile.href}>
-            <div className="category-image"><img src={`${ASSET}/${tile.image}`} alt="" loading="lazy" /></div>
-            <h3>{tile.name}</h3>
-          </Link>
-        ))}
-      </section>
-
-      <section className="section site-shell">
-        <div className="title-line">
-          <h2>Featured Products</h2>
-          <Link href="/shop">View All <ChevronRight size={15} /></Link>
-        </div>
-        <div className="deal-grid">
-          {featuredRow.map(p => <ProductCard product={p} key={p.slug} />)}
-        </div>
-      </section>
-
-      <section className="section site-shell">
-        <div className="title-line"><h2>Popular Picks</h2><Link href="/shop">View All <ChevronRight size={15} /></Link></div>
-        <div className="popular-grid">
-          <div className="popular-products">
-            {popularPicks.map(p => (
-              <MiniProduct product={p} key={p.slug} />
-            ))}
+      {catalogCategories.length > 0 && (
+        <section className="category-shortcuts site-shell" aria-labelledby="category-shortcuts-title">
+          <div className="shortcut-heading">
+            <h2 id="category-shortcuts-title">Shop by category</h2>
+            <Link href="/categories">All categories <ChevronRight size={14} /></Link>
           </div>
-          <Link className="wide-promo desert" href={categoryHref("smartphones", /tablet|ipad/i)}>
-            <img src={`${ASSET}/h-electro-pulse-banner-4.webp`} alt="" loading="lazy" />
-            <div><span>TABLETS</span><h2>Tablets for Work & Play</h2><p>Browse tablets and accessories.</p><b>Shop now</b></div>
-          </Link>
-        </div>
-      </section>
-
-      {newArrivalProducts.length > 0 && (
-        <section className="section site-shell">
-          <div className="title-line"><h2>New Arrivals</h2><Link href="/shop?sort=featured">View All <ChevronRight size={15} /></Link></div>
-          <div className="best-grid">
-            {newArrivalProducts.map(p => <ProductCard product={p} key={p.slug} />)}
+          <div className="shortcut-rail">
+            {catalogCategories.map(category => {
+              const Icon = categoryIcon(category.key);
+              // Category illustrations replace the icon where original
+              // artwork exists; see lib/category-art.ts to swap or add art.
+              const art = categoryArt(category.key);
+              return (
+                <Link
+                  key={category.key}
+                  className={art ? "shortcut has-art" : "shortcut"}
+                  href={`/shop?category=${encodeURIComponent(category.key)}`}
+                  title={category.label}
+                >
+                  {art ? (
+                    <span className="shortcut-art" aria-hidden="true">
+                      <img
+                        src={art.src}
+                        alt=""
+                        width={art.width}
+                        height={art.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </span>
+                  ) : (
+                    <span className="shortcut-icon" aria-hidden="true">
+                      <Icon size={20} strokeWidth={1.8} />
+                    </span>
+                  )}
+                  <span className="shortcut-label">{category.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
 
-      {/* Shown only when the store has real, non-cancelled sales to rank. */}
-      {bestSellerProducts.length > 0 && (
+      {featuredProducts.length > 0 && (
         <section className="section site-shell">
           <div className="title-line">
-            <h2>Best Selling</h2>
+            <h2>Featured Products</h2>
+            <Link href="/shop">View All <ChevronRight size={15} /></Link>
+          </div>
+          <div className="deal-grid">
+            {featuredProducts.map(product => (
+              <ProductCard product={product} showCategory key={product.slug} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {discoveryProducts.length > 0 && (
+        <section className="section site-shell">
+          <div className="title-line">
+            <h2>Explore the catalogue</h2>
             <Link href="/shop">View All <ChevronRight size={15} /></Link>
           </div>
           <div className="best-grid">
-            {bestSellerProducts.map(entry => <ProductCard product={entry.product} key={entry.product.slug} />)}
+            {discoveryProducts.map(product => (
+              <ProductCard product={product} showCategory key={product.slug} />
+            ))}
           </div>
-          <p className="section-note">Ranked by units sold in actual store orders.</p>
         </section>
       )}
-
-      <section className="section site-shell brands-section">
-        <div className="title-line"><h2>Featured Brands</h2><Link href="/shop">View All <ChevronRight size={15} /></Link></div>
-        <div className="brand-grid">
-          {[1, 2, 3, 4, 5].map(n => (
-            <Link key={n} href="/shop"><img src={`${ASSET}/h-electro-pulse-brand-${n}.webp`} alt="" loading="lazy" /></Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="highlight site-shell">
-        <div className="highlight-slider">
-          <img src={`${ASSET}/h-electro-pulse-hightlight-1.webp`} alt="" loading="lazy" />
-          <div className="highlight-copy">
-            <span>Portable audio</span>
-            <h2>Small Size Big Sound</h2>
-            <p>Compact, portable speakers and headphones for desk, home and travel.</p>
-            <Link href={categoryHref("multimedia", /audio|multimedia|headphone|speaker/i)}>Shop Now</Link>
-          </div>
-        </div>
-        <div className="highlight-products">
-          {highlightPicks.map(p => (
-            <MiniProduct product={p} key={p.slug} />
-          ))}
-        </div>
-      </section>
 
       <section className="benefits site-shell">
         <div><Truck /><span><strong>Delivery options</strong><small>Standard and express delivery choices with costs shown at checkout.</small></span></div>

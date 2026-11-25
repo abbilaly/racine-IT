@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { categoryIcon } from "@/lib/category-icons";
 import { useShop } from "@/lib/shop-store";
-import { imageUrl } from "@/lib/products";
+import { imageUrl, isDraftPreview } from "@/lib/products";
 
 /**
  * Product Categories sidebar.
@@ -32,7 +32,9 @@ export default function CategoryPanel() {
   const items = useMemo(
     () =>
       categories.map(cat => {
-        const list = products.filter(p => p.category === cat.key);
+        // Draft previews are available on their labelled shop pages, but the
+        // homepage flyout must not present them as normal purchasable stock.
+        const list = products.filter(p => p.category === cat.key && !isDraftPreview(p));
         return {
           key: cat.key,
           label: cat.label,

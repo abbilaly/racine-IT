@@ -5,12 +5,21 @@ import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
 import { imageUrl, isDraftPreview, type Product } from "@/lib/products";
 import { useShop } from "@/lib/shop-store";
 
-export default function ProductCard({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, money } = useShop();
+export default function ProductCard({
+  product,
+  showCategory = false
+}: {
+  product: Product;
+  /** Show the catalogue category under the brand, used on the homepage. */
+  showCategory?: boolean;
+}) {
+  const { addToCart, toggleWishlist, toggleCompare, inWishlist, inCompare, money, categoryLabel } =
+    useShop();
   const wished = inWishlist(product.slug);
   const compared = inCompare(product.slug);
   // Draft review listings are display-only until the owner approves price and stock.
   const draft = isDraftPreview(product);
+  const rating = Math.max(0, Math.min(5, Math.round(product.rating)));
 
   return (
     <article className="product-card">
@@ -44,10 +53,21 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="product-copy">
         {product.brand && <span className="product-brand">{product.brand}</span>}
+        {showCategory && <span className="product-category">{categoryLabel(product.category)}</span>}
         <Link href={`/product/${product.slug}`}>{product.title}</Link>
-        <div className="rating" aria-label={`${product.rating} out of 5 stars, ${product.reviews} reviews`}>
-          ★★★★★ <small>({product.reviews})</small>
-        </div>
+        {product.reviews > 0 ? (
+          <div
+            className="rating"
+            aria-label={`${product.rating} out of 5 stars, ${product.reviews} reviews`}
+          >
+            <span aria-hidden="true">
+              {"★".repeat(rating)}{"☆".repeat(5 - rating)}
+            </span>{" "}
+            <small>({product.reviews})</small>
+          </div>
+        ) : (
+          <div className="rating rating-empty">No reviews yet</div>
+        )}
         <div className="price-line">
           {product.oldPrice && <del>{money(product.oldPrice)}</del>}
           <strong>{money(product.price)}</strong>

@@ -9,6 +9,7 @@ import {
   Laptop,
   LayoutGrid,
   Monitor,
+  PcCase,
   Printer,
   Router,
   Server,
@@ -30,7 +31,7 @@ import {
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   // Approved taxonomy (0007)
   computers: Laptop,
-  desktops: Monitor,
+  desktops: PcCase,
   servers: Server,
   networking: Router,
   components: Cpu,
@@ -56,7 +57,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
  */
 const ICON_BY_KEY: Record<string, LucideIcon> = {
   laptop: Laptop,
-  desktop: Monitor,
+  desktop: PcCase,
   server: Server,
   router: Router,
   cpu: Cpu,

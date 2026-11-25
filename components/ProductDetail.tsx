@@ -83,8 +83,17 @@ export default function ProductDetail({ product }: { product: Product }) {
         </Link>
         <h1>{product.title}</h1>
         <div className="pd-rating">
-          <span className="rating">★★★★★</span>
-          <small>{product.rating}.0 · {product.reviews} reviews</small>
+          {product.reviews > 0 ? (
+            <>
+              <span className="rating" aria-label={`${product.rating} out of 5 stars`}>
+                {"★".repeat(Math.max(0, Math.min(5, Math.round(product.rating))))}
+                {"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(product.rating))))}
+              </span>
+              <small>{product.rating.toFixed(1)} · {product.reviews} reviews</small>
+            </>
+          ) : (
+            <small className="rating-empty">No reviews yet</small>
+          )}
         </div>
 
         <div className="pd-price">
